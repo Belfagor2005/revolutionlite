@@ -181,31 +181,6 @@ def trace_error():
     except:
         pass
 
-# def getUrl(url):
-       # print("Here in client2 getUrl url =", url)
-       # req = Request(url)
-       # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-       # response = urlopen(req)
-       # link=response.read()
-       # response.close()
-       # return link
-
-# def make_request(url):
-    # try:
-        # req = Request(url)
-        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
-        # response = urlopen(req)
-        # link = response.read()
-        # response.close()
-        # return link
-    # except:
-        # e = URLError #, e:
-        # print('We failed to open "%s".' % url)
-        # if hasattr(e, 'code'):
-            # print('We failed with error code - %s.' % e.code)
-        # if hasattr(e, 'reason'):
-            # print('We failed to reach a server.')
-            # print('Reason: ', e.reason)
 def make_request(url):
     try:
         import requests
@@ -304,22 +279,11 @@ if not os.path.exists(revol):
 
 logdata("path picons: ", str(revol))
 
-# if HD.width() > 1280:
-    # if eDreamOS:
-        # skin_path = plugin_path + '/res/skins/fhd/dreamOs/'
-    # else:
-        # skin_path = plugin_path + '/res/skins/fhd/'
-# else:
-    # if eDreamOS:
-        # skin_path = plugin_path + '/res/skins/hd/dreamOs/'
-    # else:
-        # skin_path = plugin_path + '/res/skins/hd/'
-
 if HD.width() > 1280:
     skin_path = res_plugin_path + 'skins/fhd/'
 else:
     skin_path = res_plugin_path + 'skins/hd/'
-if mpdDreamOs:
+if eDreamOS:
     skin_path = skin_path + 'dreamOs/'
 
 
