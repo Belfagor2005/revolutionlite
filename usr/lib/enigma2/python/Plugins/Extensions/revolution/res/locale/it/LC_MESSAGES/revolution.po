@@ -1,0 +1,163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: revolution\n"
+"POT-Creation-Date: 2021-04-03 18:36+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"X-Poedit-Basepath: ../../../..\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
+
+#: plugin.py:233
+msgid "IPTV(4097)"
+msgstr ""
+
+#: plugin.py:234
+msgid "Dvb(1)"
+msgstr ""
+
+#: plugin.py:235
+msgid "eServiceUri(8193)"
+msgstr ""
+
+#: plugin.py:239
+msgid "Gstreamer(5001)"
+msgstr ""
+
+#: plugin.py:241
+msgid "Exteplayer3(5002)"
+msgstr ""
+
+#: plugin.py:243
+msgid "Streamlink(5002)"
+msgstr ""
+
+#: plugin.py:360 plugin.py:541 plugin.py:804 plugin.py:1035 plugin.py:1273
+#: plugin.py:1519 plugin.py:1763
+msgid "Cache folder "
+msgstr ""
+
+#: plugin.py:367 plugin.py:538 plugin.py:802 plugin.py:1033 plugin.py:1271
+#: plugin.py:1517 plugin.py:1761
+msgid "Load selected filter list, please wait ..."
+msgstr "Carica l'elenco di filtri selezionato, attendi ..."
+
+#: plugin.py:368 plugin.py:2158
+msgid "Select"
+msgstr "Seleziona"
+
+#: plugin.py:369 plugin.py:2157
+msgid "Exit"
+msgstr "Uscire"
+
+#: plugin.py:371
+msgid "Restart"
+msgstr "Riavviare"
+
+#: plugin.py:406
+msgid "Do you want to restart Enigma?"
+msgstr "Vuoi riavviare Enigma?"
+
+#: plugin.py:463
+msgid ":P  COMING SOON!!!"
+msgstr ""
+
+#: plugin.py:553 plugin.py:816 plugin.py:1047 plugin.py:1285 plugin.py:1531
+#: plugin.py:1775
+msgid "Download"
+msgstr ""
+
+#: plugin.py:554 plugin.py:817 plugin.py:1048 plugin.py:1286 plugin.py:1532
+#: plugin.py:1776 plugin.py:2009
+msgid "Back"
+msgstr "Indietro"
+
+#: plugin.py:1999
+msgid "Config"
+msgstr "Config"
+
+#: plugin.py:2005
+msgid "Config Revolution"
+msgstr ""
+
+#: plugin.py:2006
+msgid "Choice"
+msgstr "Scegli"
+
+#: plugin.py:2008
+msgid "Save"
+msgstr "Salva"
+
+#: plugin.py:2032
+#, python-format
+msgid ""
+"Config Panel Addon\n"
+"Your current IP is %s"
+msgstr ""
+"Config Panel Addon\n"
+"Il tuo IP attuale è %s"
+
+#: plugin.py:2037
+msgid "Set the path to the Cache folder"
+msgstr ""
+
+#: plugin.py:2037
+msgid "Press Ok to select the folder containing the picons files"
+msgstr "Premere Ok per selezionare la cartella contenente i file picons"
+
+#: plugin.py:2038
+msgid "Services Player Reference type"
+msgstr ""
+
+#: plugin.py:2038
+msgid "Configure Service Player Reference"
+msgstr ""
+
+#: plugin.py:2071
+msgid "Restart Enigma is Required. Do you want to continue?"
+msgstr "E' richiesto il riavvio Enigma. Vuoi continuare?"
+
+#: plugin.py:2090
+msgid "Choose Directory:"
+msgstr "Scegli cartella"
+
+#: plugin.py:2091
+msgid "Choose Directory"
+msgstr ""
+
+#: plugin.py:2133
+msgid "Really close without saving the settings?"
+msgstr "Uscire senza salvare le impostazioni?"
+
+#: plugin.py:2426
+msgid "4:3 Letterbox"
+msgstr ""
+
+#: plugin.py:2427
+msgid "4:3 PanScan"
+msgstr ""
+
+#: plugin.py:2428
+msgid "16:9"
+msgstr ""
+
+#: plugin.py:2429
+msgid "16:9 always"
+msgstr ""
+
+#: plugin.py:2430
+msgid "16:10 Letterbox"
+msgstr ""
+
+#: plugin.py:2431
+msgid "16:10 PanScan"
+msgstr ""
+
+#: plugin.py:2432
+msgid "16:9 Letterbox"
+msgstr ""
