@@ -9,7 +9,8 @@ Info http://t.me/tivustream
 ****************************************
 '''
 from __future__ import print_function
-from . import _ , UrlLst
+from . import _
+# from . __init__ import UrlLst
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
@@ -54,6 +55,9 @@ from enigma import getDesktop, loadPNG, gFont
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
 import base64
+UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
+UrlSvr = UrlSvr.replace('+', '')
+UrlLst = base64.b64decode(UrlSvr)
 import os
 import re
 import sys
@@ -677,14 +681,14 @@ class live_stream(Screen):
         self.namex = name
         self.urlx=url
         self.picx = pic
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text=name)
+        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
 
     def filterChannels(self, result):
         if result:
             global search
             search = False
             pic = self.picx
-            name = self.namex
+            name = str(result) #self.namex
             url = self.urlx + str(result)
             if nextmodule == 'Videos4':
                 search = True
