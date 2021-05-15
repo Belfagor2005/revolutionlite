@@ -726,10 +726,21 @@ class live_stream(Screen):
         self.close(None)
 
     def up(self):
-        self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
-
+        # self[self.currentList].up()
+        # self.load_infos()
+        # self.load_poster()    
+    
+        idx = self["text"].getSelectionIndex()
+        print('idx: ', idx)
+       
+        if idx is not None or idx != -1:
+        
+            self[self.currentList].up()
+            self.load_infos()
+            self.load_poster()
+        else:
+            return
+        
     def down(self):
         self[self.currentList].down()
         self.load_infos()
