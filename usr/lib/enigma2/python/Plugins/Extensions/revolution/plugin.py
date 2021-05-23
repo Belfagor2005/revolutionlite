@@ -108,17 +108,13 @@ def getversioninfo():
 
 PY3 = sys.version_info[0] == 3
 if PY3:
-    from urllib.request import urlopen, Request
+    from urllib.request import urlopen, Request, urlretrieve
     from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import urlencode, quote
-    from urllib.request import urlretrieve
+    from urllib.parse import urlencode, quote, urlparse
 else:
-    from urllib2 import urlopen, Request
-    from urllib2 import URLError, HTTPError
+    from urllib2 import urlopen, Request, urlretrieve, URLError, HTTPError
     from urlparse import urlparse
     from urllib import urlencode, quote
-    from urllib import urlretrieve
 
 eDreamOS = False
 try:
@@ -126,11 +122,6 @@ try:
     eDreamOS = True
 except:
     eDreamOS = False
-
-try:
-    from enigma import eDVBDB
-except ImportError:
-    eDVBDB = None
 
 def checkStr(txt):
     if PY3:
@@ -587,7 +578,7 @@ class live_stream(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print('live_stream content B =', content)
         y = json.loads(content)
         self.names = []
@@ -729,12 +720,10 @@ class live_stream(Screen):
         # self[self.currentList].up()
         # self.load_infos()
         # self.load_poster()    
-    
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
        
         if idx is not None or idx != -1:
-        
             self[self.currentList].up()
             self.load_infos()
             self.load_poster()
@@ -916,7 +905,7 @@ class video3(Screen):
     #4
     def readJsonFile(self, name, url, pic):
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("Videos3 content A =", content)
         y = json.loads(content)
         self.names = []
@@ -1156,7 +1145,7 @@ class nextvideo3(Screen):
     #4
     def readJsonFile(self, name, url, pic):
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("nextVideos3 content A =", content)
         y = json.loads(content)
         self.names = []
@@ -1395,7 +1384,7 @@ class video4(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("content Video4 =", content)
         y = json.loads(content)
         print("y =", y)
@@ -1637,7 +1626,7 @@ class nextvideo4(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("content A =", content)
         y = json.loads(content)
         print("y =", y)
@@ -1881,7 +1870,7 @@ class video1(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("content Video1 =", content)
         y = json.loads(content)
         print("y =", y)
@@ -2135,7 +2124,7 @@ class nextvideo1(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("content nextvideo1 =", content)
         y = json.loads(content)
         print("y =", y)
@@ -2386,7 +2375,7 @@ class video5(Screen):
     #vid4
     def readJsonFile(self, name, url, pic):
         content = make_request(url)
-        content = six.ensure_str(content)
+        # content = six.ensure_str(content)
         print("content A =", content)
         y = json.loads(content)
         print("y =", y)
@@ -3364,6 +3353,8 @@ def main(session, **kwargs):
     if checks:
         if PY3:
             session.open(Revolmain)
+        elif eDreamOS:
+            session.open(Revolmain)        
         else:
             session.open(plgnstrt)
     else:
