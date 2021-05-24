@@ -108,11 +108,11 @@ def getversioninfo():
 
 PY3 = sys.version_info[0] == 3
 if PY3:
-    from urllib.request import urlopen, Request, urlretrieve
+    from urllib.request import urlopen, Request
     from urllib.error import URLError, HTTPError
     from urllib.parse import urlencode, quote, urlparse
 else:
-    from urllib2 import urlopen, Request, urlretrieve, URLError, HTTPError
+    from urllib2 import urlopen, Request, URLError, HTTPError
     from urlparse import urlparse
     from urllib import urlencode, quote
 
