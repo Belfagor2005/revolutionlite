@@ -6,7 +6,7 @@ import binascii
 import collections
 import ctypes
 import email
-# import getpass
+import getpass
 import io
 import itertools
 import optparse
@@ -72,6 +72,15 @@ try:
     import http.cookies as compat_cookies
 except ImportError:  # Python 2
     import Cookie as compat_cookies
+
+if sys.version_info[0] == 2:
+    class compat_cookies_SimpleCookie(compat_cookies.SimpleCookie):
+        def load(self, rawdata):
+            if isinstance(rawdata, compat_str):
+                rawdata = str(rawdata)
+            return super(compat_cookies_SimpleCookie, self).load(rawdata)
+else:
+    compat_cookies_SimpleCookie = compat_cookies.SimpleCookie
 
 try:
     import html.entities as compat_html_entities
@@ -2345,7 +2354,7 @@ except ImportError:  # Python <3.4
 
         # HTMLParseError has been deprecated in Python 3.3 and removed in
         # Python 3.5. Introducing dummy exception for Python >3.5 for compatible
-        # and uniform cross-version exceptiong handling
+        # and uniform cross-version exception handling
         class compat_HTMLParseError(Exception):
             pass
 
@@ -2786,14 +2795,14 @@ else:
         print(s)
 
 
-# if sys.version_info < (3, 0) and sys.platform == 'win32':
-    # def compat_getpass(prompt, *args, **kwargs):
-        # if isinstance(prompt, compat_str):
-            # from .utils import preferredencoding
-            # prompt = prompt.encode(preferredencoding())
-        # return getpass.getpass(prompt, *args, **kwargs)
-# else:
-    # compat_getpass = getpass.getpass
+if sys.version_info < (3, 0) and sys.platform == 'win32':
+    def compat_getpass(prompt, *args, **kwargs):
+        if isinstance(prompt, compat_str):
+            from .utils import preferredencoding
+            prompt = prompt.encode(preferredencoding())
+        return getpass.getpass(prompt, *args, **kwargs)
+else:
+    compat_getpass = getpass.getpass
 
 try:
     compat_input = raw_input
@@ -3000,6 +3009,7 @@ __all__ = [
     'compat_cookiejar',
     'compat_cookiejar_Cookie',
     'compat_cookies',
+    'compat_cookies_SimpleCookie',
     'compat_ctypes_WINFUNCTYPE',
     'compat_etree_Element',
     'compat_etree_fromstring',
@@ -3007,7 +3017,7 @@ __all__ = [
     'compat_expanduser',
     'compat_get_terminal_size',
     'compat_getenv',
-    # 'compat_getpass',
+    'compat_getpass',
     'compat_html_entities',
     'compat_html_entities_html5',
     'compat_http_client',

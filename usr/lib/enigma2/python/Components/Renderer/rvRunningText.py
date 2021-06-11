@@ -1,3 +1,4 @@
+from __future__ import absolute_import                                      
 ################################################################################
 #    RunningText.py - Running Text Renderer for Enigma2
 #    Version: 1.5 (04.04.2012 23:40)
@@ -32,7 +33,7 @@ from enigma import eWidget, eLabel, eTimer, ePoint, eSize, gFont, \
 	RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_HALIGN_RIGHT, RT_HALIGN_BLOCK, \
 	RT_VALIGN_TOP, RT_VALIGN_CENTER, RT_VALIGN_BOTTOM, RT_WRAP
 
-from Renderer import Renderer
+from Components.Renderer.Renderer import Renderer
 from skin import parseColor, parseFont
 
 import Plugins.Extensions.revolution.owibranding as xowibranding
@@ -73,7 +74,6 @@ class rvRunningText(Renderer):
 		self.mPageDelay = self.mPageLength = 0
 		self.lineHeight = 0		# for text height auto correction on dmm-enigma2
 		self.mShown = 0
-
 
 	GUI_WIDGET = eWidget
 

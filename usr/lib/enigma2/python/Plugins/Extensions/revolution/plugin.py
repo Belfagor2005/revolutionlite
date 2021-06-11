@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+from __future__ import print_function, unicode_literals
 '''
 Info http://t.me/tivustream
 ****************************************
@@ -8,7 +9,7 @@ Info http://t.me/tivustream
 *             09/05/2021               *
 ****************************************
 '''
-from __future__ import print_function
+#on ATV6.5 Error in screen 'widget': Renderer 'rvRunningText' not found!
 from . import _
 # from . __init__ import UrlLst
 from Components.AVSwitch import AVSwitch
@@ -93,7 +94,7 @@ def logdata(name = '', data = None):
         pass
 
 def getversioninfo():
-    currversion = '1.0'
+    currversion = '1.1'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -257,12 +258,10 @@ piconinter = res_picon_plugin_path + 'inter.png'
 pixmaps = res_picon_plugin_path + 'backg.png'
 revol = config.plugins.revolution.cachefold.value.strip()
 
-
 global pngori
 import random
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
-
 
 if revol.endswith('/'):
     revol = revol[:-1]
@@ -280,7 +279,6 @@ else:
     skin_path = res_plugin_path + 'skins/hd/'
 if eDreamOS:
     skin_path = skin_path + 'dreamOs/'
-
 
 class rvList(MenuList):
     def __init__(self, list):
@@ -369,14 +367,21 @@ class Revolmain(Screen):
         self["progress"].hide()
         self['progresstext'].text = ''
         self.currentList = 'text'
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
+        idx = 0
         self.menulist = []
         self['title'] = Label(title_plug)
-        self['actions'] = NumberActionMap(['SetupActions', 'DirectionActions', 'ColorActions', "MenuActions"], {'ok': self.okRun,
+        self['actions'] = NumberActionMap(['SetupActions', 'DirectionActions', "EPGSelectActions", 'ColorActions', "MenuActions"], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
          'red': self.closerm,
          # 'yellow': self.remove,
          # 'blue': self.msgtqm,
+         'epg': self.showIMDB,
+         'info': self.showIMDB,         
          'up': self.up,
          'down': self.down,
          'left': self.left,
@@ -386,6 +391,28 @@ class Revolmain(Screen):
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        itype = idx
+        name = self.names[itype]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -572,7 +599,11 @@ class live_stream(Screen):
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = name
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def readJsonFile(self, name, url, pic):
@@ -614,6 +645,8 @@ class live_stream(Screen):
                 self.urls.append("https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=")
                 self.pics.append(str(piconsearch))
                 self.infos.append(str('Search Movies'))
+                # self.infos.append(str(info))
+                i = i+1
             if 'live' in nextmodule:
                 nextmodule = "Videos3"
             if 'series' in nextmodule:
@@ -631,9 +664,11 @@ class live_stream(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            desc = self.infos[idx]
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
+            print('desc: ', desc)            
             print('nextmodule live_stream is: ', nextmodule)
 
             if 'Search' in str(name):
@@ -657,7 +692,7 @@ class live_stream(Screen):
                     self.session.open(video5, name, url, pic, nextmodule)
             #series
             # if nextmodule == 'Videos1':
-            if '&page' in str(url) and nextmodule == 'Videos1': #wooork
+            if '&page' in str(url) and nextmodule == 'Videos1': #work
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
             if '&page' not in str(url) and nextmodule == 'Videos1':
                 print('video1 and play next: ', nextmodule)
@@ -666,7 +701,7 @@ class live_stream(Screen):
                     print('video1 and tvseriesId next: ', nextmodule)
                 else:
                     print('video1 and play next: ', nextmodule)
-                    self.session.open(Playstream1, name, url)
+                    self.session.open(Playstream1, name, url, desc)
 
     def search_text(self, name, url, pic):
         self.namex = name
@@ -722,7 +757,6 @@ class live_stream(Screen):
         # self.load_poster()    
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-       
         if idx is not None or idx != -1:
             self[self.currentList].up()
             self.load_infos()
@@ -865,7 +899,7 @@ class video3(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -873,12 +907,36 @@ class video3(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         "epg": self.showIMDB,
+         "info": self.showIMDB,
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
-
+        
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -949,14 +1007,16 @@ class video3(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            desc = self.infos[idx]
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
+            print('desc: ', desc)            
             print('Videos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(nextvideo3, name, url, pic, nextmodule)
             else:
-                self.session.open(Playstream1, name, url)
+                self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
         # search == False
@@ -1108,7 +1168,7 @@ class nextvideo3(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -1116,6 +1176,8 @@ class nextvideo3(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -1123,6 +1185,28 @@ class nextvideo3(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1189,14 +1273,16 @@ class nextvideo3(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            desc = self.infos[idx]
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
+            print('desc: ', desc)            
             print('nextVideos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(video3, name, url, pic, nextmodule)
             else:
-                self.session.open(Playstream1, name, url)
+                self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
         # search == False
@@ -1345,7 +1431,7 @@ class video4(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -1353,6 +1439,8 @@ class video4(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -1360,6 +1448,28 @@ class video4(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1588,7 +1698,7 @@ class nextvideo4(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -1596,6 +1706,8 @@ class nextvideo4(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -1603,6 +1715,28 @@ class nextvideo4(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1830,7 +1964,7 @@ class video1(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -1838,6 +1972,8 @@ class video1(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
 
         self.timer = eTimer()
@@ -1845,7 +1981,29 @@ class video1(Screen):
         self.readJsonFile(name, url, pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
-
+        
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1920,9 +2078,11 @@ class video1(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            desc = self.infos[idx]
             print('Video1 name: ', name)
             print('Video1 url: ', url)
             print('Video1 png: ', pic)
+            print('Video1 desc: ', desc)            
             print('Video1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
@@ -1933,7 +2093,7 @@ class video1(Screen):
                     print('video1 and tvseriesId : ', nextmodule)
                 else:
                     print('video1 and play : ', nextmodule)
-                    self.session.open(Playstream1, name, url)
+                    self.session.open(Playstream1, name, url, desc)
             else:
                 print('bhoo .mp4???')
                 return
@@ -2085,7 +2245,7 @@ class nextvideo1(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -2093,6 +2253,8 @@ class nextvideo1(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -2100,6 +2262,28 @@ class nextvideo1(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -2171,9 +2355,11 @@ class nextvideo1(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            desc = self.infos[idx]
             print('nextvideo1 name: ', name)
             print('nextvideo1 url: ', url)
             print('nextvideo1 png: ', pic)
+            print('nextvideo1 desc: ', desc)            
             print('nextvideo1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(video1, name, url, pic, nextmodule)
@@ -2184,7 +2370,7 @@ class nextvideo1(Screen):
                     print('nextvideo1 and tvseriesId next: ', nextmodule)
                 else:
                     print('nextvideo1 and play next: ', nextmodule)
-                    self.session.open(Playstream1, name, url)
+                    self.session.open(Playstream1, name, url, desc)
             else:
                 print('bhoo .mp4???')
                 return
@@ -2337,7 +2523,7 @@ class video5(Screen):
         self.downloading = False
         self.currentList = 'text'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -2345,6 +2531,8 @@ class video5(Screen):
          'down': self.down,
          'left': self.left,
          'right': self.right,
+         'epg': self.showIMDB,
+         'info': self.showIMDB, 
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -2352,6 +2540,28 @@ class video5(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
+    def showIMDB(self):
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            inf = idx
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -2422,11 +2632,15 @@ class video5(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
+            info = self.infos[idx]
+            desc = self.infos[idx]
             print('video5 name: ', name)
             print('video5 url: ', url)
             print('video5 png: ', pic)
+            print('video5 png: ', info)    
+            print('video5 desc: ', desc)              
             print('video5 nextmodule is: ', nextmodule)
-            self.session.open(Playstream1, name, url)
+            self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
         # search == False
@@ -2706,7 +2920,7 @@ class myconfig(Screen, ConfigListScreen):
 
 class Playstream1(Screen):
 
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, desc):
         Screen.__init__(self, session)
         self.session = session
         skin = skin_path + 'Playstream1.xml'
@@ -2726,6 +2940,7 @@ class Playstream1(Screen):
          'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
+        self.desc = desc
         # if PY3:
             # self.url = url.encode('utf8')
         print('In Playstream1 self.url =', url)
@@ -2755,10 +2970,24 @@ class Playstream1(Screen):
             self.name = self.names[idx]
             self.url = self.urls[idx]
 
+            # if "youtube" in str(self.url):
+                # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+                # return
             if "youtube" in str(self.url):
-                self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-                return
-
+                desc = self.desc
+                # from youtube_dl import YoutubeDL
+                from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
+                '''
+                ydl_opts = {'format': 'best'}
+                ydl_opts = {'format': 'bestaudio/best'}
+                '''
+                ydl_opts = {'format': 'best'}
+                ydl = YoutubeDL(ydl_opts)
+                ydl.add_default_info_extractors()
+                result = ydl.extract_info(self.url, download=False)
+                url = result["url"]
+                self.session.open(Playstream2, self.name, url, desc)
+                            
             if idx == 0:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -2811,14 +3040,14 @@ class Playstream1(Screen):
         self.serverList[serverint].play(self.session, self.url, self.name)
 
     def play(self):
-        desc = self.name
+        desc = self.desc
         url = self.url
         name = self.name1
         self.session.open(Playstream2, name, url, desc)
         self.close()
 
     def play2(self):
-        desc = self.name
+        desc = self.desc
         name = self.name1
         if os.path.exists("/usr/sbin/streamlinksrv"):
             url = self.url
@@ -3077,7 +3306,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = self.name
+            # text_clear = self.name
+            # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            inf = self.desc
+            if inf is not None or inf != -1:
+                text_clear = inf
+            else:
+                text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def slinkPlay(self, url):
@@ -3112,18 +3347,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if "youtube" in str(self.url):
             self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             return
-        # if "youtube" in str(url):
-            # desc = self.name
-            # from youtube_dl import YoutubeDL
-            # '''
-            # ydl_opts = {'format': 'best'}
-            # ydl_opts = {'format': 'bestaudio/best'}
-            # '''
-            # ydl_opts = {'format': 'best'}
-            # ydl = YoutubeDL(ydl_opts)
-            # ydl.add_default_info_extractors()
-            # result = ydl.extract_info(url, download=False)
-            # url = result["url"]
+
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):

@@ -1,3 +1,4 @@
+from __future__ import print_function
 """
 Simple HTTP Live Streaming client.
 
