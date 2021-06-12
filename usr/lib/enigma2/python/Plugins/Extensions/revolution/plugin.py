@@ -6,7 +6,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *                                      *
-*             09/05/2021               *
+*             09/06/2021               *
 ****************************************
 '''
 #on ATV6.5 Error in screen 'widget': Renderer 'rvRunningText' not found!
@@ -2975,18 +2975,22 @@ class Playstream1(Screen):
                 # return
             if "youtube" in str(self.url):
                 desc = self.desc
-                # from youtube_dl import YoutubeDL
-                from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl_opts = {'format': 'bestaudio/best'}
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl = YoutubeDL(ydl_opts)
-                ydl.add_default_info_extractors()
-                result = ydl.extract_info(self.url, download=False)
-                url = result["url"]
-                self.session.open(Playstream2, self.name, url, desc)
+                try:
+                    # desc = self.desc
+                    # from youtube_dl import YoutubeDL
+                    from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl_opts = {'format': 'bestaudio/best'}
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl = YoutubeDL(ydl_opts)
+                    ydl.add_default_info_extractors()
+                    result = ydl.extract_info(self.url, download=False)
+                    self.url = result["url"]
+                except:
+                    pass
+                self.session.open(Playstream2, self.name, self.url, desc)
                             
             if idx == 0:
                 self.name = self.names[idx]
