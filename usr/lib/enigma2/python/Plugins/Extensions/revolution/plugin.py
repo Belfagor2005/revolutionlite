@@ -83,9 +83,14 @@ from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import urlencode
-import six.moves.urllib.request
+# import six.moves.urllib.request
+
 search = False
 
+# try:
+    # from urllib.parse import urlparse
+# except ImportError:
+     # from urlparse import urlparse
 try:
     from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
     from Plugins.Extensions.revolution.resolver.Utils2 import *
@@ -156,6 +161,10 @@ except:
     sslverify = False
 
 if sslverify:
+    try:
+        from urlparse import urlparse
+    except:
+        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -178,7 +187,7 @@ def make_request(url):
     try:
         import requests
         # link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        link = requests.get(url, headers = headers).text        
+        link = requests.get(url, headers = headers).text
         return link
     except ImportError:
         req = Request(url)
@@ -191,7 +200,7 @@ def make_request(url):
     except:
         return
     return
-    
+
 def deletetmp():
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
     return
@@ -213,7 +222,7 @@ def TvsApi():
         other = tvs.readline().strip()
         return live, movie, series, other
     except:
-        return live, movie, series, other    
+        return live, movie, series, other
         pass
 
 modechoices = [
@@ -374,7 +383,7 @@ class Revolmain(Screen):
          # 'yellow': self.remove,
          # 'blue': self.msgtqm,
          'epg': self.showIMDB,
-         'info': self.showIMDB,         
+         'info': self.showIMDB,
          'up': self.up,
          'down': self.down,
          'left': self.left,
@@ -405,7 +414,7 @@ class Revolmain(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -460,7 +469,7 @@ class Revolmain(Screen):
                 pic = piconinter
                 nextmodule = 'other'
                 self.mbox = self.session.open(MessageBox, _('Use my Plugin Freearhey'), MessageBox.TYPE_INFO, timeout=4)
-     
+
 
     def goConfig(self):
         self.session.open(myconfig)
@@ -661,7 +670,7 @@ class live_stream(Screen):
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
-            print('desc: ', desc)            
+            print('desc: ', desc)
             print('nextmodule live_stream is: ', nextmodule)
 
             if 'Search' in str(name):
@@ -747,7 +756,7 @@ class live_stream(Screen):
     def up(self):
         # self[self.currentList].up()
         # self.load_infos()
-        # self.load_poster()    
+        # self.load_poster()
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
@@ -756,7 +765,7 @@ class live_stream(Screen):
             self.load_poster()
         else:
             return
-        
+
     def down(self):
         self[self.currentList].down()
         self.load_infos()
@@ -907,7 +916,7 @@ class video3(Screen):
         self.timer = eTimer()
         self.timer.start(1000, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
-        
+
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
@@ -929,7 +938,7 @@ class video3(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1004,7 +1013,7 @@ class video3(Screen):
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
-            print('desc: ', desc)            
+            print('desc: ', desc)
             print('Videos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(nextvideo3, name, url, pic, nextmodule)
@@ -1170,7 +1179,7 @@ class nextvideo3(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -1199,7 +1208,7 @@ class nextvideo3(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1270,7 +1279,7 @@ class nextvideo3(Screen):
             print('name: ', name)
             print('url: ', url)
             print('png: ', pic)
-            print('desc: ', desc)            
+            print('desc: ', desc)
             print('nextVideos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(video3, name, url, pic, nextmodule)
@@ -1433,7 +1442,7 @@ class video4(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -1462,7 +1471,7 @@ class video4(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1700,7 +1709,7 @@ class nextvideo4(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -1729,7 +1738,7 @@ class nextvideo4(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -1966,7 +1975,7 @@ class video1(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
 
         self.timer = eTimer()
@@ -1974,7 +1983,7 @@ class video1(Screen):
         self.readJsonFile(name, url, pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
-        
+
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
@@ -1996,7 +2005,7 @@ class video1(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -2075,7 +2084,7 @@ class video1(Screen):
             print('Video1 name: ', name)
             print('Video1 url: ', url)
             print('Video1 png: ', pic)
-            print('Video1 desc: ', desc)            
+            print('Video1 desc: ', desc)
             print('Video1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
@@ -2247,7 +2256,7 @@ class nextvideo1(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -2276,7 +2285,7 @@ class nextvideo1(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -2352,7 +2361,7 @@ class nextvideo1(Screen):
             print('nextvideo1 name: ', name)
             print('nextvideo1 url: ', url)
             print('nextvideo1 png: ', pic)
-            print('nextvideo1 desc: ', desc)            
+            print('nextvideo1 desc: ', desc)
             print('nextvideo1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(video1, name, url, pic, nextmodule)
@@ -2525,7 +2534,7 @@ class video5(Screen):
          'left': self.left,
          'right': self.right,
          'epg': self.showIMDB,
-         'info': self.showIMDB, 
+         'info': self.showIMDB,
          'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
@@ -2554,7 +2563,7 @@ class video5(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -2630,8 +2639,8 @@ class video5(Screen):
             print('video5 name: ', name)
             print('video5 url: ', url)
             print('video5 png: ', pic)
-            print('video5 png: ', info)    
-            print('video5 desc: ', desc)              
+            print('video5 png: ', info)
+            print('video5 desc: ', desc)
             print('video5 nextmodule is: ', nextmodule)
             self.session.open(Playstream1, name, url, desc)
 
@@ -2969,8 +2978,6 @@ class Playstream1(Screen):
             if "youtube" in str(self.url):
                 desc = self.desc
                 try:
-                    # desc = self.desc
-                    # from youtube_dl import YoutubeDL
                     from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
                     '''
                     ydl_opts = {'format': 'best'}
@@ -2984,7 +2991,7 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
-                            
+
             if idx == 0:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -3213,8 +3220,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         url = checkStr(url)
         # url = url.replace(':', '%3a')
         # url = url.replace(' ','%20')
-        # url = url.replace("b'",'') 
-        # url = url.replace("'",'')         
+        # url = url.replace("b'",'')
+        # url = url.replace("'",'')
         self.icount = 0
         self.desc = desc
         self.pcip = 'None'
@@ -3316,7 +3323,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         ref = str(url)
         ref = ref.replace(':', '%3a')
         ref = ref.replace(' ','%20')
-        
+
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3341,9 +3348,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         url = str(self.url)
         currentindex = 0
         streamtypelist = ["4097"]
-        if "youtube" in str(self.url):
-            self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            return
+        # if "youtube" in str(self.url):
+            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # return
 
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001")
@@ -3575,7 +3582,7 @@ def main(session, **kwargs):
         if PY3:
             session.open(Revolmain)
         elif eDreamOS:
-            session.open(Revolmain)        
+            session.open(Revolmain)
         else:
             session.open(plgnstrt)
     else:
