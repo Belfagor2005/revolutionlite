@@ -68,11 +68,24 @@ import socket
 import glob
 import json
 import hashlib
+import random
 import six
 from os.path import splitext
 from sys import version_info
-global skin_path, revol, pngs, pngl, pngx, eDreamOS, file_json, nextmodule, search
+PY3 = sys.version_info.major >= 3
+print('Py3: ',PY3)
+plugin_path = os.path.dirname(sys.modules[__name__].__file__)
+global skin_path, revol, pngs, pngl, pngx, eDreamOS, file_json, nextmodule, search, pngori
+
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+import six.moves.urllib.request
 search = False
+
 try:
     from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
     from Plugins.Extensions.revolution.resolver.Utils2 import *
@@ -82,7 +95,6 @@ except:
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 
-plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 def logdata(name = '', data = None):
     try:
         data=str(data)
@@ -106,16 +118,6 @@ def getversioninfo():
             pass
     logdata("Version ", currversion)
     return (currversion)
-
-PY3 = sys.version_info[0] == 3
-if PY3:
-    from urllib.request import urlopen, Request
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlencode, quote, urlparse
-else:
-    from urllib2 import urlopen, Request, URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import urlencode, quote
 
 eDreamOS = False
 try:
@@ -154,11 +156,6 @@ except:
     sslverify = False
 
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
-
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -219,7 +216,6 @@ def TvsApi():
         return live, movie, series, other    
         pass
 
-
 modechoices = [
                 ("4097", _("IPTV(4097)")),
                 ("1", _("Dvb(1)")),
@@ -257,9 +253,6 @@ piconsearch = "https://tivustream.website/php_filter/kodi19/img/search.png"
 piconinter = res_picon_plugin_path + 'inter.png'
 pixmaps = res_picon_plugin_path + 'backg.png'
 revol = config.plugins.revolution.cachefold.value.strip()
-
-global pngori
-import random
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
 
