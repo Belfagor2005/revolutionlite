@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.ActionMap import NumberActionMap
@@ -46,23 +45,27 @@ import os
 import re
 import socket
 import sys
+import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import urlretrieve  
+from sys import version_info
+PY3 = sys.version_info.major >= 3
 
-PY3 = sys.version_info[0] == 3
-if PY3:
+try
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib.parse import quote, unquote_plus, unquote
-    from urllib.request import Request, urlopen as urlopen2
-    from urllib.error import URLError
-    from urllib.request import urlopen
-    from urllib.parse import parse_qs
     import http.client
     import urllib.request, urllib.parse, urllib.error
-else:
+except:
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib import quote, unquote_plus, unquote
-    from urllib2 import Request, URLError, urlopen as urlopen2
-    from urllib2 import urlopen
-    from urlparse import parse_qs
     import httplib
     import urllib
     import urlparse
@@ -118,9 +121,9 @@ class Playvid(Screen):
         global SREF
         Screen.__init__(self, session)
         if DESKHEIGHT > 1000:
-            self.skin = PlayvidFHD.skin
+           self.skin = PlayvidFHD.skin
         else:
-            self.skin = PlayvidHD.skin
+           self.skin = PlayvidHD.skin
         self.name = name
         self.url = url
         self["list"] = List([])
@@ -167,12 +170,21 @@ class Playvid(Screen):
                 self.url = self.url[:n1]
         print("Here in Playvid self.url B=", self.url)
         #self['info'].setText(txt)
+
+        ####################
+##        self.updateTimer = eTimer()
+##        self.updateTimer.callback.append(self.updateStatus)
+##        self.updateTimer.start(2000)
+##        self.updateStatus()
+        ####################
         self.updateTimer = eTimer()
         try:
-            self.updateTimer_conn = self.updateTimer.timeout.connect(self.updateStatus)
+               self.updateTimer_conn = self.updateTimer.timeout.connect(self.updateStatus)
         except AttributeError:
-            self.updateTimer.callback.append(self.updateStatus)
-
+               self.updateTimer.callback.append(self.updateStatus)
+#       self.updateTimer.callback.append(self.updateStatus)
+##	self.updateTimer.start(2000)
+##	self.updateStatus()
         ####################
         self['info'].setText(" ")
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -216,87 +228,85 @@ class Playvid(Screen):
         self.session.open(Playvid3, name, url, desc = " ")
 
     def getlocal_filename(self):
-        fold = config.plugins.kodiplug.cachefold.value+"/"
-        name = self.name.replace("/media/hdd/xbmc/vid/", "")
-        name = name.replace(" ", "-")
-        pattern = '[a-zA-Z0-9\-]'
-        input = name
-        output = ''.join(re.findall(pattern, input))
-        self.name = output
-        if self.url.endswith("mp4"):
-            svfile = fold + self.name+".mp4"
-        elif self.url.endswith("flv"):
-            svfile = fold + self.name+".flv"
-        elif self.url.endswith("avi"):
-            svfile = fold + self.name+".avi"
-        elif self.url.endswith("ts"):
-            svfile = fold + self.name+".ts"
-        else:
-            svfile = fold + self.name+".mpg"
-        filetitle=os.path.split(svfile)[1]
-        return svfile,filetitle
+           fold = config.plugins.kodiplug.cachefold.value+"/"
+           name = self.name.replace("/media/hdd/xbmc/vid/", "")
+           name = name.replace(" ", "-")
+           pattern = '[a-zA-Z0-9\-]'
+           input = name
+           output = ''.join(re.findall(pattern, input))
+           self.name = output
+           if self.url.endswith("mp4"):
+              svfile = fold + self.name+".mp4"
+           elif self.url.endswith("flv"):
+              svfile = fold + self.name+".flv"
+           elif self.url.endswith("avi"):
+              svfile = fold + self.name+".avi"
+           elif self.url.endswith("ts"):
+              svfile = fold + self.name+".ts"
+           else:
+              svfile = fold + self.name+".mpg"
+           filetitle=os.path.split(svfile)[1]
+           return svfile,filetitle
+
 
     def okClicked(self):
-        idx=self["list"].getSelectionIndex()
-        print("idx",idx)
-        if idx==0:
-            self.start2()
-        elif idx==1:
-            self.play()
+
+          idx=self["list"].getSelectionIndex()
+          print("idx",idx)
+          if idx==0:
+                self.start2()
+          elif idx==1:
+                self.play()
 
     def playfile(self, serverint):
-        self.serverList[serverint].play(self.session, self.url, self.name)
+          self.serverList[serverint].play(self.session, self.url, self.name)
 
 
     def showError(self, error):
-        print("DownloadPage error = ", error)
+               print("DownloadPage error = ", error)
 
 
     def updateStatus(self):
-#        print "self.icount =", self.icount
-#     print "In updateStatus self.pop =", self.pop
-        if self.pop == 1:
+     if self.pop == 1:
             try:
-                ptxt = self.p.read()
-                #               print "In updateStatus ptxt =", ptxt
-                if "data B" in ptxt:
-                    n1 = ptxt.find("data B", 0)
-                    n2 = ptxt.find("&url", n1)
-                    n3 = ptxt.find("\n", n2)
-                    url = ptxt[(n2+5):n3]
-                    url = url.replace("AxNxD", "&")
-                    self.url = url.replace("ExQ", "=")
-                    #                      print "In updateStatus url =", url
-                    name = "Video"
-                    desc = " "
-                    self.session.open(Playvid, self.name, self.url, desc)
-                    self.close()
-                    self.updateTimer.stop()
+               ptxt = self.p.read()
+               if "data B" in ptxt:
+                      n1 = ptxt.find("data B", 0)
+                      n2 = ptxt.find("&url", n1)
+                      n3 = ptxt.find("\n", n2)
+                      url = ptxt[(n2+5):n3]
+                      url = url.replace("AxNxD", "&")
+                      self.url = url.replace("ExQ", "=")
+                      name = "Video"
+                      desc = " "
+                      self.session.open(Playvid, self.name, self.url, desc)
+                      self.close()
+                      self.updateTimer.stop()
 #               else:
 #                      self.openTest()
 #                      return
             except:
-                self.openTest()
+               self.openTest()
 #               return
-        else:
-            if not os.path.exists(self.svfile):
-                print("No self.svfile =", self.svfile)
-                self.openTest()
-                return
+     else:
+        if not os.path.exists(self.svfile):
+            print("No self.svfile =", self.svfile)
+            self.openTest()
+            return
 
-            if self.icount == 0:
-                self.openTest()
-                return
+        if self.icount == 0:
+            self.openTest()
+            return
 
-            b1 = os.path.getsize(self.svfile)
-            b = b1 / 1000
-            if b == self.bLast:
-                infotxt = _('Download Complete....') + str(b)
-                self['info'].setText(infotxt)
-                return
-            self.bLast = b
-            infotxt = _('Downloading....') + str(b) + ' kb'
+        b1 = os.path.getsize(self.svfile)
+        b = b1 / 1000
+        if b == self.bLast:
+            infotxt = _('Download Complete....') + str(b)
             self['info'].setText(infotxt)
+            return
+        self.bLast = b
+        infotxt = _('Downloading....') + str(b) + ' kb'
+        self['info'].setText(infotxt)
 
     def LastJobView(self):
         currentjob = None
@@ -312,15 +322,15 @@ class Playvid(Screen):
            Screen.close(self, False)
 
     def stopDL(self):
-        cmd = "rm -f " + self.svfile
-        os.system(cmd)
-        self.session.nav.playService(self.srefOld)
-        cmd1 = "killall -9 rtmpdump"
-        cmd2 = "killall -9 wget"
-        os.system(cmd1)
-        os.system(cmd2)
-        self['info'].setText("Current download task stopped")
-        self.close()
+                cmd = "rm -f " + self.svfile
+                os.system(cmd)
+                self.session.nav.playService(self.srefOld)
+                cmd1 = "killall -9 rtmpdump"
+                cmd2 = "killall -9 wget"
+                os.system(cmd1)
+                os.system(cmd2)
+                self['info'].setText("Current download task stopped")
+                self.close()
 
     def keyLeft(self):
         self['text'].left()
@@ -479,7 +489,7 @@ class Playvid3(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
         if DESKHEIGHT > 1000:
               self.skin = Playvid2FHD.skin
         else:
-        # self.skin = Playvid2HD.skin
+        #                      self.skin = Playvid2HD.skin
               self.skin = PlayvidB.skin
         title = "Play"
         self.sref=None
@@ -525,232 +535,6 @@ class Playvid3(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
         self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.openTest)
-
-    def getAspect(self):
-        return AVSwitch().getAspectRatioSetting()
-
-    def getAspectString(self, aspectnum):
-        return {0: _('4:3 Letterbox'),
-         1: _('4:3 PanScan'),
-         2: _('16:9'),
-         3: _('16:9 always'),
-         4: _('16:10 Letterbox'),
-         5: _('16:10 PanScan'),
-         6: _('16:9 Letterbox')}[aspectnum]
-
-    def setAspect(self, aspect):
-        map = {0: '4_3_letterbox',
-         1: '4_3_panscan',
-         2: '16_9',
-         3: '16_9_always',
-         4: '16_10_letterbox',
-         5: '16_10_panscan',
-         6: '16_9_letterbox'}
-        config.av.aspectratio.setValue(map[aspect])
-        try:
-            AVSwitch().setAspectRatio(aspect)
-        except:
-            pass
-
-    def av(self):
-        temp = int(self.getAspect())
-        print(self.getAspectString(temp))
-        temp = temp + 1
-        if temp > 6:
-            temp = 0
-        self.new_aspect = temp
-        self.setAspect(temp)
-        print(self.getAspectString(temp))
-        self.statusScreen.setStatus(self.getAspectString(temp))
-
-    def showinfo(self):
-        debug=True
-        try:
-            servicename,serviceurl=getserviceinfo(self.sref)
-            if servicename is not None:
-                sTitle=servicename
-            else:
-                sTitle=''
-
-            if serviceurl is not None:
-                sServiceref=serviceurl
-            else:
-                sServiceref=''
-
-            currPlay = self.session.nav.getCurrentService()
-
-            sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-            sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-            sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
-            self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        except:
-            pass
-
-    def playpauseService(self):
-        print("playpauseService")
-        if self.state == self.STATE_PLAYING:
-            self.pause()
-            self.state = self.STATE_PAUSED
-        elif self.state == self.STATE_PAUSED:
-            self.unpause()
-            self.state = self.STATE_PLAYING
-
-    def pause(self):
-        self.session.nav.pause(True)
-
-    def unpause(self):
-        self.session.nav.pause(False)
-
-    def openTest(self):
-        if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
-            from tube_resolver.plugin import getvideo
-            self.url,error = getvideo(self.url)
-            if error is not None or self.url is None:
-                print("failed to get valid youtube stream link")
-                return
-        elif "pcip" in self.url:
-            n1 = self.url.find("pcip")
-            urlA = self.url
-            self.url = self.url[:n1]
-            self.pcip = urlA[(n1+4):]
-
-        url = self.url
-        name = self.name
-        print("Here in Playvid name A =", name)
-        name = name.replace(":", "-")
-        name = name.replace("&", "-")
-        name = name.replace(" ", "-")
-        name = name.replace("/", "-")
-        name = name.replace("›", "-")
-        name = name.replace(",", "-")
-        print("Here in Playvid name B2 =", name)
-
-        if url is not None:
-            url = str(url)
-            print("url final= ", url)
-            ref = eServiceReference(0x1001, 0, url)
-            ref.setName(name)
-            self.sref=ref
-            self.session.nav.stopService()
-            self.session.nav.playService(ref)
-        else:
-            return
-
-    def subtitles(self):
-        try:
-           self.subsMenu()
-        except:
-           pass
-
-    def subtitlesX(self):
-        if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
-            self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
-        else:
-            found = 0
-            pluginlist = []
-            pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-            for plugin in pluginlist:
-                if "Subtitle player" in str(plugin.name):
-                    found = 1
-                    break
-                if found == 0:
-                    self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
-                else:
-                    try:
-                        plugin(session=self.session)
-                    except:
-                        self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
-
-    def cancel(self):
-        if os.path.exists("/tmp/hls.avi"):
-                os.remove("/tmp/hls.avi")
-        self.session.nav.stopService()
-        self.session.nav.playService(self.srefOld)
-#                try:
-        if self.pcip != "None":
-            url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-            print("In Playvid2 url2 =", url2)
-            resp = urlopen(url2)
-#                except:
-#                     pass
-        ##aspect ratio
-        if not self.new_aspect == self.init_aspect:
-            try:
-                self.setAspect(self.init_aspect)
-            except:
-                pass
-        #aspect ratio
-        self.close()
-
-    def keyLeft(self):
-        self["text"].left()
-
-    def keyRight(self):
-        self["text"].right()
-
-    def keyNumberGlobal(self, number):
-        self["text"].number(number)
-
-#class Playvid2X(Screen, InfoBarMenu, InfoBarBase, SubsSupport, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
-class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
-
-    STATE_PLAYING = 1
-    STATE_PAUSED = 2
-
-    def __init__(self, session, name, url, desc):
-
-        Screen.__init__(self, session)
-        self.skinName = "Playvid"
-      # if DESKHEIGHT > 1000:
-              # self.skin = Playvid2FHD.skin
-      # else:
-              # self.skin = Playvid2HD.skin
-        title = "Play"
-        self.sref=None
-        self["title"] = Button(title)
-        self["list"] = MenuList([])
-        self["info"] = Label()
-        self['key_yellow'] = Button(_('Subtitles'))
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self)
-        InfoBarShowHide.__init__(self)
-        self.statusScreen = self.session.instantiateDialog(StatusScreen)
-        ##aspect ratio stuff
-        try:
-            self.init_aspect = int(self.getAspect())
-        except:
-            self.init_aspect = 0
-
-        self.new_aspect = self.init_aspect
-        ##end aspect ratio
-
-        self["actions"] = ActionMap(["WizardActions", "MoviePlayerActions", "EPGSelectActions", "MediaPlayerSeekActions", "ColorActions", "InfobarShowHideActions", "InfobarSeekActions", "InfobarActions"],
-        {
-                "leavePlayer":  self.cancel,
-                "back": self.cancel,
-                "info":self.showinfo,
-                "playpauseService": self.playpauseService,
-                "yellow":   self.subtitles,
-                'down': self.av,##for aspect ratio
-        }, -1)
-
-        self.allowPiP = False
-        initSubsSettings()
-        SubsSupport.__init__(self, embeddedSupport=True, searchSupport=True)
-        self.subs = True
-        InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
-        self.icount = 0
-        self.name = name
-        self.url = url
-        print("Here in Playvid2 self.url = ", self.url)
-        self.desc = desc
-        self.pcip = "None"
-        self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.openTest)
-        
     ##aspect ratio stuff
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -789,29 +573,270 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
         print(self.getAspectString(temp))
         self.statusScreen.setStatus(self.getAspectString(temp))
 
+
+
     def showinfo(self):
-        debug=True
+            debug=True
+            try:
+
+                 servicename,serviceurl=getserviceinfo(self.sref)
+                 if servicename is not None:
+                         sTitle=servicename
+                 else:
+                        sTitle=''
+
+                 if serviceurl is not None:
+                     sServiceref=serviceurl
+                 else:
+                   sServiceref=''
+
+                 currPlay = self.session.nav.getCurrentService()
+
+                 sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
+                 sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
+                 sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
+
+#return str(sTitle)
+#message='remote keys help:\nmenu: subtitle player\nnumbers 1-6 seek back and forward\nleft and right:next and previous channel when playlist supported\ninfo:help\nup and cancel keys:exit to playlist'
+                 message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
+                 # from XBMCAddonsinfo import XBMCAddonsinfoScreen
+                 # self.session.open(XBMCAddonsinfoScreen,None,'XBMCAddonsPlayer',message)
+                    # from XBMCAddonsinfo import XBMCAddonsinfoScreen
+                    # self.session.open(XBMCAddonsinfoScreen, None, 'XBMCAddonsPlayer', message)
+                 self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+            except:
+                  pass
+
+    def playpauseService(self):
+        print("playpauseService")
+        if self.state == self.STATE_PLAYING:
+                self.pause()
+                self.state = self.STATE_PAUSED
+        elif self.state == self.STATE_PAUSED:
+                self.unpause()
+                self.state = self.STATE_PLAYING
+
+    def pause(self):
+                self.session.nav.pause(True)
+
+    def unpause(self):
+                self.session.nav.pause(False)
+
+    def openTest(self):
+                if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
+
+                      from tube_resolver.plugin import getvideo
+                      self.url,error = getvideo(self.url)
+                      if error is not None or self.url is None:
+                         print("failed to get valid youtube stream link")
+                         return
+
+                elif "pcip" in self.url:
+                       n1 = self.url.find("pcip")
+                       urlA = self.url
+                       self.url = self.url[:n1]
+                       self.pcip = urlA[(n1+4):]
+
+                url = self.url
+                name = self.name
+                print("Here in Playvid name A =", name)
+                name = name.replace(":", "-")
+                name = name.replace("&", "-")
+                name = name.replace(" ", "-")
+                name = name.replace("/", "-")
+                name = name.replace("›", "-")
+                name = name.replace(",", "-")
+                print("Here in Playvid name B2 =", name)
+
+                if url is not None:
+                    url = str(url)
+                    print("url final= ", url)
+                    ref = eServiceReference(0x1001, 0, url)
+                    ref.setName(name)
+                    self.sref=ref
+                    self.session.nav.stopService()
+                    self.session.nav.playService(ref)
+                else:
+                       return
+
+    def subtitles(self):
         try:
+           self.subsMenu()
+        except:
+           pass
+    def subtitlesX(self):
+        if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
+                self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
+        else:
+                found = 0
+                pluginlist = []
+                pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
+                for plugin in pluginlist:
+                        if "Subtitle player" in str(plugin.name):
+                                found = 1
+                                break
+                if found == 0:
+                        self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
+                else:
+                    try:
+                        plugin(session=self.session)
+                    except:
+                        self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
 
-             servicename,serviceurl=getserviceinfo(self.sref)
-             if servicename is not None:
-                sTitle=servicename
-             else:
-                sTitle=''
+    def cancel(self):
+                if os.path.exists("/tmp/hls.avi"):
+                        os.remove("/tmp/hls.avi")
+                self.session.nav.stopService()
+                self.session.nav.playService(self.srefOld)
+#                try:
+                if self.pcip != "None":
+                        url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
+                        print("In Playvid2 url2 =", url2)
+                        resp = urlopen(url2)
+#                except:
+#                     pass
+                ##aspect ratio
+                if not self.new_aspect == self.init_aspect:
+                    try:
+                        self.setAspect(self.init_aspect)
+                    except:
+                        pass
+                #aspect ratio
+                self.close()
 
-             if serviceurl is not None:
-                sServiceref=serviceurl
-             else:
-                sServiceref=''
-             currPlay = self.session.nav.getCurrentService()
-             sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-             sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-             sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-             message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
-             self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+    def keyLeft(self):
+        self["text"].left()
 
+    def keyRight(self):
+        self["text"].right()
+
+    def keyNumberGlobal(self, number):
+        self["text"].number(number)
+
+#class Playvid2X(Screen, InfoBarMenu, InfoBarBase, SubsSupport, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+
+    STATE_PLAYING = 1
+    STATE_PAUSED = 2
+
+    def __init__(self, session, name, url, desc):
+
+                Screen.__init__(self, session)
+                self.skinName = "Playvid"
+                title = "Play"
+                self.sref=None
+                self["title"] = Button(title)
+                self["list"] = MenuList([])
+                self["info"] = Label()
+                self['key_yellow'] = Button(_('Subtitles'))
+                InfoBarMenu.__init__(self)
+                InfoBarNotifications.__init__(self)
+                InfoBarBase.__init__(self)
+                InfoBarShowHide.__init__(self)
+                self.statusScreen = self.session.instantiateDialog(StatusScreen)
+                ##aspect ratio stuff
+                try:
+                    self.init_aspect = int(self.getAspect())
+                except:
+                    self.init_aspect = 0
+
+                self.new_aspect = self.init_aspect
+                ##end aspect ratio
+
+                self["actions"] = ActionMap(["WizardActions", "MoviePlayerActions", "EPGSelectActions", "MediaPlayerSeekActions", "ColorActions", "InfobarShowHideActions", "InfobarSeekActions", "InfobarActions"],
+                {
+                        "leavePlayer":                  self.cancel,
+                        "back":                         self.cancel,
+                        "info":self.showinfo,
+                        "playpauseService":             self.playpauseService,
+                        "yellow":                          self.subtitles,
+                        'down': self.av,##for aspect ratio
+                }, -1)
+
+                self.allowPiP = False
+                initSubsSettings()
+                SubsSupport.__init__(self, embeddedSupport=True, searchSupport=True)
+                self.subs = True
+                InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
+                self.icount = 0
+                self.name = name
+                self.url = url
+                print("Here in Playvid2 self.url = ", self.url)
+                self.desc = desc
+                self.pcip = "None"
+                self.state = self.STATE_PLAYING
+                self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
+                self.onLayoutFinish.append(self.openTest)
+    ##aspect ratio stuff
+    def getAspect(self):
+        return AVSwitch().getAspectRatioSetting()
+
+    def getAspectString(self, aspectnum):
+        return {0: _('4:3 Letterbox'),
+         1: _('4:3 PanScan'),
+         2: _('16:9'),
+         3: _('16:9 always'),
+         4: _('16:10 Letterbox'),
+         5: _('16:10 PanScan'),
+         6: _('16:9 Letterbox')}[aspectnum]
+
+    def setAspect(self, aspect):
+        map = {0: '4_3_letterbox',
+         1: '4_3_panscan',
+         2: '16_9',
+         3: '16_9_always',
+         4: '16_10_letterbox',
+         5: '16_10_panscan',
+         6: '16_9_letterbox'}
+        config.av.aspectratio.setValue(map[aspect])
+        try:
+            AVSwitch().setAspectRatio(aspect)
         except:
             pass
+
+    def av(self):
+        temp = int(self.getAspect())
+        print(self.getAspectString(temp))
+        temp = temp + 1
+        if temp > 6:
+            temp = 0
+        self.new_aspect = temp
+        self.setAspect(temp)
+        print(self.getAspectString(temp))
+        self.statusScreen.setStatus(self.getAspectString(temp))
+
+
+
+    def showinfo(self):
+            debug=True
+            try:
+
+                 servicename,serviceurl=getserviceinfo(self.sref)
+                 if servicename is not None:
+                         sTitle=servicename
+                 else:
+                        sTitle=''
+
+                 if serviceurl is not None:
+                     sServiceref=serviceurl
+                 else:
+                   sServiceref=''
+
+                 currPlay = self.session.nav.getCurrentService()
+
+                 sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
+                 sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
+                 sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
+
+#return str(sTitle)
+#message='remote keys help:\nmenu: subtitle player\nnumbers 1-6 seek back and forward\nleft and right:next and previous channel when playlist supported\ninfo:help\nup and cancel keys:exit to playlist'
+                 message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
+                 # from XBMCAddonsinfo import XBMCAddonsinfoScreen
+                 # self.session.open(XBMCAddonsinfoScreen,None,'XBMCAddonsPlayer',message)
+                 self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+
+            except:
+                  pass
 
     def playpauseService(self):
         print("playpauseService")
@@ -823,94 +848,93 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
             self.state = self.STATE_PLAYING
 
     def pause(self):
-        self.session.nav.pause(True)
+                self.session.nav.pause(True)
 
     def unpause(self):
-        self.session.nav.pause(False)
+                self.session.nav.pause(False)
 
     def openTest(self):
-        if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
+                if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
 
-            from tube_resolver.plugin import getvideo
-            self.url,error = getvideo(self.url)
-            if error is not None or self.url is None:
-                print("failed to get valid youtube stream link")
-                return
+                      from tube_resolver.plugin import getvideo
+                      self.url,error = getvideo(self.url)
+                      if error is not None or self.url is None:
+                         print("failed to get valid youtube stream link")
+                         return
 
-        elif "pcip" in self.url:
-            n1 = self.url.find("pcip")
-            urlA = self.url
-            self.url = self.url[:n1]
-            self.pcip = urlA[(n1+4):]
+                elif "pcip" in self.url:
+                       n1 = self.url.find("pcip")
+                       urlA = self.url
+                       self.url = self.url[:n1]
+                       self.pcip = urlA[(n1+4):]
 
-        url = self.url
-        name = self.name
-        print("Here in Playvid name A =", name)
-        name = name.replace(":", "-")
-        name = name.replace("&", "-")
-        name = name.replace(" ", "-")
-        name = name.replace("/", "-")
-        name = name.replace("›", "-")
-        name = name.replace(",", "-")
-        print("Here in Playvid name B2 =", name)
+                url = self.url
+                name = self.name
+                print("Here in Playvid name A =", name)
+                name = name.replace(":", "-")
+                name = name.replace("&", "-")
+                name = name.replace(" ", "-")
+                name = name.replace("/", "-")
+                name = name.replace("›", "-")
+                name = name.replace(",", "-")
+                print("Here in Playvid name B2 =", name)
 
-        if url is not None:
-            url = str(url)
-            print("url final= ", url)
-            ref = eServiceReference(0x1001, 0, url)
-            ref.setName(name)
-            self.sref=ref
-            self.session.nav.stopService()
-            self.session.nav.playService(ref)
-        else:
-            return
+                if url is not None:
+                    url = str(url)
+                    print("url final= ", url)
+                    ref = eServiceReference(0x1001, 0, url)
+                    ref.setName(name)
+                    self.sref=ref
+                    self.session.nav.stopService()
+                    self.session.nav.playService(ref)
+                else:
+                       return
 
     def subtitles(self):
         try:
-            self.subsMenu()
+           self.subsMenu()
         except:
-            self['programm'].setText('Unable to start subtitles player')
+           self['programm'].setText('Unable to start subtitles player')
 
     def subtitlesX(self):
         if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
-            self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
+                self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
         else:
-            found = 0
-            pluginlist = []
-            pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-            for plugin in pluginlist:
-                #   print "str(plugin.name) =", str(plugin.name)
-                if "Subtitle player" in str(plugin.name):
-                    found = 1
-                    break
-            if found == 0:
-                self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
-            else:
-                try:
-                    plugin(session=self.session)
-                except:
-                    self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
+                found = 0
+                pluginlist = []
+                pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
+                for plugin in pluginlist:
+                        if "Subtitle player" in str(plugin.name):
+                                found = 1
+                                break
+                if found == 0:
+                        self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
+                else:
+                    try:
+                        plugin(session=self.session)
+                    except:
+                        self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
 
     def cancel(self):
-        if os.path.exists("/tmp/hls.avi"):
-            os.remove("/tmp/hls.avi")
-        self.session.nav.stopService()
-        self.session.nav.playService(self.srefOld)
-        #   try:
-        if self.pcip != "None":
-            url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-            print("In Playvid2 url2 =", url2)
-            resp = urlopen(url2)
+                if os.path.exists("/tmp/hls.avi"):
+                        os.remove("/tmp/hls.avi")
+                self.session.nav.stopService()
+                self.session.nav.playService(self.srefOld)
+#                try:
+                if self.pcip != "None":
+                        url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
+                        print("In Playvid2 url2 =", url2)
+                        resp = urlopen(url2)
 #                except:
 #                     pass
-        ##aspect ratio
-        if not self.new_aspect == self.init_aspect:
-            try:
-                self.setAspect(self.init_aspect)
-            except:
-                pass
-        #aspect ratio
-        self.close()
+                ##aspect ratio
+                if not self.new_aspect == self.init_aspect:
+                    try:
+                        self.setAspect(self.init_aspect)
+                    except:
+                        pass
+                #aspect ratio
+                self.close()
 
     def keyLeft(self):
         self["text"].left()
@@ -924,48 +948,48 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
 
 
 class downloadJob(Job):
-    def __init__(self, toolbox, cmdline, filename, filetitle):
-        Job.__init__(self, _("Saving Video"))
-        self.toolbox = toolbox
-        self.retrycount = 0
-        downloadTask(self, cmdline, filename, filetitle)
+        def __init__(self, toolbox, cmdline, filename, filetitle):
+                Job.__init__(self, _("Saving Video"))
+                self.toolbox = toolbox
+                self.retrycount = 0
+                downloadTask(self, cmdline, filename, filetitle)
 
-    def retry(self):
-        assert self.status == self.FAILED
-        self.retrycount += 1
-        self.restart()
+        def retry(self):
+                assert self.status == self.FAILED
+                self.retrycount += 1
+                self.restart()
 
 class downloadTask(Task):
-    ERROR_CORRUPT_FILE, ERROR_RTMP_ReadPacket, ERROR_SEGFAULT, ERROR_SERVER, ERROR_UNKNOWN = range(5)
-    def __init__(self, job, cmdline, filename, filetitle):
-        Task.__init__(self, job, filetitle)
-        self.setCmdline(cmdline)
-        self.filename = filename
-        self.toolbox = job.toolbox
-        self.error = None
-        self.lasterrormsg = None
+        ERROR_CORRUPT_FILE, ERROR_RTMP_ReadPacket, ERROR_SEGFAULT, ERROR_SERVER, ERROR_UNKNOWN = range(5)
+        def __init__(self, job, cmdline, filename, filetitle):
+                Task.__init__(self, job, filetitle)
+                self.setCmdline(cmdline)
+                self.filename = filename
+                self.toolbox = job.toolbox
+                self.error = None
+                self.lasterrormsg = None
 
-    def processOutput(self, data):
-        try:
-            if data.endswith('%)'):
-                startpos = data.rfind("sec (")+5
-                if startpos and startpos != -1:
-                    self.progress = int(float(data[startpos:-4]))
-            elif data.find('%') != -1:
-                tmpvalue = data[:data.find("%")]
-                tmpvalue = tmpvalue[tmpvalue.rfind(" "):].strip()
-                tmpvalue = tmpvalue[tmpvalue.rfind("(")+1:].strip()
-                self.progress = int(float(tmpvalue))
-            else:
-                Task.processOutput(self, data)
-        except Exception as errormsg:
-            Task.processOutput(self, data)
+        def processOutput(self, data):
+                try:
+                        if data.endswith('%)'):
+                                startpos = data.rfind("sec (")+5
+                                if startpos and startpos != -1:
+                                        self.progress = int(float(data[startpos:-4]))
+                        elif data.find('%') != -1:
+                                tmpvalue = data[:data.find("%")]
+                                tmpvalue = tmpvalue[tmpvalue.rfind(" "):].strip()
+                                tmpvalue = tmpvalue[tmpvalue.rfind("(")+1:].strip()
+                                self.progress = int(float(tmpvalue))
+                        else:
+                                Task.processOutput(self, data)
+                except Exception as errormsg:
+                        Task.processOutput(self, data)
 
-    def processOutputLine(self, line):
-        self.error = self.ERROR_SERVER
+        def processOutputLine(self, line):
+                        self.error = self.ERROR_SERVER
 
-    def afterRun(self):
-        pass
+        def afterRun(self):
+                pass
 
 #################
 class RSList(MenuList):
@@ -1053,15 +1077,16 @@ def RSListEntry(download):
 
 
 def showlist(data, list):
-    icount = 0
-    plist = []
-    for line in data:
-        name = data[icount]
-        plist.append(RSListEntry(name))
-        icount = icount+1
-    list.setList(plist)
+        icount = 0
+        plist = []
+        for line in data:
+            name = data[icount]
+            plist.append(RSListEntry(name))
+            icount = icount+1
+        list.setList(plist)
 
 
+#################
 
 def getserviceinfo(sref):## this def returns the current playing service name and stream_url from give sref
     try:
@@ -1163,3 +1188,4 @@ class StatusScreen(Screen):
     def __onClose(self):
         self.delayTimer.stop()
         del self.delayTimer
+

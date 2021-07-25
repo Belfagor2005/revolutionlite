@@ -76,21 +76,13 @@ PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 global skin_path, revol, pngs, pngl, pngx, eDreamOS, file_json, nextmodule, search, pngori
-
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import urlencode
-# import six.moves.urllib.request
-
 search = False
-
-# try:
-    # from urllib.parse import urlparse
-# except ImportError:
-     # from urlparse import urlparse
 try:
     from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
     from Plugins.Extensions.revolution.resolver.Utils2 import *
@@ -142,16 +134,11 @@ def checkStr(txt):
 
 def checkInternet():
     try:
-        response = checkStr(urlopen("http://google.com", None, 5))
-        response.close()
-    except HTTPError:
-        return False
-    except URLError:
-        return False
-    except socket.timeout:
-        return False
-    else:
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
         return True
+    except:
+        return False
 try:
     from OpenSSL import SSL
     from twisted.internet import ssl

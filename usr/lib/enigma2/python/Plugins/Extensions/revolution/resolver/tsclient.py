@@ -1,4 +1,3 @@
-from __future__ import print_function
 """
 Simple HTTP Live Streaming client.
 
@@ -20,19 +19,35 @@ Depends on python-crypto (for secure stream)
 Modified for OpenPli enigma2 usage by athoik
 Modified for KodiDirect, KodiLite and IPTVworld by pcd 
 """
+import sys
+import threading
+import time
+import queue
+import os
+import re
+import operator
+import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import urlretrieve  
+from sys import version_info
+PY3 = sys.version_info.major >= 3
+
 def log(msg):
         f1=open("/tmp/e.log","a")
         ms = "\n" + msg
         f1.write(ms)
         f1.close()
 
-pass#log("Here in hlsclient-py 1")
-import urlparse, urllib2, os , re
-pass#print "Here in hlsclient-py 2"
-import sys, threading, time, Queue
-pass#print "Here in hlsclient-py 3"
-import operator
-pass#print "Here in hlsclient-py 4"
+
 
 SUPPORTED_VERSION = 3
 STREAM_PFILE      = '/tmp/hls.avi'
@@ -41,33 +56,26 @@ import bitstring
 
 defualtype=""
 def getLastPTS(data,rpid,type="video"):
-    ##pass#print 'inpcr'
     ret=None
     currentpost=len(data)
-    ##pass#print 'currentpost',currentpost
     found=False
     packsize=188
     spoint=0
     while not found:
         ff=data.rfind('\x47',0,currentpost-1)
-        ##pass#print 'ff',ff,data[ff-188]
         if ff==-1:
-            #pass#print 'No sync data'
             found=True
         elif data[ff-packsize]=='\x47' and data[ff-packsize-packsize]=='\x47':
             spoint=ff
             found=True
         else:
             currentpost=ff-1
-    ##pass#print 'spoint',spoint
     if spoint<=0: return None
     
     currentpost=   spoint 
     found=False
     while not found:
-        ##pass#print len(data)-currentpost
         if len(data)-currentpost>=188:
-            ##pass#print 'currentpost',currentpost
             bytes=data[currentpost:currentpost+188]
             
             bits=bitstring.ConstBitStream(bytes=bytes)
@@ -76,22 +84,16 @@ def getLastPTS(data,rpid,type="video"):
             pusi = bits.read(1).uint
             transportpri = bits.read(1).uint
             pid = bits.read(13).uint
-            ##pass#print pid
             if pid==rpid or rpid==0:
-                ##pass#print pid
-                ##pass#print 1/0
-             
                 try:
                     packet = bits.read((packsize-3)*8)
                     scramblecontrol = packet.read(2).uint
                     adapt = packet.read(2).uint
                     concounter = packet.read(4).uint
                 except:
-                    #pass#print 'error'
-                    return None##pass#print 'errpor'#adapt=-1
+                    return None
                 decodedpts=None
                 av=""
-                ##pass#print 'adapt',adapt
                 if adapt == 3:
                     adaptation_size = packet.read(8).uint
                     discontinuity = packet.read(1).uint
@@ -162,7 +164,6 @@ def getLastPTS(data,rpid,type="video"):
                         restofadapt -=  6
                 elif adapt == 1:
                     pesync = packet.read(24)#.hex
-                    ##pass#print 'pesync',pesync
                     if pesync == ('0x000001'):
                         pestype = packet.read(8).uint
                         if pestype > 223 and pestype < 240:
@@ -172,7 +173,6 @@ def getLastPTS(data,rpid,type="video"):
                         packet.pos += 24
                         ptspresent = packet.read(1).uint
                         dtspresent = packet.read(1).uint
-                        ##pass#print 'ptspresent',ptspresent
                         if ptspresent:
                             packet.pos += (14)
                             pts = packet.read(40)
@@ -195,43 +195,35 @@ def getLastPTS(data,rpid,type="video"):
                                 #decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
                                 decodeddts =int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]),2)#
                 if decodedpts and (type=="" or av==type) and len(av)>0:
-                    ##pass#print 'currentpost',currentpost,decodedpts
                     return decodedpts
             
         currentpost=currentpost-packsize
         if currentpost<10:
-            #pass#print 'came back to begin'
             found=True
     return ret
 
 
 def getFirstPTSFrom(data,rpid, initpts,type="video" ):
-    ##pass#pass#print 'xxxxxxxxxxxinpcr getFirstPTSFrom'
     ret=None
     currentpost=0#len(data)
-    ##pass#pass#print 'currentpost',currentpost
     found=False
     packsize=188
     spoint=0
-    ##pass#pass#print 'inwhile'
     while not found:
         ff=data.find('\x47',currentpost)
         if ff==-1:
-            #pass#pass#print 'No sync data'
             found=True
         elif data[ff+packsize]=='\x47' and data[ff+packsize+packsize]=='\x47':
             spoint=ff
             found=True
         else:
             currentpost=ff+1
-    ##pass#pass#print 'spoint',spoint
     if spoint>len(data)-packsize: return None
     
     currentpost=   spoint 
     found=False    
 
     while not found:
-        ##pass#pass#print 'currentpost',currentpost
         if len(data)-currentpost>=188:
             bytes=data[currentpost:currentpost+188]
             
@@ -241,19 +233,14 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
             pusi = bits.read(1).uint
             transportpri = bits.read(1).uint
             pid = bits.read(13).uint
-            ##pass#pass#print pid
-            ##pass#pass#print pid,rpid
-                ##pass#pass#print 1/0
             if rpid==pid or rpid==0: 
-                ##pass#pass#print 'here pid is same'
                 try:
                     packet = bits.read((packsize-3)*8)
                     scramblecontrol = packet.read(2).uint
                     adapt = packet.read(2).uint
                     concounter = packet.read(4).uint
                 except:
-                    #pass#pass#print 'error'
-                    return None##pass#pass#print 'errpor'#adapt=-1
+                    return None
                 decodedpts=None
                 av=""
                 if adapt == 3:
@@ -326,7 +313,6 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
                         restofadapt -=  6
                 elif adapt == 1:
                     pesync = packet.read(24)#.hex
-                    ##pass#pass#print 'pesync',pesync
                     if pesync == ('0x000001'):
                         pestype = packet.read(8).uint
                         if pestype > 223 and pestype < 240:
@@ -336,7 +322,6 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
                         packet.pos += 24
                         ptspresent = packet.read(1).uint
                         dtspresent = packet.read(1).uint
-                        ##pass#pass#print 'ptspresent',ptspresent
                         if ptspresent:
                             packet.pos += (14)
                             pts = packet.read(40)
@@ -359,14 +344,12 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
                                 #decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
                                 decodeddts =int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]),2)#
                 if decodedpts and (type=="" or av==type) and len(av)>0:
-                    ##pass#pass#print decodedpts
                     if decodedpts>initpts:
                         return decodedpts,currentpost
         else:
             found=True
         currentpost=currentpost+188
         if currentpost>=len(data):
-            ##pass#pass#print 'came back to begin'
             found=True
     return ret
         
@@ -378,11 +361,9 @@ class hlsclient(threading.Thread):
         self._stop = False
         self.thread = None
         self._downLoading = False
-        pass#print "Here in hlsclient-py 1 "
         threading.Thread.__init__(self)
 
     def setUrl(self, url):
-        pass#print "Here in hlsclient-py url =", url
         self.url = url
         self._stop = False
         self.thread = None
@@ -394,18 +375,15 @@ class hlsclient(threading.Thread):
     def run(self):
         self.play()
 #    def download_chunks(self, downloadUrl, chunk_size=4096):
+
     def download_chunks(self, downloadUrl, chunk_size=192512):
-        pass#print "Here in hlsclient-py downloadUrl =", downloadUrl
-        conn=urllib2.urlopen(downloadUrl)
-        pass#print "Here in hlsclient-py downloadUrl done"
+        conn=urlopen(downloadUrl)
         while 1:
             data=conn.read(chunk_size)
-##            pass#print "Here in hlsclient-py data =", data
             if not data: return
             yield data
 
     def download_file(self, downloadUrl):
-        pass#print "Here in hlsclient-py downloadUrl A=", downloadUrl
         return ''.join(self.download_chunks(downloadUrl))
 
 
@@ -416,7 +394,6 @@ class hlsclient(threading.Thread):
             videopipe.write(block)
             #videopipe.flush()
             if not self._downLoading:
-                pass#print 'Connected...'
                 self._downLoading = True
 
     def play(self):
@@ -426,11 +403,8 @@ class hlsclient(threading.Thread):
                os.remove(STREAM_PFILE)
 #        os.mkfifo(STREAM_PFILE)
         cmd = "/usr/bin/mkfifo " + STREAM_PFILE
-        pass#print "Here in hlsclient-py cmd =" , cmd
         os.system(cmd)
-        pass#print "Here in hlsclient-py cmd done"
         videopipe = open(STREAM_PFILE, "w+b")
-        pass#print "Here in hlsclient-py play"
         variants = []
         variant = None
         """
@@ -487,7 +461,6 @@ class hlsclient(threading.Thread):
         fpts = 0
         while self.thread.isAlive():
                 if self._stop:
-                    pass#print '[hlsclient::play] Stopping Download Thread'
                     self.hread._Thread__stop()
                 """    
                 medialist = list(self.handle_basic_m3u(self.url))
@@ -516,66 +489,37 @@ class hlsclient(threading.Thread):
                 starttime = time.time()
                 for chunk in self.download_chunks(self.url):
                    lastchunk = chunk
-                   pass#log("Here in i A1="+str(i))
                    if len(chunk) >1:
-#                      pass#log("Here in i A="+str(i))
                       if i == 0:
-#                          try:
-#                            if enc: chunk = enc.decrypt(chunk)
-                            pass#log("Here in i B="+str(i))
                             try:
                                    firstpts,pos= getFirstPTSFrom(chunk,fixpid,lastpts)
-                                   pass#log("Here in firstpts ="+str(firstpts))
                             except:       
-                                   pass#log("Here in pts error")
                                    continue
 
                       i = i+1      
-                      pass#log("Here in i A="+str(i))
-                      pass#log("Here in firstpts queue="+str(firstpts))
                       queue.put(chunk, block=True)
                    else:
                          continue   
                       
                 lc = len(lastchunk)
-                pass#log("len(lastchunk) ="+str(lc))
-
-#                firstpts,pos= getFirstPTSFrom(chunk,fixpid,lastpts)
-                pass#log("Here in i C="+str(i))
-                pass#log("Here in firstpts B="+str(firstpts)) 
+ 
                 fpts = firstpts
-                pass#log("Here in fpts B="+str(fpts))  
                 
                 lastpts=getLastPTS(lastchunk,fixpid,defualtype)
                 if (lastpts is None) or (lastpts == "None"):
                        lastpts = 0
-                pass#log("Here in lastpts ="+str(lastpts))
-#                time.sleep(5)
-
                 videotime = lastpts - firstpts
-                pass#log("Here in videotime ="+str(videotime))
                 videotime = videotime/90000
-                pass#log("Here in videotime 2="+str(videotime))
-                pass#log("Here in starttime ="+str(starttime))
                 starttime = int(float(starttime))
-                pass#log("Here in starttime 2="+str(starttime))
                 endtime = time.time()
-                pass#log("Here in endtime ="+str(endtime))
                 endtime = int(float(endtime))
-                pass#log("Here in endtime 2="+str(endtime))
                 timetaken = endtime - starttime
-                pass#log("Here in timetaken="+str(timetaken))
                 if videotime > timetaken:
                        sleeptime = videotime - timetaken 
                 else:
                        sleeptime = 10
-                pass#log("Here in sleeptime="+str(sleeptime))
               
-                pass#log("Here in time before sleep ="+str(time.time()))
-#                if sleeptime > 2:
-#                       sleeptime = sleeptime - 2
                 time.sleep(sleeptime)
-                pass#log("Here in time after sleep ="+str(time.time()))       
                            
                 """
                         last_seq = seq
@@ -611,31 +555,18 @@ class hlsclient(threading.Thread):
         self._downLoading = False
         if self.thread:
             self.thread._Thread__stop()
-        pass#print '[hlsclient::stop] Stopping Main hlsclient thread'
         self._Thread__stop()
 
 
-pass#print "Here in sys.argv =", sys.argv
+
 if __name__ == '__main__':
-        pass#print "Here in sys.argv =", sys.argv
-#    if len(sys.argv) <> 3:
-#        pass#print "Here in usage", sys.argv[0], "<stream URL> L%s" % len(sys.argv)
-#        sys.exit(1)
-#    else:
+
         try:
-            pass#print "Here in sys.argv B=", sys.argv
             h = hlsclient()
             h.setUrl(sys.argv[1])
-            pass#print "(sys.argv[2]) =", sys.argv[2]
             if (sys.argv[2]) == '1':
-                pass#print "Here in going in play"
-##                h.start()
                 h.play()
-                pass#print "Here in started"
         except:
-#            if h:
-#                h.stop()
-             pass#print "In except"
              os.remove(STREAM_PFILE)
              h.stop()
 

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.ActionMap import NumberActionMap
@@ -118,9 +117,9 @@ class Playvid(Screen):
         global SREF
         Screen.__init__(self, session)
         if DESKHEIGHT > 1000:
-            self.skin = PlayvidFHD.skin
+              self.skin = PlayvidFHD.skin
         else:
-            self.skin = PlayvidHD.skin
+              self.skin = PlayvidHD.skin                             
         self.name = name
         self.url = url
         self["list"] = List([])
@@ -159,30 +158,14 @@ class Playvid(Screen):
 ########################
         self.name = name
         self.url = url
-        pass#print "Here in Playvid self.url =", self.url
-        pass#print "<<<Endurl"
-#        self.url = self.url.replace("|", "\|")
         n1 = self.url.find("|", 0)
         if n1 > -1:
-                self.url = self.url[:n1]
-        pass#print "Here in Playvid self.url B=", self.url
-        #self['info'].setText(txt)
-
-        ####################
-##        self.updateTimer = eTimer()
-##        self.updateTimer.callback.append(self.updateStatus)
-##        self.updateTimer.start(2000)
-##        self.updateStatus()
-        ####################
+            self.url = self.url[:n1]
         self.updateTimer = eTimer()
         try:
-               self.updateTimer_conn = self.updateTimer.timeout.connect(self.updateStatus)
+            self.updateTimer_conn = self.updateTimer.timeout.connect(self.updateStatus)
         except AttributeError:
-               self.updateTimer.callback.append(self.updateStatus)
-#       self.updateTimer.callback.append(self.updateStatus)
-##	self.updateTimer.start(2000)
-##	self.updateStatus()
-        ####################
+            self.updateTimer.callback.append(self.updateStatus)
         self['info'].setText(" ")
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
@@ -249,7 +232,6 @@ class Playvid(Screen):
     def okClicked(self):
 
           idx=self["list"].getSelectionIndex()
-          pass#print "idx",idx
           if idx==0:
                 self.start2()
           elif idx==1:
@@ -260,16 +242,13 @@ class Playvid(Screen):
 
 
     def showError(self, error):
-         pass#print "DownloadPage error = ", error
+         pass
 
 
     def updateStatus(self):
-#        pass#print "self.icount =", self.icount
-#     pass#print "In updateStatus self.pop =", self.pop
      if self.pop == 1:
             try:
                ptxt = self.p.read()
-#               pass#print "In updateStatus ptxt =", ptxt
                if "data B" in ptxt:
                       n1 = ptxt.find("data B", 0)
                       n2 = ptxt.find("&url", n1)
@@ -277,21 +256,16 @@ class Playvid(Screen):
                       url = ptxt[(n2+5):n3]
                       url = url.replace("AxNxD", "&")
                       self.url = url.replace("ExQ", "=")
-#                      pass#print "In updateStatus url =", url
                       name = "Video"
                       desc = " "
                       self.session.open(Playvid, self.name, self.url, desc)
                       self.close()
                       self.updateTimer.stop()
-#               else:
-#                      self.openTest()
-#                      return
+
             except:
                self.openTest()
-#               return
      else:
         if not os.path.exists(self.svfile):
-            pass#print "No self.svfile =", self.svfile
             self.openTest()
             return
 
@@ -299,9 +273,7 @@ class Playvid(Screen):
             self.openTest()
             return
 
-#        pass#print "Exists self.svfile =", self.svfile
         b1 = os.path.getsize(self.svfile)
-#        pass#print "b1 =", b1
         b = b1 / 1000
         if b == self.bLast:
             infotxt = _('Download Complete....') + str(b)
@@ -527,26 +499,16 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
             }, -1)
 
         self.allowPiP = False
-        #   initSubsSettings()
-        #   SubsSupport.__init__(self, embeddedSupport=True, searchSupport=True)
-        #   self.subs = True
         InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
         self.icount = 0
         self.name = name
         self.url = url
-        #ok                self.url = "rtmpe://fms-fra33.rtl.de/rtlnow/ swfVfy=1 playpath=mp4:2/V_398575_CEAT_E89903_93262_h264-mq_a535063e1a1fbf7249dbddf64452b6e6.f4v app=rtlnow/_definst_ pageUrl=http://rtl-now.rtl.de/p/ tcUrl=rtmpe://fms-fra33.rtl.de/rtlnow/ swfUrl=http://rtl-now.rtl.de/includes/vodplayer.swf"
-        #ok                self.url = "http://iphone.cdn.viasat.tv/iphone/008/00834/S83412_7dagemedsex_coasbb1elswjk4hj_Layer4_vod.m3u8"
-        #ok                self.url = "http://r8---sn-cu-cims.googlevideo.com/videoplayback?ratebypass=yes&id=c480126945309259&upn=cy2tR5f-Euc&expire=1394492898&ipbits=0&sparams=id%2Cip%2Cipbits%2Citag%2Cratebypass%2Csource%2Cupn%2Cexpire&fexp=917000%2C935501%2C914005%2C916611%2C936117%2C937417%2C913434%2C936910%2C936913%2C902907%2C934022&itag=22&sver=3&key=yt5&ip=86.129.227.24&ms=au&signature=248F501C2CC4F46437504012DDF0E517A936385C.713CC09A87E83950ACD42D60E12B68D467E107E7&mt=1394470293&mv=m&source=youtube"
-        #ok                self.url = "http://199.115.117.219//d/nbi6zz36qm752xrl7fzqr2llvh3gq2mynl3fitbewdtshbuk6rh3acul/A7r0n1nwb72G.mkv"
-        #                self.url = "http://2uscreativem3-vh.rai.it/i/podcastcdn/raiuno/sottovoce/Sottovoce_2014/4761193_1800.mp4/index_0_av.m3u8"
-        #                self.url = "https://openload.co/stream/bxQRLDZsSlg~1444840274~86.185.0.0~ooI8G6Rq?mime=true"
-        pass#print "Here in Playvid2 self.url = ", self.url
         self.desc = desc
         self.pcip = "None"
         self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.openTest)
-    ##aspect ratio stuff
+
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
 
@@ -575,16 +537,12 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
 
     def av(self):
         temp = int(self.getAspect())
-        pass#print self.getAspectString(temp)
         temp = temp + 1
         if temp > 6:
             temp = 0
         self.new_aspect = temp
         self.setAspect(temp)
-        pass#print self.getAspectString(temp)
         self.statusScreen.setStatus(self.getAspectString(temp))
-
-
 
     def showinfo(self):
             debug=True
@@ -606,6 +564,7 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
                  sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
                  sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
                  sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
+
                  message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
                  self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
 
@@ -613,7 +572,6 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
                   pass
 
     def playpauseService(self):
-        pass#print "playpauseService"
         if self.state == self.STATE_PLAYING:
              self.pause()
              self.state = self.STATE_PAUSED
@@ -633,7 +591,6 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
                       from tube_resolver.plugin import getvideo
                       self.url,error = getvideo(self.url)
                       if error is not None or self.url is None:
-                         pass#print "failed to get valid youtube stream link"
                          return
 
                 elif "pcip" in self.url:
@@ -644,18 +601,15 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
 
                 url = self.url
                 name = self.name
-                pass#print "Here in Playvid name A =", name
                 name = name.replace(":", "-")
                 name = name.replace("&", "-")
                 name = name.replace(" ", "-")
                 name = name.replace("/", "-")
                 name = name.replace("›", "-")
                 name = name.replace(",", "-")
-                pass#print "Here in Playvid name B2 =", name
 
                 if url is not None:
                     url = str(url)
-                    pass#print "url final= ", url
                     ref = eServiceReference(0x1001, 0, url)
                     ref.setName(name)
                     self.sref=ref
@@ -678,7 +632,6 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
 #                try:
                 if self.pcip != "None":
                         url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-                        pass#print "In Playvid2 url2 =", url2
                         resp = urlopen(url2)
 #                except:
 #                     pass
@@ -751,13 +704,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
               self.icount = 0
               self.name = name
               self.url = url
-#ok                self.url = "rtmpe://fms-fra33.rtl.de/rtlnow/ swfVfy=1 playpath=mp4:2/V_398575_CEAT_E89903_93262_h264-mq_a535063e1a1fbf7249dbddf64452b6e6.f4v app=rtlnow/_definst_ pageUrl=http://rtl-now.rtl.de/p/ tcUrl=rtmpe://fms-fra33.rtl.de/rtlnow/ swfUrl=http://rtl-now.rtl.de/includes/vodplayer.swf"
-#ok                self.url = "http://iphone.cdn.viasat.tv/iphone/008/00834/S83412_7dagemedsex_coasbb1elswjk4hj_Layer4_vod.m3u8"
-#ok                self.url = "http://r8---sn-cu-cims.googlevideo.com/videoplayback?ratebypass=yes&id=c480126945309259&upn=cy2tR5f-Euc&expire=1394492898&ipbits=0&sparams=id%2Cip%2Cipbits%2Citag%2Cratebypass%2Csource%2Cupn%2Cexpire&fexp=917000%2C935501%2C914005%2C916611%2C936117%2C937417%2C913434%2C936910%2C936913%2C902907%2C934022&itag=22&sver=3&key=yt5&ip=86.129.227.24&ms=au&signature=248F501C2CC4F46437504012DDF0E517A936385C.713CC09A87E83950ACD42D60E12B68D467E107E7&mt=1394470293&mv=m&source=youtube"
-#ok                self.url = "http://199.115.117.219//d/nbi6zz36qm752xrl7fzqr2llvh3gq2mynl3fitbewdtshbuk6rh3acul/A7r0n1nwb72G.mkv"
-#                self.url = "http://2uscreativem3-vh.rai.it/i/podcastcdn/raiuno/sottovoce/Sottovoce_2014/4761193_1800.mp4/index_0_av.m3u8"
-#                self.url = "https://openload.co/stream/bxQRLDZsSlg~1444840274~86.185.0.0~ooI8G6Rq?mime=true"
-              pass#print "Here in Playvid2 self.url = ", self.url
               self.desc = desc
               self.pcip = "None"
               self.state = self.STATE_PLAYING
@@ -792,13 +738,11 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
 
     def av(self):
         temp = int(self.getAspect())
-        pass#print self.getAspectString(temp)
         temp = temp + 1
         if temp > 6:
             temp = 0
         self.new_aspect = temp
         self.setAspect(temp)
-        pass#print self.getAspectString(temp)
         self.statusScreen.setStatus(self.getAspectString(temp))
 
 
@@ -835,7 +779,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
                   pass
 
     def playpauseService(self):
-        pass#print "playpauseService"
         if self.state == self.STATE_PLAYING:
              self.pause()
              self.state = self.STATE_PAUSED
@@ -855,7 +798,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
                       from tube_resolver.plugin import getvideo
                       self.url,error = getvideo(self.url)
                       if error is not None or self.url is None:
-                         pass#print "failed to get valid youtube stream link"
                          return
 
                 elif "pcip" in self.url:
@@ -866,18 +808,14 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
 
                 url = self.url
                 name = self.name
-                pass#print "Here in Playvid name A =", name
                 name = name.replace(":", "-")
                 name = name.replace("&", "-")
                 name = name.replace(" ", "-")
                 name = name.replace("/", "-")
                 name = name.replace("›", "-")
                 name = name.replace(",", "-")
-                pass#print "Here in Playvid name B2 =", name
-
                 if url is not None:
                      url = str(url)
-                     pass#print "url final= ", url
                      ref = eServiceReference(0x1001, 0, url)
                      ref.setName(name)
                      self.sref=ref
@@ -891,6 +829,7 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
            self.subsMenu()
 #        except:
 #           self['programm'].setText('Unable to start subtitles player')
+
     def subtitlesX(self):
           if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
                   self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
@@ -899,7 +838,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
                   pluginlist = []
                   pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
                   for plugin in pluginlist:
-#                                  pass#print "str(plugin.name) =", str(plugin.name)
                           if "Subtitle player" in str(plugin.name):
                                   found = 1
                                   break
@@ -919,7 +857,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
 #                try:
                 if self.pcip != "None":
                         url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-                        pass#print "In Playvid2 url2 =", url2
                         resp = urlopen(url2)
 #                except:
 #                     pass
@@ -1075,14 +1012,14 @@ def RSListEntry(download):
 
 
 def showlist(data, list):
-    icount = 0
-    plist = []
-    for line in data:
-    #   pass#print "In showlist line =", line
-        name = data[icount]
-        plist.append(RSListEntry(name))
-        icount = icount+1
-    list.setList(plist)
+         icount = 0
+         plist = []
+         for line in data:
+              name = data[icount]
+              plist.append(RSListEntry(name))
+              icount = icount+1
+
+         list.setList(plist)
 
 
 
@@ -1094,7 +1031,7 @@ def getserviceinfo(sref):## this def returns the current playing service name an
         serviceurl=str(p.getPath())
         return servicename,serviceurl
     except:
-        return None, None
+        return None,None
 
 
 def addstreamboq(bouquetname=None):
@@ -1174,7 +1111,6 @@ class StatusScreen(Screen):
          str(self.sc_width))
         Screen.__init__(self, session)
         self.stand_alone = True
-        pass#print 'initializing status display'
         self['status'] = Label('')
         self.onClose.append(self.__onClose)
 
