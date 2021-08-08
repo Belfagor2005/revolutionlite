@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
 from __future__ import print_function
 '''
@@ -121,6 +121,9 @@ def getversioninfo():
             pass
     logdata("Version ", currversion)
     return (currversion)
+                     
+                              
+                                       
 
 eDreamOS = False
 try:
@@ -176,6 +179,7 @@ def trace_error():
         traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
     except:
         pass
+                 
 
 def make_request(url):
     link = []
@@ -251,6 +255,7 @@ if os.path.exists("/usr/bin/exteplayer3"):
     modechoices.append(("5002", _("Exteplayer3(5002)")))
 if os.path.exists("/usr/sbin/streamlinksrv"):
     modechoices.append(("5002", _("Streamlink(5002)")))
+    
 config.plugins.revolution = ConfigSubsection()
 config.plugins.revolution.cachefold = ConfigDirectory(default='/media/hdd/revolution/')
 config.plugins.revolution.services = ConfigSelection(default='4097', choices = modechoices)
@@ -275,6 +280,32 @@ pixmaps = res_picon_plugin_path + 'backg.png'
 revol = config.plugins.revolution.cachefold.value.strip()
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
+                                                                                                 
+                                  
+                                    
+                                                
+                                    
+                      
+                                                                                                         
+                          
+                                                       
+                                                                 
+                                                                  
+
+                             
+                                       
+
+                                                                                                                                                                
+                                                                                                                                                          
+                                                                                                                           
+                                       
+                                         
+                      
+
+                      
+                                                                                                         
+                  
+                                      
 
 if revol.endswith('/'):
     revol = revol[:-1]
@@ -429,11 +460,14 @@ class Revolmain(Screen):
         self['actions'] = NumberActionMap(['SetupActions', 'DirectionActions', "EPGSelectActions", 'ColorActions', "MenuActions"], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
+                           
          'red': self.closerm,
+                                     
          # 'yellow': self.remove,
          # 'blue': self.msgtqm,
          'epg': self.showIMDB,
          'info': self.showIMDB,
+                                   
          'up': self.up,
          'down': self.down,
          'left': self.left,
@@ -442,9 +476,52 @@ class Revolmain(Screen):
          'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.__layoutFinished)
+                      
+                      
+                  
+                      
+                  
+             
+                                  
+                                   
+                         
+                              
+                               
+                                  
+                                 
+                             
+                              
+                                 
+                                
+                        
+                         
+                               
+                               
+                               
+                                  
+                                  
+                              
+                              
+                              
+                                 
+                                 
+                        
+                             
+                      
+             
+                 
+                                          
+
+                       
+              
 
     def showIMDB(self):
         itype = idx
+                   
+                           
+                   
+             
+                                
         name = self.names[itype]
         if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
             from Plugins.Extensions.TMBD.plugin import TMBD
@@ -464,6 +541,12 @@ class Revolmain(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+
+                     
+                    
+
+                         
+            
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -485,6 +568,23 @@ class Revolmain(Screen):
             idx += 1
         self['text'].setList(list)
         self.load_poster()
+                          
+                                     
+                                     
+                                     
+                                     
+                                     
+                             
+                            
+                                                                
+                                                                    
+                 
+                                 
+                                                                    
+             
+                            
+                                                               
+                                                                    
 
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
@@ -528,6 +628,9 @@ class Revolmain(Screen):
 
     def down(self):
         self[self.currentList].down()
+                                 
+                  
+             
         self.load_poster()
 
     def left(self):
@@ -635,25 +738,52 @@ class live_stream(Screen):
 
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
+                   
+                           
+                   
+             
+                                
+                                                     
         name = self.names[idx]
         if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
+                            
             self.session.open(TMBD, text, False)
         elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
             HHHHH = text
+                         
+                                              
+                                       
+
+                                                                  
+                                                 
+                
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
             if inf and inf != '':
                 text_clear = self.infos[inf]
+                                                                
+                                        
+                    
+                                                                    
+                                       
+                       
+                        
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+
+                                                                   
+                                                      
+                    
+                                                               
+                                       
 
     def readJsonFile(self, name, url, pic):
         global nextmodule
@@ -858,6 +988,11 @@ class live_stream(Screen):
                 print(ex)
                 print("Error: can't find file or read data")
             return
+                                   
+                                   
+                                                                                                                                      
+             
+                                     
 
     def downloadError(self, raw):
         try:
@@ -982,11 +1117,228 @@ class video3(Screen):
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
+                         
+                                                                                                                   
+                                                        
+                                              
+                           
+                            
+                             
+                        
+                                        
+                                                 
+                                 
+                                                  
+                                   
+
+                       
+                                                                                                  
+                                   
+                                             
+                                             
+                                                                                                          
+
+                                                                              
+                                              
+                                             
+                                                                                                           
+                  
+                          
+                          
+                                                      
+                                                                            
+                         
+                                                                                                               
+                                   
+
+             
+              
+                       
+                             
+                                              
+                     
+                                   
+                                     
+                                                        
+                                                             
+                                                             
+                                
+                               
+                                   
+                                        
+                 
+                                            
+                         
+                
+                                                                             
+                   
+                                                                          
+                   
+                                  
+                                                                       
+                         
+
+                       
+                       
+                          
+                                      
+                         
+
+                        
+                          
+                           
+                          
+                          
+                           
+                       
+                                      
+                          
+                         
+
+                     
+                                                                              
+                                   
+                                                                                
+                                                
+                                        
+                              
+                                           
+                               
+                                 
+                      
+                 
+                                
+             
+                            
+
+                       
+                                                                                
+                                   
+                                                                                 
+                                                  
+                                        
+                                       
+                                           
+                               
+                                          
+                              
+                              
+                               
+                 
+                                                                                         
+                                 
+             
+                             
+
+                        
+                          
+                              
+                                
+                                         
+                                                               
+
+                            
+                                       
+
+                             
+                                       
+
+                                   
+                         
+                                              
+                                       
+
+                                                                  
+                                                 
+                
+                                                           
+                                   
+                   
+                    
+                                                                      
+                                                                            
+                                        
+                    
+                                                                    
+                                       
+                       
+                        
+                 
+                                                                                
+                                                         
+
+                                                                   
+                                                         
+                    
+                                                               
+                                       
+                       
+                        
+
+                                                                      
+                                                           
+                
+                                                       
+                                   
+                   
+                    
+
+                                                                        
+                                               
+                
+                                                         
+                   
+                    
+
+                                             
+                                                    
+                
+                          
+                                                       
+                                   
+                   
+                    
+
+                                          
+                                                              
+                                                            
+                                                    
+                
+                                                       
+                                   
+                   
+                    
+
+                                          
+                                                 
+                
+                                                       
+                                   
+                   
+                    
+
+                                          
+                                                 
+                
+                                                       
+                                   
+                   
+                    
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
         self.load_infos()
         self.load_poster()
+                   
+                    
+             
+                        
+
+                                     
+                         
+                     
+                                                                                                                          
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -994,12 +1346,76 @@ class video3(Screen):
         if idx is not None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
+                                   
+                   
+                      
         else:
             info = ''
             name = ''
         self['desc'].setText(str(info))
-        self['space'].setText(str(name))
+                     
+                      
+              
+                  
+         
+                         
 
+                                
+                                      
+                      
+                                      
+                                 
+                            
+                                     
+                              
+        self['space'].setText(str(name))
+                                 
+                                             
+                                               
+                                                                                                                
+         
+                                 
+                               
+                              
+                                    
+              
+                                                                             
+                   
+                           
+                                                     
+                                           
+
+                           
+                       
+                      
+                       
+                                  
+                                   
+                                    
+                                 
+                                  
+                                   
+                             
+                             
+                                                                  
+                                                                   
+                                                                    
+                                                                                                     
+                             
+                                           
+                                           
+                                   
+                                              
+
+                                                                                                       
+                     
+                                       
+
+                     
+                                              
+                        
+
+                      
     def selectionChanged(self):
         if self["text"].getCurrent():
             currentindex = self["text"].getIndex()
@@ -1044,6 +1460,12 @@ class video3(Screen):
             except:
                 break
             showlist(self.names, self['text'])
+                               
+                                  
+                                 
+                                  
+                                  
+                                  
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -1198,6 +1620,8 @@ class nextvideo3(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
+                                    
+              
         self.name = name
         self.url = url
         self.pic = pic
@@ -1460,6 +1884,7 @@ class video4(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
+              
         self.name = name
         self.url = url
         self.pic = pic
@@ -1720,6 +2145,7 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
+              
         self.name = name
         self.url = url
         self.pic = pic
@@ -2955,8 +3381,6 @@ class Playstream1(Screen):
         self.name1 = name
         self.url = url
         self.desc = desc
-        # if six.PY3:
-            # self.url = url.encode('utf8')
         print('In Playstream1 self.url =', url)
         global srefInit
         self.initialservice = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -3077,7 +3501,7 @@ class Playstream1(Screen):
             self.session.open(Playstream2, name, sref, desc)
             self.close()
         else:
-            self.mbox = self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
     def cancel(self):
         try:
@@ -3231,11 +3655,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.service = None
         service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        # url = checkStr(url)
-        # url = url.replace(':', '%3a')
-        # url = url.replace(' ','%20')
-        # url = url.replace("b'",'')
-        # url = url.replace("'",'')
         self.icount = 0
         self.desc = desc
         self.pcip = 'None'
@@ -3317,12 +3736,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif fileExists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+            self.session.open(IMDB, text)
         else:
             inf = self.desc
             if inf and inf != '':
@@ -3361,8 +3779,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        # if streamlink==True:
-            # streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+        if streamlink==True:
+            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/exteplayer3"):
