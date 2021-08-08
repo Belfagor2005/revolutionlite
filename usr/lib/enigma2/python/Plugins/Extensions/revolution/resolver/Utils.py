@@ -60,7 +60,7 @@ from six.moves.urllib.request import urlretrieve
 from sys import version_info
 PY3 = sys.version_info.major >= 3
 
-try
+try:
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
     import http.client
     import urllib.request, urllib.parse, urllib.error
