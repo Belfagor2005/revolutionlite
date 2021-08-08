@@ -1,17 +1,15 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from __future__ import print_function#, unicode_literals
+#!/usr/bin/python
+from __future__ import print_function
 '''
 Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *                                      *
-*             09/06/2021               *
+*             08/08/2021               *
 ****************************************
 '''
-#on ATV6.5 Error in screen 'widget': Renderer 'rvRunningText' not found!
 from . import _
-# from . __init__ import UrlLst
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
@@ -71,26 +69,34 @@ import hashlib
 import random
 import six
 from os.path import splitext
-from sys import version_info
-PY3 = sys.version_info.major >= 3
-print('Py3: ',PY3)
+if six.PY3:
+    print('six.PY3: True ')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 global skin_path, revol, pngs, pngl, pngx, eDreamOS, file_json, nextmodule, search, pngori
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
-from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.error import HTTPError
+from six.moves.urllib.error import URLError
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import urlencode
+import six.moves.urllib.request
 search = False
 try:
     from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
     from Plugins.Extensions.revolution.resolver.Utils2 import *
 except:
     from Plugins.Extensions.revolution.resolver.Utils import *
-
+streamlink = False
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
+       
+try:       
+    if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
+        if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
+            streamlink = True
+except:
+    streamlink = False
 
 def logdata(name = '', data = None):
     try:
@@ -103,7 +109,7 @@ def logdata(name = '', data = None):
         pass
 
 def getversioninfo():
-    currversion = '1.1'
+    currversion = '1.2'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -122,9 +128,14 @@ try:
     eDreamOS = True
 except:
     eDreamOS = False
+try:
+    from urlparse import urlparse
+except:
+    from urllib.parse import urlparse
+
 
 def checkStr(txt):
-    if PY3:
+    if six.PY3:
         if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
@@ -148,10 +159,6 @@ except:
     sslverify = False
 
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -171,22 +178,42 @@ def trace_error():
         pass
 
 def make_request(url):
+    link = []
     try:
         import requests
-        # link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        link = requests.get(url, headers = headers).text
+        if six.PY3:
+            url = url.encode()
+        link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
         return link
     except ImportError:
+        print("Here in client2 getUrl url =", url)
+        if six.PY3:
+            url = url.encode()
         req = Request(url)
-        req.add_header('User-Agent', 'TVS')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
-        link = response.read()
+        link=response.read()
         response.close()
-        logdata("Link 2 ", link)
+        print("Here in client2 link =", link)
         return link
     except:
         return
     return
+    # try:
+        # import requests
+        # link = requests.get(url, headers = headers).text
+        # return link
+    # except ImportError:
+        # req = Request(url)
+        # req.add_header('User-Agent', 'TVS')
+        # response = urlopen(req, None, 3)
+        # link = response.read()
+        # response.close()
+        # logdata("Link 2 ", link)
+        # return link
+    # except:
+        # return
+    # return
 
 def deletetmp():
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
@@ -224,13 +251,10 @@ if os.path.exists("/usr/bin/exteplayer3"):
     modechoices.append(("5002", _("Exteplayer3(5002)")))
 if os.path.exists("/usr/sbin/streamlinksrv"):
     modechoices.append(("5002", _("Streamlink(5002)")))
-
 config.plugins.revolution = ConfigSubsection()
 config.plugins.revolution.cachefold = ConfigDirectory(default='/media/hdd/revolution/')
 config.plugins.revolution.services = ConfigSelection(default='4097', choices = modechoices)
-
 HD = getDesktop(0).size()
-
 currversion = getversioninfo()
 title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
@@ -269,6 +293,47 @@ else:
 if eDreamOS:
     skin_path = skin_path + 'dreamOs/'
 
+REGEX = re.compile(
+		r'([\(\[]).*?([\)\]])|'
+		r'(: odc.\d+)|'
+		r'(\d+: odc.\d+)|'
+		r'(\d+ odc.\d+)|(:)|'
+		r'( -(.*?).*)|(,)|'
+		r'!|'
+		r'/.*|'
+		r'\|\s[0-9]+\+|'
+		r'[0-9]+\+|'
+		r'\s\d{4}\Z|'
+		r'([\(\[\|].*?[\)\]\|])|'
+		r'(\"|\"\.|\"\,|\.)\s.+|'
+		r'\"|:|'
+		r'Премьера\.\s|'
+		r'(х|Х|м|М|т|Т|д|Д)/ф\s|'
+		r'(х|Х|м|М|т|Т|д|Д)/с\s|'
+		r'\s(с|С)(езон|ерия|-н|-я)\s.+|'
+		r'\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
+		r'\.\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
+		r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
+		r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
+
+def getJsonURL(url):
+    request = Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    request.add_header('Accept-Encoding', 'gzip')
+    response = urlopen(request, timeout=30)
+    gzipped = response.info().get('Content-Encoding') == 'gzip'
+    data = '' #[]
+    dec_obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    while True:
+        res_data = response.read()
+        if not res_data:
+            break
+        if gzipped:
+            data += dec_obj.decompress(res_data)
+        else:
+            data += res_data
+    return json.loads(data)
+
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
@@ -298,7 +363,6 @@ def rvListEntry(name, idx):
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
             res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =2, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT))
         return res
-
 def rvoneListEntry(name):
     pngx = ico1_path
     res = [name]
@@ -326,7 +390,6 @@ PanelMain = [
  ('INTERNATIONAL')]
 
 class Revolmain(Screen):
-
     def __init__(self, session):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -396,7 +459,7 @@ class Revolmain(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -430,7 +493,6 @@ class Revolmain(Screen):
         global nextmodule
         sel = self.menu_list[idx]
         live, movie, series, other = TvsApi()
-
         if sel == ('LIVE'):
             name = 'LIVE'
             url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1' #live #all_channel_live
@@ -456,7 +518,6 @@ class Revolmain(Screen):
                 pic = piconinter
                 nextmodule = 'other'
                 self.mbox = self.session.open(MessageBox, _('Use my Plugin Freearhey'), MessageBox.TYPE_INFO, timeout=4)
-
 
     def goConfig(self):
         self.session.open(myconfig)
@@ -517,7 +578,6 @@ class Revolmain(Screen):
             return
 
 class live_stream(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -589,7 +649,7 @@ class live_stream(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -598,7 +658,8 @@ class live_stream(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        # content = six.ensure_str(content)
+        if six.PY3:
+            content = six.ensure_str(content)
         print('live_stream content B =', content)
         y = json.loads(content)
         self.names = []
@@ -610,21 +671,19 @@ class live_stream(Screen):
             try:
                 print('In live_stream y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In live_stream name =", name)
+                name = REGEX.sub('', name.strip())
+                # print("In live_stream name =", name)
                 url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
-                print("In live_stream url =", url)
+                # print("In live_stream url =", url)
                 pic = (y["items"][i]["thumbnail"])
-                print("In live_stream pic =", pic)
+                # print("In live_stream pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In live_stream info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In live_stream info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -634,7 +693,6 @@ class live_stream(Screen):
                 self.urls.append("https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=")
                 self.pics.append(str(piconsearch))
                 self.infos.append(str('Search Movies'))
-                # self.infos.append(str(info))
                 i = i+1
             if 'live' in nextmodule:
                 nextmodule = "Videos3"
@@ -646,20 +704,12 @@ class live_stream(Screen):
         showlist(self.names, self['text'])
 
     def okRun(self):
-        # global search
         idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
         if idx is not None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
             desc = self.infos[idx]
-            print('name: ', name)
-            print('url: ', url)
-            print('png: ', pic)
-            print('desc: ', desc)
-            print('nextmodule live_stream is: ', nextmodule)
-
             if 'Search' in str(name):
                 search = True
                 from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -703,12 +753,23 @@ class live_stream(Screen):
             global search
             search = False
             pic = self.picx
-            name = str(result) #self.namex
+            name = str(result)
             url = self.urlx + str(result)
-            if nextmodule == 'Videos4':
-                search = True
-                self.session.open(nextvideo4, name, url, pic, nextmodule)
+            
+            try:
+                # if nextmodule == 'Videos4':
+                    search = True
+                    self.session.open(nextvideo4, name, url, pic, nextmodule)
+            except:
+                return
+        else:
+            self.resetSearch()
 
+    def resetSearch(self):
+        global search
+        search = False
+        return
+        
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -741,9 +802,6 @@ class live_stream(Screen):
         self.close(None)
 
     def up(self):
-        # self[self.currentList].up()
-        # self.load_infos()
-        # self.load_poster()
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
@@ -790,7 +848,7 @@ class live_stream(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -847,7 +905,6 @@ class live_stream(Screen):
             return
 
 class video3(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -878,7 +935,6 @@ class video3(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.pic = pic
@@ -920,7 +976,7 @@ class video3(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -949,41 +1005,41 @@ class video3(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #4
     def readJsonFile(self, name, url, pic):
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("Videos3 content A =", content)
-        y = json.loads(content)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        y = json.loads(content)
         i = 0
         while i < 100:
             try:
                 print('In Videos3 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In Videos3 name =", name)
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                # print("In Videos3 name =", name)
                 try:
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
                 # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
-                print("In Videos3 url =", url)
+                # print("In Videos3 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In Videos3 pic =", pic)
+                # print("In Videos3 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In Videos3 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In Videos3 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -997,10 +1053,6 @@ class video3(Screen):
             url = self.urls[idx]
             pic = self.pics[idx]
             desc = self.infos[idx]
-            print('name: ', name)
-            print('url: ', url)
-            print('png: ', pic)
-            print('desc: ', desc)
             print('Videos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(nextvideo3, name, url, pic, nextmodule)
@@ -1008,7 +1060,6 @@ class video3(Screen):
                 self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
-        # search == False
         global nextmodule
         if nextmodule == 'Videos3':
             nextmodule = 'Videos3'
@@ -1059,7 +1110,7 @@ class video3(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -1116,7 +1167,6 @@ class video3(Screen):
             return
 
 class nextvideo3(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -1168,7 +1218,7 @@ class nextvideo3(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
-        self.readJsonFile(name, url, pic)
+        self.readJsonFile(self.name, self.url, self.pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
         # self.onFirstExecBegin.append(self.download)
@@ -1190,7 +1240,7 @@ class nextvideo3(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -1199,8 +1249,8 @@ class nextvideo3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -1215,24 +1265,26 @@ class nextvideo3(Screen):
         if self["text"].getCurrent():
             currentindex = self["text"].getIndex()
             print(currentindex)
-    #4
+
     def readJsonFile(self, name, url, pic):
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("nextVideos3 content A =", content)
-        y = json.loads(content)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("nextVideos3 content A =", content)
+        y = json.loads(content)
         i = 0
         while i < 100:
             try:
                 print('In nextVideos3 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
                 print("In nextVideos3 name =", name)
                 try:
                     url = (y["items"][i]["link"])
@@ -1240,22 +1292,24 @@ class nextvideo3(Screen):
                     url = (y["items"][i]["yatse"])
                 # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
-                print("In nextVideos3 url =", url)
+                # print("In nextVideos3 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In nextVideos3 pic =", pic)
+                # print("In nextVideos3 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In nextVideos3 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In nextVideos3 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
             showlist(self.names, self['text'])
 
     def okRun(self):
+        idx = self["text"].getSelectionIndex()
+        print('video1 idx: ', idx)
         if idx is not None or idx != -1:
             idx = self["text"].getSelectionIndex()
             print('idx: ', idx)
@@ -1263,10 +1317,6 @@ class nextvideo3(Screen):
             url = self.urls[idx]
             pic = self.pics[idx]
             desc = self.infos[idx]
-            print('name: ', name)
-            print('url: ', url)
-            print('png: ', pic)
-            print('desc: ', desc)
             print('nextVideos3 nextmodule - is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos3':
                 self.session.open(video3, name, url, pic, nextmodule)
@@ -1274,7 +1324,6 @@ class nextvideo3(Screen):
                 self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
-        # search == False
         global nextmodule
         nextmodule = 'Videos3'
         print('cancel nextvideos3 nextmodule ', nextmodule)
@@ -1304,7 +1353,9 @@ class nextvideo3(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = self.pics[idx]
+            if six.PY3:
+                pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
@@ -1322,9 +1373,8 @@ class nextvideo3(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
-                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -1379,7 +1429,6 @@ class nextvideo3(Screen):
             return
 
 class video4(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -1433,7 +1482,7 @@ class video4(Screen):
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        self.readJsonFile(name, url, pic)
+        self.readJsonFile(self.name, self.url, self.pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1453,7 +1502,7 @@ class video4(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -1462,8 +1511,8 @@ class video4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -1479,42 +1528,42 @@ class video4(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #vid4
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("content Video4 =", content)
-        y = json.loads(content)
-        print("y =", y)
-        print('In video4 y["items"] =', y["items"])
-        print('In video4 y["items"][0] =', y["items"][0])
-        print('In video4 y["items"][0]["title"] =', y["items"][0]["title"])
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content Video4 =", content)
+        y = json.loads(content)
+        # print("y =", y)
+        # print('In video4 y["items"] =', y["items"])
+        # print('In video4 y["items"][0] =', y["items"][0])
         i = 0
         while i < 50:
             try:
                 print('In video4 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In video4 name =", name)
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                # print("In video4 name =", name)
                 url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
-                print("In video4 url =", url)
+                # print("In video4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In video4 pic =", pic)
+                # print("In video4 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In video4 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In video4 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1529,13 +1578,9 @@ class video4(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
-            print('video4 name: ', name)
-            print('video4 url: ', url)
-            print('video4 png: ', pic)
             print('video4 nextmodule is: ', nextmodule)
             if '&page' in str(url):
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
-
             if 'listMovie' in str(url):
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
                 print('video4 and listMovie : ', nextmodule)
@@ -1544,7 +1589,6 @@ class video4(Screen):
                     self.session.open(video5, name, url, pic, nextmodule)
 
     def cancel(self):
-        # search == False
         self.close(None)
 
     def up(self):
@@ -1589,7 +1633,7 @@ class video4(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -1646,7 +1690,6 @@ class video4(Screen):
             return
 
 class nextvideo4(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -1677,7 +1720,6 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.pic = pic
@@ -1720,7 +1762,7 @@ class nextvideo4(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -1729,8 +1771,8 @@ class nextvideo4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -1745,43 +1787,46 @@ class nextvideo4(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #vid4
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("content A =", content)
-        y = json.loads(content)
-        print("y =", y)
-        print('In nextvideo4 y["items"] =', y["items"])
-        print('In nextvideo4 y["items"][0] =', y["items"][0])
-        print('In nextvideo4 y["items"][0]["title"] =', y["items"][0]["title"])
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content A =", content)
+        y = json.loads(content)
+        # print("y =", y)
+        # print('In nextvideo4 y["items"] =', y["items"])
+        # print('In nextvideo4 y["items"][0] =', y["items"][0])
         i = 0
         while i < 100:
             try:
                 print('In nextvideo4 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In nextvideo4 name =", name)
-                url = (y["items"][i]["externallink"])
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                try:
+                    url = (y["items"][i]["externallink"])                
+                except:
+                    url = (y["items"][i]["link"])  
+                # print("In nextvideo4 name =", name)
                 # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
-                print("In nextvideo4 url =", url)
+                # print("In nextvideo4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In nextvideo4 pic =", pic)
+                # print("In nextvideo4 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In nextvideo4 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In nextvideo4 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1795,9 +1840,6 @@ class nextvideo4(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
-            print('nextvideo4 name: ', name)
-            print('nextvideo4 url: ', url)
-            print('nextvideo4 png: ', pic)
             print('nextvideo4 x x nextmodule is: ', nextmodule)
             if '&page' in str(url):
                 self.session.open(video4, name, url, pic, nextmodule)
@@ -1810,7 +1852,6 @@ class nextvideo4(Screen):
                     self.session.open(video5, name, url, pic, nextmodule)
 
     def cancel(self):
-        # search == False
         self.close(None)
 
     def up(self):
@@ -1837,7 +1878,9 @@ class nextvideo4(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = self.pics[idx]
+            if six.PY3:
+                pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
@@ -1855,7 +1898,7 @@ class nextvideo4(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -1964,7 +2007,6 @@ class video1(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
-
         self.timer = eTimer()
         self.timer.start(1000, 1)
         self.readJsonFile(name, url, pic)
@@ -1987,7 +2029,7 @@ class video1(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -1996,8 +2038,8 @@ class video1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -2013,46 +2055,46 @@ class video1(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #vid4
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("content Video1 =", content)
-        y = json.loads(content)
-        print("y =", y)
-        print('In Video1 y["items"] =', y["items"])
-        print('In Video1 y["items"][0] =', y["items"][0])
-        print('In Video1 y["items"][0]["title"] =', y["items"][0]["title"])
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content Video1 =", content)
+        y = json.loads(content)
+        # print("y =", y)
+        # print('In Video1 y["items"] =', y["items"])
+        # print('In Video1 y["items"][0] =', y["items"][0])
         i = 0
         while i < 50:
             try:
                 print('In Video1 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In Video1 name =", name)
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                # print("In Video1 name =", name)
                 try:
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
                 # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
-                print("In Video1 url =", url)
+                # print("In Video1 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In Video1 pic =", pic)
+                # print("In Video1 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In Video1 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In Video1 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -2068,10 +2110,6 @@ class video1(Screen):
             url = self.urls[idx]
             pic = self.pics[idx]
             desc = self.infos[idx]
-            print('Video1 name: ', name)
-            print('Video1 url: ', url)
-            print('Video1 png: ', pic)
-            print('Video1 desc: ', desc)
             print('Video1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
@@ -2118,7 +2156,9 @@ class video1(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = self.pics[idx]
+            if six.PY3:
+                pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
@@ -2136,9 +2176,8 @@ class video1(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
-                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -2193,7 +2232,6 @@ class video1(Screen):
             return
 
 class nextvideo1(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -2247,7 +2285,7 @@ class nextvideo1(Screen):
          'cancel': self.cancel}, -2)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        self.readJsonFile(name, url, pic)
+        self.readJsonFile(self.name, self.url, self.pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2267,7 +2305,7 @@ class nextvideo1(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -2276,8 +2314,8 @@ class nextvideo1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -2293,43 +2331,42 @@ class nextvideo1(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #vid4
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("content nextvideo1 =", content)
-        y = json.loads(content)
-        print("y =", y)
-        print('In nextvideo1 y["items"] =', y["items"])
-        print('In nextvideo1 y["items"][0] =', y["items"][0])
-        print('In nextvideo1 y["items"][0]["title"] =', y["items"][0]["title"])
-
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content nextvideo1 =", content)
+        y = json.loads(content)
+        # print("y =", y)
+        # print('In nextvideo1 y["items"] =', y["items"])
+        # print('In nextvideo1 y["items"][0] =', y["items"][0])
         i = 0
         while i < 50:
             try:
                 print('In nextvideo1 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In nextvideo1 name =", name)
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                # print("In nextvideo1 name =", name)
                 url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
-                print("In nextvideo1 url =", url)
+                # print("In nextvideo1 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In nextvideo1 pic =", pic)
+                # print("In nextvideo1 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In nextvideo1 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In nextvideo1 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -2345,10 +2382,6 @@ class nextvideo1(Screen):
             url = self.urls[idx]
             pic = self.pics[idx]
             desc = self.infos[idx]
-            print('nextvideo1 name: ', name)
-            print('nextvideo1 url: ', url)
-            print('nextvideo1 png: ', pic)
-            print('nextvideo1 desc: ', desc)
             print('nextvideo1 nextmodule is: ', nextmodule)
             if '&page' in str(url) and nextmodule == 'Videos1': #wooork
                 self.session.open(video1, name, url, pic, nextmodule)
@@ -2365,7 +2398,6 @@ class nextvideo1(Screen):
                 return
 
     def cancel(self):
-        # search == False
         global nextmodule
         nextmodule = 'Videos1'
         print('cancel movie nextmodule ', nextmodule)
@@ -2395,7 +2427,9 @@ class nextvideo1(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = self.pics[idx]
+            if six.PY3:
+                pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
@@ -2413,7 +2447,7 @@ class nextvideo1(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -2470,7 +2504,6 @@ class nextvideo1(Screen):
             return
 
 class video5(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -2545,7 +2578,7 @@ class video5(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
-            if inf is not None or inf != -1:
+            if inf and inf != '':
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -2554,8 +2587,8 @@ class video5(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self.load_poster()
         self.load_infos()
+        self.load_poster()
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -2571,44 +2604,44 @@ class video5(Screen):
             currentindex = self["text"].getIndex()
             print(currentindex)
 
-    #vid4
     def readJsonFile(self, name, url, pic):
-        content = make_request(url)
-        # content = six.ensure_str(content)
-        print("content A =", content)
-        y = json.loads(content)
-        print("y =", y)
-        print('In video5 y["items"] =', y["items"])
-        print('In video5 y["items"][0] =', y["items"][0])
-        print('In video5 y["items"][0]["title"] =', y["items"][0]["title"])
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        content = make_request(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+        print("content A =", content)
+        y = json.loads(content)
+        # print("y =", y)
+        # print('In video5 y["items"] =', y["items"])
+        # print('In video5 y["items"][0] =', y["items"][0])
         i = 0
         while i < 100:
             try:
                 print('In Videos5 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In Videos5 name =", name)
+                # n1 = name.find("]", 0)
+                # n2 = name.find("[", n1)
+                # name = name[(n1+1):n2]
+                name = REGEX.sub('', name.strip())
+                # print("In Videos5 name =", name)
                 try:
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
                 url = url.replace("\\", "")
-                print("In Videos5 url =", url)
+                # print("In Videos5 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
-                print("In Videos5 pic =", pic)
+                # print("In Videos5 pic =", pic)
                 info = (y["items"][i]["info"])
-                print("In Videos5 info =", info)
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                # print("In Videos5 info =", info)
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -2623,16 +2656,10 @@ class video5(Screen):
             pic = self.pics[idx]
             info = self.infos[idx]
             desc = self.infos[idx]
-            print('video5 name: ', name)
-            print('video5 url: ', url)
-            print('video5 png: ', pic)
-            print('video5 png: ', info)
-            print('video5 desc: ', desc)
             print('video5 nextmodule is: ', nextmodule)
             self.session.open(Playstream1, name, url, desc)
 
     def cancel(self):
-        # search == False
         global nextmodule
         nextmodule = 'Videos4'
         print('cancel nextmodule ', nextmodule)
@@ -2662,7 +2689,9 @@ class video5(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = self.pics[idx]
+            if six.PY3:
+                pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
@@ -2680,9 +2709,8 @@ class video5(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if PY3 == 3:
+                    if six.PY3:
                         pixmaps = pixmaps.encode()
-                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -2737,7 +2765,6 @@ class video5(Screen):
             return
 
 class myconfig(Screen, ConfigListScreen):
-
     def __init__(self, session):
         skin = skin_path + 'myconfig.xml'
         f = open(skin, 'r')
@@ -2906,9 +2933,7 @@ class myconfig(Screen, ConfigListScreen):
             x[1].cancel()
         self.close()
 
-
 class Playstream1(Screen):
-
     def __init__(self, session, name, url, desc):
         Screen.__init__(self, session)
         self.session = session
@@ -2930,7 +2955,7 @@ class Playstream1(Screen):
         self.name1 = name
         self.url = url
         self.desc = desc
-        # if PY3:
+        # if six.PY3:
             # self.url = url.encode('utf8')
         print('In Playstream1 self.url =', url)
         global srefInit
@@ -2944,13 +2969,13 @@ class Playstream1(Screen):
         self.names = []
         self.urls = []
         self.names.append('Play Now')
-        self.urls.append(str(url))
+        self.urls.append(checkStr(url))
         self.names.append('Play HLS')
-        self.urls.append(str(url))
+        self.urls.append(checkStr(url))
         self.names.append('Play TS')
-        self.urls.append(str(url))
-        # self.names.append('Preview')
-        # self.urls.append(str(url))
+        self.urls.append(checkStr(url))
+        self.names.append('Streamlink')
+        self.urls.append(checkStr(url))
         showlist(self.names, self['list'])
 
     def okClicked(self):
@@ -2958,7 +2983,6 @@ class Playstream1(Screen):
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-
             # if "youtube" in str(self.url):
                 # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
                 # return
@@ -3038,9 +3062,10 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        desc = self.desc
-        name = self.name1
-        if os.path.exists("/usr/sbin/streamlinksrv"):
+        if streamlink==True:
+            desc = self.desc
+            name = self.name1
+            # if os.path.exists("/usr/sbin/streamlinksrv"):
             url = self.url
             url = url.replace(':', '%3a')
             print('In revolution url =', url)
@@ -3051,6 +3076,8 @@ class Playstream1(Screen):
             sref.setName(self.name1)
             self.session.open(Playstream2, name, sref, desc)
             self.close()
+        else:
+            self.mbox = self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
     def cancel(self):
         try:
@@ -3167,7 +3194,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def __init__(self, session, name, url, desc):
         global SREF
         Screen.__init__(self, session)
-        self.session = session #edit
+        self.session = session
         self.skinName = 'MoviePlayer'
         title = name
         # self['list'] = MenuList([])
@@ -3204,7 +3231,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.service = None
         service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        url = checkStr(url)
+        # url = checkStr(url)
         # url = url.replace(':', '%3a')
         # url = url.replace(' ','%20')
         # url = url.replace("b'",'')
@@ -3297,20 +3324,17 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            # text_clear = self.name
-            # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
             inf = self.desc
-            if inf is not None or inf != -1:
-                text_clear = inf
+            if inf and inf != '':
+                text_clear = self.infos[inf]
             else:
                 text_clear = name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)            
 
     def slinkPlay(self, url):
         ref = str(url)
         ref = ref.replace(':', '%3a')
         ref = ref.replace(' ','%20')
-
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3320,7 +3344,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a')
         url = url.replace(' ','%20')
-        ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
+        ref = str(servicetype) + str(url) #+':0:1:0:0:0:0:0:0:0:' + str(url)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3330,7 +3354,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def cicleStreamType(self):
         from itertools import cycle, islice
         self.servicetype = str(config.plugins.revolution.services.value) #  '4097'
-        ###kiddac test - thank's
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -3338,19 +3361,20 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-
+        # if streamlink==True:
+            # streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
         if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
+            streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
+            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/apt-get"):
-            streamtypelist.append("8193")
+            streamtypelist.append("8193:0:1:0:0:0:0:0:0:0:")
         for index, item in enumerate(streamtypelist, start=0):
             if str(item) == str(self.servicetype):
                 currentindex = index
                 break
         nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
-        self.servicetype = int(next(nextStreamType))
+        self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
@@ -3396,7 +3420,6 @@ class plgnstrt(Screen):
         self.onFirstExecBegin.append(self.loadDefaultImage)
         self.onLayoutFinish.append(self.checkDwnld)
 
-
     def decodeImage(self, pngori):
         pixmaps = pngori
         if eDreamOS:
@@ -3428,7 +3451,7 @@ class plgnstrt(Screen):
         return
 
     def image_downloaded(self):
-        pngori = '/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/fulltop.jpg'
+        pngori = res_plugin_path + 'pics/fulltop.jpg'
         if os.path.exists(pngori):
             print('image pngori: ', pngori)
             try:
@@ -3441,7 +3464,6 @@ class plgnstrt(Screen):
 
     def loadDefaultImage(self, failure=None):
         print("*** failure *** %s" % failure)
-        # if self["poster"].instance:
         global pngori
         # self.png = '/usr/lib/enigma2/python/Plugins/Extensions/TivuStream/res/pics/fulltop.jpg'
         fldpng = '/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/'
@@ -3557,7 +3579,6 @@ def charRemove(text):
             myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("       ", " ").strip()
     return myreplace
 
-
 def checks():
     chekin= False
     if checkInternet():
@@ -3566,7 +3587,7 @@ def checks():
 
 def main(session, **kwargs):
     if checks:
-        if PY3:
+        if six.PY3:
             session.open(Revolmain)
         elif eDreamOS:
             session.open(Revolmain)
