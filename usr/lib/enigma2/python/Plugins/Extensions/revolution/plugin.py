@@ -87,11 +87,11 @@ try:
     from Plugins.Extensions.revolution.resolver.Utils2 import *
 except:
     from Plugins.Extensions.revolution.resolver.Utils import *
-streamlink = False
+
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
-       
-try:       
+streamlink = False
+try:
     if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
         if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
             streamlink = True
@@ -121,9 +121,9 @@ def getversioninfo():
             pass
     logdata("Version ", currversion)
     return (currversion)
-                     
-                              
-                                       
+
+
+
 
 eDreamOS = False
 try:
@@ -179,7 +179,7 @@ def trace_error():
         traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
     except:
         pass
-                 
+
 
 def make_request(url):
     link = []
@@ -255,7 +255,7 @@ if os.path.exists("/usr/bin/exteplayer3"):
     modechoices.append(("5002", _("Exteplayer3(5002)")))
 if os.path.exists("/usr/sbin/streamlinksrv"):
     modechoices.append(("5002", _("Streamlink(5002)")))
-    
+
 config.plugins.revolution = ConfigSubsection()
 config.plugins.revolution.cachefold = ConfigDirectory(default='/media/hdd/revolution/')
 config.plugins.revolution.services = ConfigSelection(default='4097', choices = modechoices)
@@ -280,32 +280,7 @@ pixmaps = res_picon_plugin_path + 'backg.png'
 revol = config.plugins.revolution.cachefold.value.strip()
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
-                                                                                                 
-                                  
-                                    
-                                                
-                                    
-                      
-                                                                                                         
-                          
-                                                       
-                                                                 
-                                                                  
 
-                             
-                                       
-
-                                                                                                                                                                
-                                                                                                                                                          
-                                                                                                                           
-                                       
-                                         
-                      
-
-                      
-                                                                                                         
-                  
-                                      
 
 if revol.endswith('/'):
     revol = revol[:-1]
@@ -460,14 +435,14 @@ class Revolmain(Screen):
         self['actions'] = NumberActionMap(['SetupActions', 'DirectionActions', "EPGSelectActions", 'ColorActions', "MenuActions"], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
-                           
+
          'red': self.closerm,
-                                     
+
          # 'yellow': self.remove,
          # 'blue': self.msgtqm,
          'epg': self.showIMDB,
          'info': self.showIMDB,
-                                   
+
          'up': self.up,
          'down': self.down,
          'left': self.left,
@@ -476,52 +451,10 @@ class Revolmain(Screen):
          'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.__layoutFinished)
-                      
-                      
-                  
-                      
-                  
-             
-                                  
-                                   
-                         
-                              
-                               
-                                  
-                                 
-                             
-                              
-                                 
-                                
-                        
-                         
-                               
-                               
-                               
-                                  
-                                  
-                              
-                              
-                              
-                                 
-                                 
-                        
-                             
-                      
-             
-                 
-                                          
 
-                       
-              
 
     def showIMDB(self):
         itype = idx
-                   
-                           
-                   
-             
-                                
         name = self.names[itype]
         if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
             from Plugins.Extensions.TMBD.plugin import TMBD
@@ -541,12 +474,6 @@ class Revolmain(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-
-                     
-                    
-
-                         
-            
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -568,23 +495,6 @@ class Revolmain(Screen):
             idx += 1
         self['text'].setList(list)
         self.load_poster()
-                          
-                                     
-                                     
-                                     
-                                     
-                                     
-                             
-                            
-                                                                
-                                                                    
-                 
-                                 
-                                                                    
-             
-                            
-                                                               
-                                                                    
 
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
@@ -628,9 +538,9 @@ class Revolmain(Screen):
 
     def down(self):
         self[self.currentList].down()
-                                 
-                  
-             
+
+
+
         self.load_poster()
 
     def left(self):
@@ -738,52 +648,26 @@ class live_stream(Screen):
 
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
-                   
-                           
-                   
-             
-                                
-                                                     
         name = self.names[idx]
         if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
-                            
+
             self.session.open(TMBD, text, False)
         elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
             HHHHH = text
-                         
-                                              
-                                       
-
-                                                                  
-                                                 
-                
             self.session.open(IMDB, HHHHH)
         else:
             inf = idx
             if inf and inf != '':
                 text_clear = self.infos[inf]
-                                                                
-                                        
-                    
-                                                                    
-                                       
-                       
-                        
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-
-                                                                   
-                                                      
-                    
-                                                               
-                                       
 
     def readJsonFile(self, name, url, pic):
         global nextmodule
@@ -885,7 +769,7 @@ class live_stream(Screen):
             pic = self.picx
             name = str(result)
             url = self.urlx + str(result)
-            
+
             try:
                 # if nextmodule == 'Videos4':
                     search = True
@@ -899,7 +783,7 @@ class live_stream(Screen):
         global search
         search = False
         return
-        
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
@@ -988,11 +872,6 @@ class live_stream(Screen):
                 print(ex)
                 print("Error: can't find file or read data")
             return
-                                   
-                                   
-                                                                                                                                      
-             
-                                     
 
     def downloadError(self, raw):
         try:
@@ -1117,228 +996,12 @@ class video3(Screen):
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
-                         
-                                                                                                                   
-                                                        
-                                              
-                           
-                            
-                             
-                        
-                                        
-                                                 
-                                 
-                                                  
-                                   
-
-                       
-                                                                                                  
-                                   
-                                             
-                                             
-                                                                                                          
-
-                                                                              
-                                              
-                                             
-                                                                                                           
-                  
-                          
-                          
-                                                      
-                                                                            
-                         
-                                                                                                               
-                                   
-
-             
-              
-                       
-                             
-                                              
-                     
-                                   
-                                     
-                                                        
-                                                             
-                                                             
-                                
-                               
-                                   
-                                        
-                 
-                                            
-                         
-                
-                                                                             
-                   
-                                                                          
-                   
-                                  
-                                                                       
-                         
-
-                       
-                       
-                          
-                                      
-                         
-
-                        
-                          
-                           
-                          
-                          
-                           
-                       
-                                      
-                          
-                         
-
-                     
-                                                                              
-                                   
-                                                                                
-                                                
-                                        
-                              
-                                           
-                               
-                                 
-                      
-                 
-                                
-             
-                            
-
-                       
-                                                                                
-                                   
-                                                                                 
-                                                  
-                                        
-                                       
-                                           
-                               
-                                          
-                              
-                              
-                               
-                 
-                                                                                         
-                                 
-             
-                             
-
-                        
-                          
-                              
-                                
-                                         
-                                                               
-
-                            
-                                       
-
-                             
-                                       
-
-                                   
-                         
-                                              
-                                       
-
-                                                                  
-                                                 
-                
-                                                           
-                                   
-                   
-                    
-                                                                      
-                                                                            
-                                        
-                    
-                                                                    
-                                       
-                       
-                        
-                 
-                                                                                
-                                                         
-
-                                                                   
-                                                         
-                    
-                                                               
-                                       
-                       
-                        
-
-                                                                      
-                                                           
-                
-                                                       
-                                   
-                   
-                    
-
-                                                                        
-                                               
-                
-                                                         
-                   
-                    
-
-                                             
-                                                    
-                
-                          
-                                                       
-                                   
-                   
-                    
-
-                                          
-                                                              
-                                                            
-                                                    
-                
-                                                       
-                                   
-                   
-                    
-
-                                          
-                                                 
-                
-                                                       
-                                   
-                   
-                    
-
-                                          
-                                                 
-                
-                                                       
-                                   
-                   
-                    
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
         self.load_infos()
         self.load_poster()
-                   
-                    
-             
-                        
-
-                                     
-                         
-                     
-                                                                                                                          
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -1346,76 +1009,13 @@ class video3(Screen):
         if idx is not None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-                                   
-                   
-                      
         else:
             info = ''
             name = ''
         self['desc'].setText(str(info))
-                     
-                      
-              
-                  
-         
-                         
-
-                                
-                                      
-                      
-                                      
-                                 
-                            
-                                     
-                              
         self['space'].setText(str(name))
-                                 
-                                             
-                                               
-                                                                                                                
-         
-                                 
-                               
-                              
-                                    
-              
-                                                                             
-                   
-                           
-                                                     
-                                           
 
-                           
-                       
-                      
-                       
-                                  
-                                   
-                                    
-                                 
-                                  
-                                   
-                             
-                             
-                                                                  
-                                                                   
-                                                                    
-                                                                                                     
-                             
-                                           
-                                           
-                                   
-                                              
 
-                                                                                                       
-                     
-                                       
-
-                     
-                                              
-                        
-
-                      
     def selectionChanged(self):
         if self["text"].getCurrent():
             currentindex = self["text"].getIndex()
@@ -1460,12 +1060,6 @@ class video3(Screen):
             except:
                 break
             showlist(self.names, self['text'])
-                               
-                                  
-                                 
-                                  
-                                  
-                                  
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
@@ -1620,8 +1214,8 @@ class nextvideo3(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
-                                    
-              
+
+
         self.name = name
         self.url = url
         self.pic = pic
@@ -1884,7 +1478,7 @@ class video4(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
-              
+
         self.name = name
         self.url = url
         self.pic = pic
@@ -2145,7 +1739,7 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-              
+
         self.name = name
         self.url = url
         self.pic = pic
@@ -2237,9 +1831,9 @@ class nextvideo4(Screen):
                 # name = name[(n1+1):n2]
                 name = REGEX.sub('', name.strip())
                 try:
-                    url = (y["items"][i]["externallink"])                
+                    url = (y["items"][i]["externallink"])
                 except:
-                    url = (y["items"][i]["link"])  
+                    url = (y["items"][i]["link"])
                 # print("In nextvideo4 name =", name)
                 # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
@@ -3486,7 +3080,7 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        if streamlink==True:
+        if os.path.exists("/usr/sbin/streamlinksrv"):
             desc = self.desc
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
@@ -3614,13 +3208,14 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
     screen_timeout = 5000
-
+        
     def __init__(self, session, name, url, desc):
-        global SREF
+        global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
         title = name
+        streaml = False
         # self['list'] = MenuList([])
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
@@ -3747,7 +3342,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)            
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def slinkPlay(self, url):
         ref = str(url)
@@ -3762,7 +3357,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a')
         url = url.replace(' ','%20')
-        ref = str(servicetype) + str(url) #+':0:1:0:0:0:0:0:0:0:' + str(url)
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
+        if streaml == True:
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)        
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3770,8 +3367,10 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.session.nav.playService(sref)
 
     def cicleStreamType(self):
+        global streml
+        streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.revolution.services.value) #  '4097'
+        self.servicetype = str(config.plugins.revolution.services.value) +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -3779,14 +3378,15 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if streamlink==True:
-            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+        if os.path.exists("/usr/sbin/streamlinksrv"):
+            streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("5002")
         if os.path.exists("/usr/bin/apt-get"):
-            streamtypelist.append("8193:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
             if str(item) == str(self.servicetype):
                 currentindex = index
@@ -3809,6 +3409,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 self.setAspect(self.init_aspect)
             except:
                 pass
+        streaml = False
         self.close()
 
     def leavePlayer(self):
