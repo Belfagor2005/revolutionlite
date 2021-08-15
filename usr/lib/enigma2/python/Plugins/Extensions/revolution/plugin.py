@@ -123,8 +123,6 @@ def getversioninfo():
     return (currversion)
 
 
-
-
 eDreamOS = False
 try:
     from enigma import eMediaDatabase
@@ -1065,6 +1063,7 @@ class video3(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
+
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -3208,7 +3207,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
     screen_timeout = 5000
-        
+
     def __init__(self, session, name, url, desc):
         global SREF, streaml
         Screen.__init__(self, session)
@@ -3344,8 +3343,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
-    def slinkPlay(self, url):
-        ref = str(url)
+    def slinkPlay(self):
+        ref = str(self.url)
         ref = ref.replace(':', '%3a')
         ref = ref.replace(' ','%20')
         print('final reference:   ', ref)
@@ -3359,7 +3358,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         url = url.replace(' ','%20')
         ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
         if streaml == True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)        
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3370,7 +3369,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.revolution.services.value) +':0:1:0:0:0:0:0:0:0:'#  '4097'
+        self.servicetype = '4097:0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
