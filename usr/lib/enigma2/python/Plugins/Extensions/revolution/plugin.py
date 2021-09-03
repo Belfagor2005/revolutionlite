@@ -72,7 +72,7 @@ from os.path import splitext
 if six.PY3:
     print('six.PY3: True ')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
-global skin_path, revol, pngs, pngl, pngx, eDreamOS, file_json, nextmodule, search, pngori
+global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError
@@ -122,18 +122,10 @@ def getversioninfo():
     logdata("Version ", currversion)
     return (currversion)
 
-
-eDreamOS = False
-try:
-    from enigma import eMediaDatabase
-    eDreamOS = True
-except:
-    eDreamOS = False
 try:
     from urlparse import urlparse
 except:
     from urllib.parse import urlparse
-
 
 def checkStr(txt):
     if six.PY3:
@@ -178,7 +170,6 @@ def trace_error():
     except:
         pass
 
-
 def make_request(url):
     link = []
     try:
@@ -194,28 +185,13 @@ def make_request(url):
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
-        link=response.read()
+        link=response.read().decode('utf-8') #03/09/2021
         response.close()
         print("Here in client2 link =", link)
         return link
     except:
         return
     return
-    # try:
-        # import requests
-        # link = requests.get(url, headers = headers).text
-        # return link
-    # except ImportError:
-        # req = Request(url)
-        # req.add_header('User-Agent', 'TVS')
-        # response = urlopen(req, None, 3)
-        # link = response.read()
-        # response.close()
-        # logdata("Link 2 ", link)
-        # return link
-    # except:
-        # return
-    # return
 
 def deletetmp():
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
@@ -294,7 +270,7 @@ if HD.width() > 1280:
     skin_path = res_plugin_path + 'skins/fhd/'
 else:
     skin_path = res_plugin_path + 'skins/hd/'
-if eDreamOS:
+if os.path.exists('/var/lib/dpkg/status'):
     skin_path = skin_path + 'dreamOs/'
 
 REGEX = re.compile(
@@ -433,14 +409,11 @@ class Revolmain(Screen):
         self['actions'] = NumberActionMap(['SetupActions', 'DirectionActions', "EPGSelectActions", 'ColorActions', "MenuActions"], {'ok': self.okRun,
          'green': self.okRun,
          'back': self.closerm,
-
          'red': self.closerm,
-
          # 'yellow': self.remove,
          # 'blue': self.msgtqm,
          'epg': self.showIMDB,
          'info': self.showIMDB,
-
          'up': self.up,
          'down': self.down,
          'left': self.left,
@@ -449,7 +422,6 @@ class Revolmain(Screen):
          'cancel': self.closerm}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.__layoutFinished)
-
 
     def showIMDB(self):
         itype = idx
@@ -536,9 +508,6 @@ class Revolmain(Screen):
 
     def down(self):
         self[self.currentList].down()
-
-
-
         self.load_poster()
 
     def left(self):
@@ -560,7 +529,7 @@ class Revolmain(Screen):
                 pixmaps = piconseries
             else:
                 pixmaps = piconinter
-            if eDreamOS:
+            if os.path.exists('/var/lib/dpkg/status'):
                 self['poster'].instance.setPixmap(gPixmapPtr())
             else:
                 self['poster'].instance.setPixmap(None)
@@ -575,7 +544,7 @@ class Revolmain(Screen):
              1,
              '#FF000000'))
             ptr = self.picload.getData()
-            if eDreamOS:
+            if os.path.exists('/var/lib/dpkg/status'):
                 if self.picload.startDecode(pixmaps, False) == 0:
                     ptr = self.picload.getData()
             else:
@@ -670,8 +639,8 @@ class live_stream(Screen):
     def readJsonFile(self, name, url, pic):
         global nextmodule
         content = make_request(url)
-        if six.PY3:
-            content = six.ensure_str(content)
+        # if six.PY3:
+            # content = six.ensure_str(content)
         print('live_stream content B =', content)
         y = json.loads(content)
         self.names = []
@@ -848,9 +817,9 @@ class live_stream(Screen):
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -860,8 +829,8 @@ class live_stream(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
@@ -886,29 +855,19 @@ class live_stream(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -993,7 +952,6 @@ class video3(Screen):
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -1113,9 +1071,9 @@ class video3(Screen):
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -1125,8 +1083,8 @@ class video3(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
@@ -1151,29 +1109,19 @@ class video3(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -1213,8 +1161,6 @@ class nextvideo3(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
-
-
         self.name = name
         self.url = url
         self.pic = pic
@@ -1370,17 +1316,15 @@ class nextvideo3(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = self.pics[idx]
-            if six.PY3:
-                pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -1390,8 +1334,9 @@ class nextvideo3(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
+                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -1415,29 +1360,19 @@ class nextvideo3(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -1477,7 +1412,6 @@ class video4(Screen):
         self['key_blue'].hide()
         self['key_green'].hide()
         # idx = 0
-
         self.name = name
         self.url = url
         self.pic = pic
@@ -1639,9 +1573,9 @@ class video4(Screen):
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -1651,8 +1585,8 @@ class video4(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
@@ -1677,29 +1611,19 @@ class video4(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -1738,7 +1662,6 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-
         self.name = name
         self.url = url
         self.pic = pic
@@ -1897,17 +1820,15 @@ class nextvideo4(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = self.pics[idx]
-            if six.PY3:
-                pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -1917,8 +1838,8 @@ class nextvideo4(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
@@ -1943,29 +1864,19 @@ class nextvideo4(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -2175,17 +2086,15 @@ class video1(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = self.pics[idx]
-            if six.PY3:
-                pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -2195,8 +2104,9 @@ class video1(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
+                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -2220,29 +2130,19 @@ class video1(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -2446,17 +2346,15 @@ class nextvideo1(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = self.pics[idx]
-            if six.PY3:
-                pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -2466,8 +2364,8 @@ class nextvideo1(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
@@ -2492,29 +2390,19 @@ class nextvideo1(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -2708,17 +2596,15 @@ class video5(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx is not None or idx != -1:
-            pixmaps = self.pics[idx]
-            if six.PY3:
-                pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
             global tmp_image
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = b'/tmp/posterx' + ext
+            tmp_image = '/tmp/posterx' + str(ext)
             if fileExists(tmp_image):
-                tmp_image = b'/tmp/posterx' + ext
+                tmp_image = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
@@ -2728,8 +2614,9 @@ class video5(Screen):
                     parsed_uri = urlparse(pixmaps)
                     domain = parsed_uri.hostname
                     sniFactory = SNIFactory(domain)
-                    if six.PY3:
-                        pixmaps = pixmaps.encode()
+                    # if six.PY3:
+                        # pixmaps = pixmaps.encode()
+                    print('uurrll: ', pixmaps)
                     downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
                 else:
                     downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
@@ -2753,29 +2640,19 @@ class video5(Screen):
             print('logo not found')
 
     def poster_resize(self, png):
-            self["poster"].show()
-            pixmaps = png
-            if eDreamOS:
-                self['poster'].instance.setPixmap(gPixmapPtr())
-            else:
-                self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
-            self.picload = ePicLoad()
+        self["poster"].show()
+        pixmaps = png
+        if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
-            self.picload.setPara((size.width(),
-             size.height(),
-             sc[0],
-             sc[1],
-             False,
-             1,
-             '#FF000000'))
+            self.picload = ePicLoad()
+            sc = AVSwitch().getFramebufferScale()
+            if self.picload:
+                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+                if os.path.exists('/var/lib/dpkg/status'):
+                    self.picload.startDecode(pixmaps, False)
+                else:
+                    self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
-            if eDreamOS:
-                if self.picload.startDecode(pixmaps, False) == 0:
-                    ptr = self.picload.getData()
-            else:
-                if self.picload.startDecode(pixmaps, 0, 0, False) == 0:
-                    ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
                 self['poster'].show()
@@ -3415,7 +3292,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.close()
 
 class plgnstrt(Screen):
-
     def __init__(self, session):
         self.session = session
         skin = skin_path + '/Plgnstrt.xml'
@@ -3440,7 +3316,7 @@ class plgnstrt(Screen):
 
     def decodeImage(self, pngori):
         pixmaps = pngori
-        if eDreamOS:
+        if os.path.exists('/var/lib/dpkg/status'):
             self['poster'].instance.setPixmap(gPixmapPtr())
         else:
             self['poster'].instance.setPixmap(None)
@@ -3455,7 +3331,7 @@ class plgnstrt(Screen):
          1,
          '#FF000000'))
         ptr = self.picload.getData()
-        if eDreamOS:
+        if os.path.exists('/var/lib/dpkg/status'):
             if self.picload.startDecode(pixmaps, False) == 0:
                 ptr = self.picload.getData()
         else:
@@ -3494,7 +3370,7 @@ class plgnstrt(Screen):
         self['text'].setText(_('\n\n\nCheck Connection wait please...'))
         self.timer = eTimer()
         self.timer.start(2000, 1)
-        if eDreamOS:
+        if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
@@ -3607,7 +3483,7 @@ def main(session, **kwargs):
     if checks:
         if six.PY3:
             session.open(Revolmain)
-        elif eDreamOS:
+        elif os.path.exists('/var/lib/dpkg/status'):
             session.open(Revolmain)
         else:
             session.open(plgnstrt)
