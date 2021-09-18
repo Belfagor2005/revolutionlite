@@ -1,10 +1,12 @@
 <!-- Skin HD1 10/05/2021 -->
-<screen name="HD1" position="553,360" size="488,389" title="Player Choice" backgroundColor="#FF000000" flags="wfNoBorder">
-	<eLabel position="4,0" zPosition="-1" size="512,394" backgroundColor="#00000000" />
-	<widget name="list" position="43,73" size="446,235" zPosition="4" scrollbarMode="showOnDemand" itemHeight="50" />
+<screen name="HD1" position="515,174" size="525,433" title="Player Choice" backgroundColor="#FF000000" flags="wfNoBorder">
+	<eLabel position="0,-1" zPosition="-1" size="523,435" backgroundColor="#00000000" />
+	<widget name="list" position="48,73" size="446,227" zPosition="4" scrollbarMode="showOnDemand" itemHeight="50" />
 	<widget name="info" position="4,12" zPosition="4" size="510,56" font="Regular;38" foregroundColor="#ffffff" transparent="1" halign="center" valign="center" />
-	<ePixmap name="red" position="50,319" zPosition="2" size="210,60" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
-	<widget name="key_red" position="51,319" size="210,60" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	<ePixmap name="green" position="276,321" zPosition="2" size="210,60" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
-	<widget name="key_green" position="277,317" size="210,60" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<ePixmap name="red" position="20,313" zPosition="2" size="210,60" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
+	<widget name="key_red" position="22,314" size="210,60" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<ePixmap name="green" position="287,316" zPosition="2" size="210,60" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
+	<widget name="key_green" position="287,313" size="210,60" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<widget name="progress" position="162,377" size="200,33" foregroundColor="#2a70a4" backgroundColor="#10000000" transparent="1" zPosition="5" />
+	<widget source="progresstext" render="Label" font="Regular;13" position="162,379" size="200,33" backgroundColor="#202020" transparent="1" halign="center" zPosition="6" />
 </screen>

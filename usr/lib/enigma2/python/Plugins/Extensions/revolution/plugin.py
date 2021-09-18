@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
-from __future__ import print_function
+
 '''
 Info http://t.me/tivustream
 ****************************************
@@ -9,6 +9,7 @@ Info http://t.me/tivustream
 *             08/08/2021               *
 ****************************************
 '''
+from __future__ import print_function
 from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap, NumberActionMap
@@ -23,10 +24,11 @@ from Components.Pixmap import Pixmap, MovingPixmap
 from Components.PluginComponent import plugins
 from Components.PluginList import *
 from Components.ProgressBar import ProgressBar
+from Components.Sources.Progress import Progress
+from Tools.Downloader import downloadWithProgress
 from Components.ScrollLabel import ScrollLabel
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.List import List
-from Components.Sources.Progress import Progress
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
 from Components.config import *
@@ -42,7 +44,6 @@ from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_PLUGINS, SCOPE_LANGUAGE
 from Tools.Directories import pathExists, resolveFilename, fileExists, copyfile
-from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
@@ -109,7 +110,7 @@ def logdata(name = '', data = None):
         pass
 
 def getversioninfo():
-    currversion = '1.2'
+    currversion = '1.3'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -170,6 +171,34 @@ def trace_error():
     except:
         pass
 
+# def make_request(url):
+    # link = []
+    # url= checkStr(url)
+    # try:
+        # print("Here in client1 getUrl url =", url)
+        # req = Request(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # response = urlopen(req)#.decode('utf-8')
+        # link=response.read()#.decode('utf-8')
+        # response.close()
+        # print("Here in client1 link =", link)
+        # return link
+    # except ImportError:
+        # print("Here in client2 getUrl url =", url)
+        # print("Here in client2 getUrl url =", url)
+
+
+        # req = Request(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # response = urlopen(req, None, 3)
+        # link=response.read()#.decode('utf-8')
+        # response.close()
+        # print("Here in client2 link =", link)
+        # return link
+    # except:
+        # return ''
+    # return
+
 def make_request(url):
     link = []
     try:
@@ -194,6 +223,7 @@ def make_request(url):
     return
 
 def deletetmp():
+
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
     return
 
@@ -232,7 +262,27 @@ if os.path.exists("/usr/sbin/streamlinksrv"):
 
 config.plugins.revolution = ConfigSubsection()
 config.plugins.revolution.cachefold = ConfigDirectory(default='/media/hdd/revolution/')
+config.plugins.revolution.movie = ConfigDirectory("/media/hdd/movie")
+try:
+    from Components.UsageConfig import defaultMoviePath
+    downloadpath = defaultMoviePath()
+    config.plugins.revolution.movie = ConfigDirectory(default=downloadpath)
+except:
+    if os.path.exists("/usr/bin/apt-get"):
+        config.plugins.revolution.movie   = ConfigDirectory(default='/media/hdd/movie')
+
 config.plugins.revolution.services = ConfigSelection(default='4097', choices = modechoices)
+config.plugins.revolution.cachefold = ConfigDirectory("/media/hdd", False)
+cfg = config.plugins.revolution
+
+global Path_Movies
+Path_Movies             = str(config.plugins.revolution.movie.value) + "/"
+if Path_Movies.endswith("\/\/") is True:
+    Path_Movies = Path_Movies[:-1]
+print('patch movies: ', Path_Movies)
+
+
+
 HD = getDesktop(0).size()
 currversion = getversioninfo()
 title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
@@ -426,12 +476,12 @@ class Revolmain(Screen):
     def showIMDB(self):
         itype = idx
         name = self.names[itype]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -465,6 +515,7 @@ class Revolmain(Screen):
             idx += 1
         self['text'].setList(list)
         self.load_poster()
+
 
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
@@ -616,13 +667,13 @@ class live_stream(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
 
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -861,12 +912,12 @@ class live_stream(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -934,12 +985,12 @@ class video3(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -970,7 +1021,6 @@ class video3(Screen):
             name = ''
         self['desc'].setText(str(info))
         self['space'].setText(str(name))
-
 
     def selectionChanged(self):
         if self["text"].getCurrent():
@@ -1115,12 +1165,12 @@ class video3(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -1190,12 +1240,12 @@ class nextvideo3(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -1366,12 +1416,12 @@ class nextvideo3(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -1441,12 +1491,12 @@ class video4(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -1617,12 +1667,12 @@ class video4(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -1662,6 +1712,7 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
+
         self.name = name
         self.url = url
         self.pic = pic
@@ -1691,12 +1742,12 @@ class nextvideo4(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -1870,12 +1921,12 @@ class nextvideo4(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -1946,12 +1997,12 @@ class video1(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -2136,12 +2187,12 @@ class video1(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -2211,12 +2262,12 @@ class nextvideo1(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -2396,12 +2447,12 @@ class nextvideo1(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -2472,12 +2523,12 @@ class video5(Screen):
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -2646,12 +2697,12 @@ class video5(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            if self.picload:
-                self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
-                if os.path.exists('/var/lib/dpkg/status'):
-                    self.picload.startDecode(pixmaps, False)
-                else:
-                    self.picload.startDecode(pixmaps, 0, 0, False)
+            # if self.picload:
+            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            if os.path.exists('/var/lib/dpkg/status'):
+                self.picload.startDecode(pixmaps, False)
+            else:
+                self.picload.startDecode(pixmaps, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -2702,8 +2753,18 @@ class myconfig(Screen, ConfigListScreen):
         if entry == _('Set the path to the Cache folder'):
             self['description'].setText(_("Press Ok to select the folder containing the picons files"))
             return
+
+    def setInfo(self):
+        entry = str(self.getCurrentEntry())
+        if entry == _('Set the path Movie folder'):
+            self['description'].setText(_("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required"))
+            return
+        if entry == _('Set the path to the Cache folder'):
+            self['description'].setText(_("Press Ok to select the folder containing the picons files"))
+            return
         if entry == _('Services Player Reference type'):
             self['description'].setText(_("Configure Service Player Reference"))
+            return
         return
 
     def layoutFinished(self):
@@ -2717,6 +2778,7 @@ class myconfig(Screen, ConfigListScreen):
     def createSetup(self):
         self.editListEntry = None
         self.list = []
+        self.list.append(getConfigListEntry(_("Set the path Movie folder"), config.plugins.revolution.movie,_("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required")))
         self.list.append(getConfigListEntry(_("Set the path to the Cache folder"), config.plugins.revolution.cachefold, _("Press Ok to select the folder containing the picons files")))
         self.list.append(getConfigListEntry(_('Services Player Reference type'), config.plugins.revolution.services, _("Configure Service Player Reference")))
         self["config"].list = self.list
@@ -2727,7 +2789,7 @@ class myconfig(Screen, ConfigListScreen):
         fold = config.plugins.tvspro.cachefold.value + "/pic"
         cmd = "rm " + fold + "/*"
         os.system(cmd)
-        self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
+        self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
 
     def keyLeft(self):
         ConfigListScreen.keyLeft(self)
@@ -2755,6 +2817,9 @@ class myconfig(Screen, ConfigListScreen):
             self.setting = 'revol'
             mmkpth = config.plugins.revolution.cachefold.value
             self.openDirectoryBrowser(mmkpth)
+        if sel and sel == config.plugins.revolution.movie:
+            self.setting = 'moviefold'
+            self.openDirectoryBrowser(config.plugins.revolution.movie.value)
         else:
             pass
 
@@ -2778,6 +2843,8 @@ class myconfig(Screen, ConfigListScreen):
         if path is not None:
             if self.setting == 'revol':
                 config.plugins.revolution.cachefold.setValue(path)
+            if self.setting == 'moviefold':
+                config.plugins.revolution.revolution.setValue(path)
         return
 
     def KeyText(self):
@@ -2840,13 +2907,20 @@ class Playstream1(Screen):
         self.list = []
         self['list'] = RSList([])
         self['info'] = Label()
-        self['info'].setText('Select Player')
+        self['info'].setText(name)
         self['key_red'] = Button(_('Exit'))
         self['key_green'] = Button(_('Select'))
-        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions'], {'red': self.cancel,
+        self['progress'] = ProgressBar()
+        self['progresstext'] = StaticText()
+        self["progress"].hide()
+        self.downloading = False
+        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions', 'InfobarInstantRecord'], {'red': self.cancel,
          'green': self.okClicked,
          'back': self.cancel,
          'cancel': self.cancel,
+         "rec": self.runRec,
+         "instantRecord": self.runRec,
+         "ShortRecord": self.runRec,
          'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
@@ -2858,10 +2932,68 @@ class Playstream1(Screen):
         self.onLayoutFinish.append(self.openTest)
         return
 
+    def runRec(self):
+        self.namem3u = self.name1
+        self.urlm3u = self.url
+        if self.downloading == True:
+            self.session.open(MessageBox, _('You are already downloading!!!'), MessageBox.TYPE_INFO, timeout=5)
+            return
+        else:
+            if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u: # or 'm3u8':
+                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" %self.namem3u ) , type=MessageBox.TYPE_YESNO, timeout = 10, default = False)
+            else:
+                self.downloading = False
+                self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
+
+    def download_m3u(self, result):
+        if result:
+            if not 'm3u8' in self.urlm3u:
+                path = urlparse(self.urlm3u).path
+                ext = '.mp4'
+                ext = splitext(path)[1]
+                if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv': # or ext != 'm3u8':
+                    ext = '.mp4'
+                fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
+                fileTitle = re.sub(r' ', '_', fileTitle)
+                fileTitle = re.sub(r'_+', '_', fileTitle)
+                fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
+                fileTitle = fileTitle.lower() + ext
+                self.in_tmp = Path_Movies + fileTitle
+                self.downloading = True
+                self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
+                self.download.addProgress(self.downloadProgress)
+                self.download.start().addCallback(self.check).addErrback(self.showError)
+            else:
+                self.downloading = False
+                self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+        else:
+            self.downloading = False
+        # return
+
+    def downloadProgress(self, recvbytes, totalbytes):
+        self["progress"].show()
+        self['progress'].value = int(100 * recvbytes / float(totalbytes))
+        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (recvbytes / 1024, totalbytes / 1024, 100 * recvbytes / float(totalbytes))
+
+    def check(self, fplug):
+        checkfile = self.in_tmp
+        if os.path.exists(checkfile):
+            self.downloading = False
+            self['progresstext'].text = ''
+            self.progclear = 0
+            self['progress'].setValue(self.progclear)
+            self["progress"].hide()
+
+    def showError(self, error):
+        self.downloading = False
+        self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+
     def openTest(self):
         url = self.url
         self.names = []
         self.urls = []
+        self.names.append('Download Now')
+        self.urls.append(checkStr(url))
         self.names.append('Play Now')
         self.urls.append(checkStr(url))
         self.names.append('Play HLS')
@@ -2898,11 +3030,18 @@ class Playstream1(Screen):
                 self.session.open(Playstream2, self.name, self.url, desc)
 
             if idx == 0:
+                # self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.runRec()
+                # return
+
+            if idx == 1:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.play()
-            elif idx == 1:
+            elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -2917,7 +3056,7 @@ class Playstream1(Screen):
                 os.system('sleep 3')
                 self.url = '/tmp/hls.avi'
                 self.play()
-            elif idx == 2:
+            elif idx == 3:
                 print('In playVideo url A=', self.url)
                 url = self.url
                 try:
@@ -2933,16 +3072,17 @@ class Playstream1(Screen):
                 self.name = self.names[idx]
                 self.play()
 
-            elif idx == 3:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play2()
             else:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play()
+                if idx == 4:
+                    self.name = self.names[idx]
+                    self.url = self.urls[idx]
+                    print('In playVideo url D=', self.url)
+                    self.play2()
+            # else:
+                # self.name = self.names[idx]
+                # self.url = self.urls[idx]
+                # print('In playVideo url D=', self.url)
+                # self.play()
             return
 
     def playfile(self, serverint):
@@ -3083,7 +3223,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     STATE_PAUSED = 2
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
-    screen_timeout = 5000
+    screen_timeout = 4000
 
     def __init__(self, session, name, url, desc):
         global SREF, streaml
@@ -3177,7 +3317,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.setAspect(temp)
 
     def showinfo(self):
-        debug = True
+        # debug = True
         sTitle = ''
         sServiceref = ''
         try:
@@ -3195,19 +3335,19 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
             sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
             message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec:' + str(sTagAudioCodec)
-            self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+            self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
 
         return
 
     def showIMDB(self):
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif fileExists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)

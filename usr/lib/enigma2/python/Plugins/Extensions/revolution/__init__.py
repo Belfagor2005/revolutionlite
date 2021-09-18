@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import os
+from os import environ as os_environ
 from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_LANGUAGE
 import gettext
-import os
-from os import environ as os_environ
 PluginLanguageDomain = 'revolution'
 PluginLanguagePath = 'Extensions/revolution/res/locale'
 
