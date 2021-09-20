@@ -571,7 +571,7 @@ class Revolmain(Screen):
 
     def load_poster(self):
         sel = self['text'].getSelectedIndex()
-        if sel is not None or sel != -1:
+        if sel != None or sel != -1:
             if sel == 0:
                 pixmaps = piconlive
             elif sel == 1:
@@ -737,7 +737,7 @@ class live_stream(Screen):
 
     def okRun(self):
         idx = self["text"].getSelectionIndex()
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -811,7 +811,7 @@ class live_stream(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -836,7 +836,7 @@ class live_stream(Screen):
     def up(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             self[self.currentList].up()
             self.load_infos()
             self.load_poster()
@@ -861,7 +861,7 @@ class live_stream(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -1013,7 +1013,7 @@ class video3(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
         else:
@@ -1070,7 +1070,7 @@ class video3(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
 
             name = self.names[idx]
             url = self.urls[idx]
@@ -1114,7 +1114,7 @@ class video3(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -1268,7 +1268,7 @@ class nextvideo3(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -1323,7 +1323,7 @@ class nextvideo3(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('video1 idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             idx = self["text"].getSelectionIndex()
             print('idx: ', idx)
             name = self.names[idx]
@@ -1365,7 +1365,7 @@ class nextvideo3(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -1519,7 +1519,7 @@ class video4(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -1576,7 +1576,7 @@ class video4(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('video4 idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -1616,7 +1616,7 @@ class video4(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -1829,7 +1829,7 @@ class nextvideo4(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('video4 idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -1870,7 +1870,7 @@ class nextvideo4(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -2025,7 +2025,7 @@ class video1(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -2086,7 +2086,7 @@ class video1(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('Video1 idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -2136,7 +2136,7 @@ class video1(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -2290,7 +2290,7 @@ class nextvideo1(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -2347,7 +2347,7 @@ class nextvideo1(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('nextvideo1 idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -2396,7 +2396,7 @@ class nextvideo1(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -2551,7 +2551,7 @@ class video5(Screen):
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
             self['desc'].setText(str(info))
@@ -2608,7 +2608,7 @@ class video5(Screen):
     def okRun(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -2646,7 +2646,7 @@ class video5(Screen):
     def load_poster(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
@@ -2840,7 +2840,7 @@ class myconfig(Screen, ConfigListScreen):
             print(('openDirectoryBrowser get failed: ', str(e)))
 
     def openDirectoryBrowserCB(self, path):
-        if path is not None:
+        if path != None:
             if self.setting == 'revol':
                 config.plugins.revolution.cachefold.setValue(path)
             if self.setting == 'moviefold':
@@ -2853,7 +2853,7 @@ class myconfig(Screen, ConfigListScreen):
             self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
 
     def VirtualKeyBoardCallback(self, callback = None):
-        if callback is not None and len(callback):
+        if callback != None and len(callback):
             self['config'].getCurrent()[1].value = callback
             self['config'].invalidate(self['config'].getCurrent())
         return
@@ -3006,7 +3006,7 @@ class Playstream1(Screen):
 
     def okClicked(self):
         idx = self['list'].getSelectionIndex()
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
             # if "youtube" in str(self.url):
@@ -3322,11 +3322,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         sServiceref = ''
         try:
             servicename, serviceurl = getserviceinfo(sref)
-            if servicename is not None:
+            if servicename != None:
                 sTitle = servicename
             else:
                 sTitle = ''
-            if serviceurl is not None:
+            if serviceurl != None:
                 sServiceref = serviceurl
             else:
                 sServiceref = ''
