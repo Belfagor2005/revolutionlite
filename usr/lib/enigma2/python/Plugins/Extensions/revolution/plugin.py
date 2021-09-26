@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 '''
 Info http://t.me/tivustream
@@ -24,11 +24,10 @@ from Components.Pixmap import Pixmap, MovingPixmap
 from Components.PluginComponent import plugins
 from Components.PluginList import *
 from Components.ProgressBar import ProgressBar
-from Components.Sources.Progress import Progress
-from Tools.Downloader import downloadWithProgress
 from Components.ScrollLabel import ScrollLabel
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.List import List
+from Components.Sources.Progress import Progress
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
 from Components.config import *
@@ -44,6 +43,7 @@ from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_PLUGINS, SCOPE_LANGUAGE
 from Tools.Directories import pathExists, resolveFilename, fileExists, copyfile
+from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
@@ -73,7 +73,7 @@ from os.path import splitext
 if six.PY3:
     print('six.PY3: True ')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
-global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori
+global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError
@@ -222,6 +222,9 @@ def make_request(url):
         return
     return
 
+
+
+
 def deletetmp():
 
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
@@ -281,8 +284,6 @@ if Path_Movies.endswith("\/\/") is True:
     Path_Movies = Path_Movies[:-1]
 print('patch movies: ', Path_Movies)
 
-
-
 HD = getDesktop(0).size()
 currversion = getversioninfo()
 title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
@@ -305,7 +306,8 @@ revol = config.plugins.revolution.cachefold.value.strip()
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
 
-
+Path_Tmp = "/tmp"
+pictmp = Path_Tmp + "/poster.jpg"
 if revol.endswith('/'):
     revol = revol[:-1]
 if not os.path.exists(revol):
@@ -345,24 +347,6 @@ REGEX = re.compile(
 		r'\.\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
 		r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
 		r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
-
-def getJsonURL(url):
-    request = Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    request.add_header('Accept-Encoding', 'gzip')
-    response = urlopen(request, timeout=30)
-    gzipped = response.info().get('Content-Encoding') == 'gzip'
-    data = '' #[]
-    dec_obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
-    while True:
-        res_data = response.read()
-        if not res_data:
-            break
-        if gzipped:
-            data += dec_obj.decompress(res_data)
-        else:
-            data += res_data
-    return json.loads(data)
 
 class rvList(MenuList):
     def __init__(self, list):
@@ -516,7 +500,6 @@ class Revolmain(Screen):
         self['text'].setList(list)
         self.load_poster()
 
-
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
 
@@ -580,13 +563,13 @@ class Revolmain(Screen):
                 pixmaps = piconseries
             else:
                 pixmaps = piconinter
+            size = self['poster'].instance.size()
             if os.path.exists('/var/lib/dpkg/status'):
                 self['poster'].instance.setPixmap(gPixmapPtr())
             else:
                 self['poster'].instance.setPixmap(None)
             sc = AVSwitch().getFramebufferScale()
             self.picload = ePicLoad()
-            size = self['poster'].instance.size()
             self.picload.setPara((size.width(),
              size.height(),
              sc[0],
@@ -862,62 +845,71 @@ class live_stream(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx != None or idx != -1:
-            pixmaps = six.ensure_binary(self.pics[idx])
-            print("debug: pixmaps:",pixmaps)
-            print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
-            path = urlparse(pixmaps).path
-            ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
-            else:
-                m = hashlib.md5()
-                m.update(pixmaps)
-                tmp_image = m.hexdigest()
-            try:
-                if pixmaps.startswith(b"https") and sslverify:
-                    parsed_uri = urlparse(pixmaps)
-                    domain = parsed_uri.hostname
-                    sniFactory = SNIFactory(domain)
-                    # if six.PY3:
-                        # pixmaps = pixmaps.encode()
-                    print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+            pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
+            if pixmaps != "" or pixmaps != "n/A" or pixmaps != None or pixmaps != "null" :
+                if pixmaps.find('http') == -1:
+                    self.poster_resize(no_cover)
+                    return
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
-            except Exception as ex:
-                print(ex)
-                print("Error: can't find file or read data")
-            return
+                    try:
+                        if six.PY3:
+                            pixmaps = six.ensure_binary(self.pics[idx])
+                        # print("debug: pixmaps:",pixmaps)
+                        # print("debug: pixmaps:",type(pixmaps))
+                        if pixmaps.startswith(b"https") and sslverify:
+                            parsed_uri = urlparse(pixmaps)
+                            domain = parsed_uri.hostname
+                            sniFactory = SNIFactory(domain)
+                            # if six.PY3:
+                                # pixmaps = pixmaps.encode()
+                            downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        else:
+                            downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                    except Exception as ex:
+                        print(ex)
+                        print("Error: can't find file or read data")
+                return
 
-    def downloadError(self, raw):
+    def downloadPic(self, data, pictmp):
+        if os.path.exists(pictmp):
+            try:
+                self.poster_resize(pictmp)
+            except Exception as ex:
+                print("* error ** %s" % ex)
+                pass
+            except:
+                pass
+
+
+    def downloadError(self, png):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(png):
+                self.poster_resize(no_cover)
         except Exception as ex:
+            self.poster_resize(no_cover)
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
     def poster_resize(self, png):
-        self["poster"].show()
-        pixmaps = png
-        if os.path.exists(pixmaps):
+        self["poster"].hide()
+
+        if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            # if self.picload:
+
             self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
-                self.picload.startDecode(pixmaps, False)
+                self.picload.startDecode(png, False)
             else:
-                self.picload.startDecode(pixmaps, 0, 0, False)
+                self.picload.startDecode(png, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -1118,16 +1110,16 @@ class video3(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -1136,9 +1128,9 @@ class video3(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
@@ -1146,15 +1138,16 @@ class video3(Screen):
 
     def downloadError(self, raw):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(pictmp):
+                self.poster_resize(pictmp)
         except Exception as ex:
+
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
@@ -1262,6 +1255,7 @@ class nextvideo3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+
         self.load_infos()
         self.load_poster()
 
@@ -1339,6 +1333,7 @@ class nextvideo3(Screen):
     def cancel(self):
         global nextmodule
         nextmodule = 'Videos3'
+
         print('cancel nextvideos3 nextmodule ', nextmodule)
         self.close(None)
 
@@ -1369,16 +1364,16 @@ class nextvideo3(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -1387,9 +1382,9 @@ class nextvideo3(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
@@ -1397,15 +1392,15 @@ class nextvideo3(Screen):
 
     def downloadError(self, raw):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(pictmp):
+                self.poster_resize(pictmp)
         except Exception as ex:
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
@@ -1620,16 +1615,16 @@ class video4(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -1638,9 +1633,9 @@ class video4(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
@@ -1648,15 +1643,15 @@ class video4(Screen):
 
     def downloadError(self, raw):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(pictmp):
+                self.poster_resize(pictmp)
         except Exception as ex:
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
@@ -1712,7 +1707,6 @@ class nextvideo4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-
         self.name = name
         self.url = url
         self.pic = pic
@@ -1874,16 +1868,16 @@ class nextvideo4(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -1892,9 +1886,9 @@ class nextvideo4(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
@@ -1902,15 +1896,15 @@ class nextvideo4(Screen):
 
     def downloadError(self, raw):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(pictmp):
+                self.poster_resize(pictmp)
         except Exception as ex:
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
@@ -1936,7 +1930,6 @@ class nextvideo4(Screen):
             return
 
 class video1(Screen):
-
     def __init__(self, session, name, url, pic, nextmodule):
         self.session = session
         skin = skin_path + 'revall.xml'
@@ -1988,9 +1981,9 @@ class video1(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
+        self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        self.readJsonFile(name, url, pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2028,6 +2021,9 @@ class video1(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
+        else:
+            info = ''
+            name = ''
             self['desc'].setText(str(info))
             self['space'].setText(str(name))
 
@@ -2140,16 +2136,16 @@ class video1(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -2158,9 +2154,9 @@ class video1(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
@@ -2168,15 +2164,15 @@ class video1(Screen):
 
     def downloadError(self, raw):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(pictmp):
+                self.poster_resize(pictmp)
         except Exception as ex:
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
@@ -2400,16 +2396,16 @@ class nextvideo1(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -2418,41 +2414,52 @@ class nextvideo1(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
             return
 
-    def downloadError(self, raw):
+    def downloadPic(self, data, pictmp):
+        if os.path.exists(pictmp):
+            try:
+                self.poster_resize(pictmp)
+            except Exception as ex:
+                print("* error ** %s" % ex)
+                pass
+            except:
+                pass
+
+    def downloadError(self, png):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(png):
+                self.poster_resize(no_cover)
         except Exception as ex:
+            self.poster_resize(no_cover)
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
     def poster_resize(self, png):
-        self["poster"].show()
-        pixmaps = png
-        if os.path.exists(pixmaps):
+        self["poster"].hide()
+
+        if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            # if self.picload:
+
             self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
-                self.picload.startDecode(pixmaps, False)
+                self.picload.startDecode(png, False)
             else:
-                self.picload.startDecode(pixmaps, 0, 0, False)
+                self.picload.startDecode(png, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -2650,16 +2657,16 @@ class video5(Screen):
             pixmaps = six.ensure_binary(self.pics[idx])
             print("debug: pixmaps:",pixmaps)
             print("debug: pixmaps:",type(pixmaps))
-            global tmp_image
+            global pictmp
             path = urlparse(pixmaps).path
             ext = splitext(path)[1]
-            tmp_image = '/tmp/posterx' + str(ext)
-            if fileExists(tmp_image):
-                tmp_image = '/tmp/posterx' + str(ext)
+            pictmp = '/tmp/posterx' + str(ext)
+            if fileExists(pictmp):
+                pictmp = '/tmp/posterx' + str(ext)
             else:
                 m = hashlib.md5()
                 m.update(pixmaps)
-                tmp_image = m.hexdigest()
+                pictmp = m.hexdigest()
             try:
                 if pixmaps.startswith(b"https") and sslverify:
                     parsed_uri = urlparse(pixmaps)
@@ -2668,41 +2675,52 @@ class video5(Screen):
                     # if six.PY3:
                         # pixmaps = pixmaps.encode()
                     print('uurrll: ', pixmaps)
-                    downloadPage(pixmaps, tmp_image, sniFactory, timeout=5).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 else:
-                    downloadPage(pixmaps, tmp_image).addCallback(self.downloadPic, tmp_image).addErrback(self.downloadError)
+                    downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             except Exception as ex:
                 print(ex)
                 print("Error: can't find file or read data")
             return
 
-    def downloadError(self, raw):
+    def downloadPic(self, data, pictmp):
+        if os.path.exists(pictmp):
+            try:
+                self.poster_resize(pictmp)
+            except Exception as ex:
+                print("* error ** %s" % ex)
+                pass
+            except:
+                pass
+
+    def downloadError(self, png):
         try:
-            if fileExists(tmp_image):
-                self.poster_resize(tmp_image)
+            if fileExists(png):
+                self.poster_resize(no_cover)
         except Exception as ex:
+            self.poster_resize(no_cover)
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, tmp_image):
-        if fileExists(tmp_image):
-            self.poster_resize(tmp_image)
+    def downloadPic(self, data, pictmp):
+        if fileExists(pictmp):
+            self.poster_resize(pictmp)
         else:
             print('logo not found')
 
     def poster_resize(self, png):
-        self["poster"].show()
-        pixmaps = png
-        if os.path.exists(pixmaps):
+        self["poster"].hide()
+
+        if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             sc = AVSwitch().getFramebufferScale()
-            # if self.picload:
+
             self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
-                self.picload.startDecode(pixmaps, False)
+                self.picload.startDecode(png, False)
             else:
-                self.picload.startDecode(pixmaps, 0, 0, False)
+                self.picload.startDecode(png, 0, 0, False)
             ptr = self.picload.getData()
             if ptr != None:
                 self['poster'].instance.setPixmap(ptr)
@@ -3266,6 +3284,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.service = None
         service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
+        url = checkStr(url)
         self.icount = 0
         self.desc = desc
         self.pcip = 'None'
@@ -3355,7 +3374,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         else:
             inf = self.desc
             if inf and inf != '':
-                text_clear = self.infos[inf]
+                text_clear = inf
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
@@ -3454,7 +3473,7 @@ class plgnstrt(Screen):
         self.onFirstExecBegin.append(self.loadDefaultImage)
         self.onLayoutFinish.append(self.checkDwnld)
 
-    def decodeImage(self, pngori):
+    def poster_resize(self, pngori):
         pixmaps = pngori
         if os.path.exists('/var/lib/dpkg/status'):
             self['poster'].instance.setPixmap(gPixmapPtr())
@@ -3489,7 +3508,7 @@ class plgnstrt(Screen):
         if os.path.exists(pngori):
             print('image pngori: ', pngori)
             try:
-                self.decodeImage(pngori)
+                self.poster_resize(pngori)
             except Exception as ex:
                 print(ex)
                 pass
@@ -3499,11 +3518,10 @@ class plgnstrt(Screen):
     def loadDefaultImage(self, failure=None):
         print("*** failure *** %s" % failure)
         global pngori
-        # self.png = '/usr/lib/enigma2/python/Plugins/Extensions/TivuStream/res/pics/fulltop.jpg'
         fldpng = '/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/'
         npj = random.choice(imgjpg)
         pngori = fldpng + npj
-        self.decodeImage(pngori)
+        self.poster_resize(pngori)
 
     def checkDwnld(self):
         self.icount = 0
@@ -3552,66 +3570,100 @@ class plgnstrt(Screen):
 
 
 def charRemove(text):
-    char = ["1080p",
-     "2018",
-     "2019",
-     "2020",
-     "2021",
-     "480p",
-     "4K",
-     "720p",
-     "ANIMAZIONE",
-     "APR",
-     "AVVENTURA",
-     "BIOGRAFICO",
-     "BDRip",
-     "BluRay",
-     "CINEMA",
-     "COMMEDIA",
-     "DOCUMENTARIO",
-     "DRAMMATICO",
-     "FANTASCIENZA",
-     "FANTASY",
-     "FEB",
-     "GEN",
-     "GIU",
-     "HDCAM",
-     "HDTC",
-     "HDTS",
-     "LD",
-     "MAFIA",
-     "MAG",
-     "MARVEL",
-     "MD",
-     "ORROR",
-     "NEW_AUDIO",
-     "POLIZ",
-     "R3",
-     "R6",
-     "SD",
-     "SENTIMENTALE",
-     "TC",
-     "TEEN",
-     "TELECINE",
-     "TELESYNC",
-     "THRILLER",
-     "Uncensored",
-     "V2",
-     "WEBDL",
-     "WEBRip",
-     "WEB",
-     "WESTERN",
-     "-",
-     "_",
-     ".",
-     "+",
-     "[",
-     "]"]
+        char = ["1080p",
+                 "2018",
+                 "2019",
+                 "2020",
+                 "2021",
+                 "2022"
+                 "PF1",
+                 "PF2",
+                 "PF3",
+                 "PF4",
+                 "PF5",
+                 "PF6",
+                 "PF7",
+                 "PF8",
+                 "PF9",
+                 "PF10",
+                 "PF11",
+                 "PF12",
+                 "PF13",
+                 "PF14",
+                 "PF15",
+                 "PF16",
+                 "PF17",
+                 "PF18",
+                 "PF19",
+                 "PF20",
+                 "PF21",
+                 "PF22",
+                 "PF23",
+                 "PF24",
+                 "PF25",
+                 "PF26",
+                 "PF27",
+                 "PF28",
+                 "PF29",
+                 "PF30"
+                 "480p",
+                 "4K",
+                 "720p",
+                 "ANIMAZIONE",
+                 # "APR",
+                 # "AVVENTURA",
+                 "BIOGRAFICO",
+                 "BDRip",
+                 "BluRay",
+                 "CINEMA",
+                 # "COMMEDIA",
+                 "DOCUMENTARIO",
+                 "DRAMMATICO",
+                 "FANTASCIENZA",
+                 "FANTASY",
+                 # "FEB",
+                 # "GEN",
+                 # "GIU",
+                 "HDCAM",
+                 "HDTC",
+                 "HDTS",
+                 "LD",
+                 "MAFIA",
+                 # "MAG",
+                 "MARVEL",
+                 "MD",
+                 # "ORROR",
+                 "NEW_AUDIO",
+                 "POLIZ",
+                 "R3",
+                 "R6",
+                 "SD",
+                 "SENTIMENTALE",
+                 "TC",
+                 "TEEN",
+                 "TELECINE",
+                 "TELESYNC",
+                 "THRILLER",
+                 "Uncensored",
+                 "V2",
+                 "WEBDL",
+                 "WEBRip",
+                 "WEB",
+                 "WESTERN",
+                 "-",
+                 "_",
+                 ".",
+                 "+",
+                 "[",
+                 "]"
+                 ]
 
-    myreplace = text
-    for ch in char:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("       ", " ").strip()
-    return myreplace
+        myreplace = text.lower()
+        for ch in char:
+            ch= ch.lower()
+            # if myreplace == ch:
+            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+        return myreplace
 
 def checks():
     chekin= False
@@ -3644,7 +3696,7 @@ def mainmenu(session, **kwargs):
 def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not os.path.exists('/var/lib/dpkg/status'):
-        ico_path = plugin_path + '/res/pics/logo.png'
+        ico_path = res_plugin_path + 'pics/logo.png'
     result = [PluginDescriptor(name =desc_plug, description =title_plug, where =[PluginDescriptor.WHERE_PLUGINMENU], icon =ico_path, fnc =main)]
     return result
 
