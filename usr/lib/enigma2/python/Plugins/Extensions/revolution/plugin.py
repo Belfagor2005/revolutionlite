@@ -110,7 +110,7 @@ def logdata(name = '', data = None):
         pass
 
 def getversioninfo():
-    currversion = '1.3'
+    currversion = '1.4'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -890,12 +890,6 @@ class live_stream(Screen):
             self.poster_resize(no_cover)
             print(ex)
             print('exe downloadError')
-
-    def downloadPic(self, data, pictmp):
-        if fileExists(pictmp):
-            self.poster_resize(pictmp)
-        else:
-            print('logo not found')
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2441,11 +2435,6 @@ class nextvideo1(Screen):
             print(ex)
             print('exe downloadError')
 
-    def downloadPic(self, data, pictmp):
-        if fileExists(pictmp):
-            self.poster_resize(pictmp)
-        else:
-            print('logo not found')
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2701,12 +2690,6 @@ class video5(Screen):
             self.poster_resize(no_cover)
             print(ex)
             print('exe downloadError')
-
-    def downloadPic(self, data, pictmp):
-        if fileExists(pictmp):
-            self.poster_resize(pictmp)
-        else:
-            print('logo not found')
 
     def poster_resize(self, png):
         self["poster"].hide()
