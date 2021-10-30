@@ -34,8 +34,9 @@ from Components.config import *
 from Plugins.Plugin import PluginDescriptor
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Console import Console
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarSubtitleSupport, InfoBarNotifications
-from Screens.InfoBarGenerics import InfoBarServiceNotifications, InfoBarMoviePlayerSummarySupport, InfoBarMenu
+from Screens.InfoBar import MoviePlayer, InfoBar
+from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
+    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
@@ -222,9 +223,6 @@ def make_request(url):
         return
     return
 
-
-
-
 def deletetmp():
 
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
@@ -253,7 +251,6 @@ def TvsApi():
 modechoices = [
                 ("4097", _("IPTV(4097)")),
                 ("1", _("Dvb(1)")),
-                ("8193", _("eServiceUri(8193)")),
                 ]
 
 if os.path.exists("/usr/bin/gstplayer"):
@@ -262,7 +259,8 @@ if os.path.exists("/usr/bin/exteplayer3"):
     modechoices.append(("5002", _("Exteplayer3(5002)")))
 if os.path.exists("/usr/sbin/streamlinksrv"):
     modechoices.append(("5002", _("Streamlink(5002)")))
-
+if os.path.exists("/usr/bin/apt-get"):
+    modechoices.append(("8193", _("eServiceUri(8193)")))
 config.plugins.revolution = ConfigSubsection()
 config.plugins.revolution.cachefold = ConfigDirectory(default='/media/hdd/revolution/')
 config.plugins.revolution.movie = ConfigDirectory("/media/hdd/movie")
@@ -433,6 +431,8 @@ class Revolmain(Screen):
         self["progress"].hide()
         self['progresstext'].text = ''
         self.currentList = 'text'
+        self.picload = ePicLoad()
+        self.scale = AVSwitch().getFramebufferScale()        
         self.names = []
         self.urls = []
         self.pics = []
@@ -568,12 +568,12 @@ class Revolmain(Screen):
                 self['poster'].instance.setPixmap(gPixmapPtr())
             else:
                 self['poster'].instance.setPixmap(None)
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             self.picload = ePicLoad()
             self.picload.setPara((size.width(),
              size.height(),
-             sc[0],
-             sc[1],
+             self.scale[0],
+             self.scale[1],
              False,
              1,
              '#FF000000'))
@@ -770,7 +770,6 @@ class live_stream(Screen):
             pic = self.picx
             name = str(result)
             url = self.urlx + str(result)
-
             try:
                 # if nextmodule == 'Videos4':
                     search = True
@@ -897,9 +896,9 @@ class live_stream(Screen):
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
 
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(png, False)
             else:
@@ -1151,9 +1150,9 @@ class video3(Screen):
         if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(pixmaps, False)
             else:
@@ -1404,9 +1403,9 @@ class nextvideo3(Screen):
         if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(pixmaps, False)
             else:
@@ -1655,9 +1654,9 @@ class video4(Screen):
         if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(pixmaps, False)
             else:
@@ -1908,9 +1907,9 @@ class nextvideo4(Screen):
         if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(pixmaps, False)
             else:
@@ -2176,9 +2175,9 @@ class video1(Screen):
         if os.path.exists(pixmaps):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(pixmaps, False)
             else:
@@ -2442,9 +2441,9 @@ class nextvideo1(Screen):
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
 
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(png, False)
             else:
@@ -2697,9 +2696,9 @@ class video5(Screen):
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
-            sc = AVSwitch().getFramebufferScale()
+            self.scale = AVSwitch().getFramebufferScale()
 
-            self.picload.setPara([size.width(), size.height(), sc[0], sc[1], False, 1, '#00000000'])
+            self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(png, False)
             else:
@@ -3218,35 +3217,72 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
+
+# class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
+class Playstream2(
+    InfoBarBase,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarMoviePlayerSummarySupport,
+    InfoBarSubtitleSupport,
+    InfoBarSummarySupport,
+    InfoBarServiceErrorPopupSupport,
+    InfoBarNotifications,
+    TvInfoBarShowHide,
+    Screen
+):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
-    screen_timeout = 4000
+    screen_timeout = 5000
+
+    # STATE_IDLE = 0
+    # STATE_PLAYING = 1
+    # STATE_PAUSED = 2
+    # # ENABLE_RESUME_SUPPORT = True
+    # # ALLOW_SUSPEND = True
+    # screen_timeout = 4000
 
     def __init__(self, session, name, url, desc):
         global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
+        
+        
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-        # self['list'] = MenuList([])
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self, steal_current_service=True)
-        TvInfoBarShowHide.__init__(self)
-        InfoBarAudioSelection.__init__(self)
-        # InfoBarSubtitleSupport.__init__(self)
+        
+        for x in InfoBarBase, \
+                InfoBarMenu, \
+                InfoBarSeek, \
+                InfoBarAudioSelection, \
+                InfoBarMoviePlayerSummarySupport, \
+                InfoBarSubtitleSupport, \
+                InfoBarSummarySupport, \
+                InfoBarServiceErrorPopupSupport, \
+                InfoBarNotifications, \
+                TvInfoBarShowHide:
+            x.__init__(self)        
+        
+        # InfoBarMenu.__init__(self)
+        # InfoBarNotifications.__init__(self)
+        # InfoBarBase.__init__(self, steal_current_service=True)
+        # TvInfoBarShowHide.__init__(self)
+        # InfoBarAudioSelection.__init__(self)
+        # # InfoBarSubtitleSupport.__init__(self)
+        # InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')      
+
+        
         try:
             self.init_aspect = int(self.getAspect())
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        self['actions'] = ActionMap(['WizardActions',
-         'MoviePlayerActions',
+        self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
          'EPGSelectActions',
@@ -3258,7 +3294,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'InfobarSeekActions'], {'leavePlayer': self.cancel,
          'epg': self.showIMDB,
          'info': self.showinfo,
-         # 'info': self.cicleStreamType,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
          'cancel': self.cancel,
@@ -3266,22 +3301,23 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.allowPiP = False
         self.service = None
         service = None
-        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         url = checkStr(url)
         self.icount = 0
         self.desc = desc
-        self.pcip = 'None'
+        # self.pcip = 'None'
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        SREF = self.srefOld
-        if '8088' in str(self.url):
-            self.onLayoutFinish.append(self.slinkPlay)
-        else:
-            self.onLayoutFinish.append(self.cicleStreamType)
-        self.onClose.append(self.cancel)
+        SREF= self.session.nav.getCurrentlyPlayingServiceReference()
+        # self.onLayoutFinish.append(self.cicleStreamType)
+        # self.onClose.append(self.cancel)
 		# self.onClose.append(self.__onClose)
+        if '8088' in str(self.url):
+            # self.onLayoutFinish.append(self.slinkPlay)
+            self.onFirstExecBegin.append(self.slinkPlay)
+        else:
+            # self.onLayoutFinish.append(self.cicleStreamType)
+            self.onFirstExecBegin.append(self.cicleStreamType)
         return
 
     def getAspect(self):
@@ -3319,7 +3355,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.setAspect(temp)
 
     def showinfo(self):
-        # debug = True
         sTitle = ''
         sServiceref = ''
         try:
@@ -3364,8 +3399,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def slinkPlay(self):
         ref = str(self.url)
-        ref = ref.replace(':', '%3a')
-        ref = ref.replace(' ','%20')
+        ref = ref.replace(':', '%3a').replace(' ','%20')
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3373,8 +3407,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.session.nav.playService(sref)
 
     def openPlay(self, servicetype, url):
-        url = url.replace(':', '%3a')
-        url = url.replace(' ','%20')
+        url = url.replace(':', '%3a').replace(' ','%20')
         ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
         if streaml == True:
             ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
@@ -3414,14 +3447,30 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
+    def keyNumberGlobal(self, number):
+        self['text'].number(number)
+
+    def keyLeft(self):
+        self['text'].left()
+
+    def keyRight(self):
+        self['text'].right()
+
+    def showVideoInfo(self):
+        if self.shown:
+            self.hideInfobar()
+        if self.infoCallback != None:
+            self.infoCallback()
+        return
+
+    def showAfterSeek(self):
+        if isinstance(self, TvInfoBarShowHide):
+            self.doShow()
     def cancel(self):
-        if os.path.exists('/tmp/hls.avi'):
+        if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
         self.session.nav.playService(SREF)
-        if self.pcip != 'None':
-            url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
-            resp = urlopen(url2)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
@@ -3462,13 +3511,13 @@ class plgnstrt(Screen):
             self['poster'].instance.setPixmap(gPixmapPtr())
         else:
             self['poster'].instance.setPixmap(None)
-        sc = AVSwitch().getFramebufferScale()
+        self.scale = AVSwitch().getFramebufferScale()
         self.picload = ePicLoad()
         size = self['poster'].instance.size()
         self.picload.setPara((size.width(),
          size.height(),
-         sc[0],
-         sc[1],
+         self.scale[0],
+         self.scale[1],
          False,
          1,
          '#FF000000'))
