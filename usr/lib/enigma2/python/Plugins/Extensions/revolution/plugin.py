@@ -6,7 +6,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *                                      *
-*             11/11/2021               *
+*             18/11/2021               *
 ****************************************
 '''
 from __future__ import print_function
@@ -55,26 +55,16 @@ from enigma import eSize, iServiceInformation, eServiceReference
 from enigma import getDesktop, loadPNG, gFont
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
-import base64
-UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
-UrlSvr = UrlSvr.replace('+', '')
-UrlLst = base64.b64decode(UrlSvr)
 import os
 import re
 import sys
 import ssl
-import socket
-# import subprocess
 import glob
 import json
 import hashlib
-import random
 import six
 from os.path import splitext
-if six.PY3:
-    print('six.PY3: True ')
-plugin_path = os.path.dirname(sys.modules[__name__].__file__)
-global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
+import base64
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError
@@ -82,37 +72,30 @@ from six.moves.urllib.error import URLError
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import urlencode
-import six.moves.urllib.request
+from Plugins.Extensions.revolution.Utils import *
+if six.PY3:
+    print('six.PY3: True ')
+plugin_path = os.path.dirname(sys.modules[__name__].__file__)
+global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
 search = False
 _session = None
-
-try:
-    from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
-    from Plugins.Extensions.revolution.resolver.Utils2 import *
-except:
-    from Plugins.Extensions.revolution.resolver.Utils import *
-
+UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
+UrlSvr = UrlSvr.replace('+', '')
+# UrlLst = base64.b64decode(UrlSvr)
+UrlLst = b64decoder(UrlSvr)
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 streamlink = False
-try:
-    if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
-        if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
-            streamlink = True
-except:
-    streamlink = False
+if isStreamlinkAvailable:
+    streamlink = True
 
-try:
-	from Plugins.Extensions.tmdb import tmdb
-	is_tmdb = True
-except Exception:
-	is_tmdb = False
-
-try:
-	from Plugins.Extensions.IMDb.plugin import main as imdb
-	is_imdb = True
-except Exception:
-	is_imdb = False
+def trace_error():
+    import traceback
+    try:
+        traceback.print_exc(file=sys.stdout)
+        traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
+    except:
+        pass
 
 def logdata(name = '', data = None):
     try:
@@ -123,19 +106,9 @@ def logdata(name = '', data = None):
     except:
         trace_error()
         pass
-        
-def getserviceinfo(sref):## this def returns the current playing service name and stream_url from give sref
-    try:
-        from ServiceReference import ServiceReference
-        p=ServiceReference(sref)
-        servicename=str(p.getServiceName())
-        serviceurl=str(p.getPath())
-        return servicename,serviceurl
-    except:
-        return None, None
-        
+
 def getversioninfo():
-    currversion = '1.4'
+    currversion = '1.5'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -149,53 +122,21 @@ def getversioninfo():
     return (currversion)
 
 try:
-    from urlparse import urlparse
-except:
-    from urllib.parse import urlparse
-
-def checkStr(txt):
-    if six.PY3:
-        if isinstance(txt, type(bytes())):
-            txt = txt.decode('utf-8')
-    else:
-        if isinstance(txt, type(six.text_type())):
-            txt = txt.encode('utf-8')
-    return txt
-
-def checkInternet():
-    try:
-        socket.setdefaulttimeout(0.5)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
-        return True
-    except:
-        return False
-try:
     from OpenSSL import SSL
     from twisted.internet import ssl
     from twisted.internet._sslverify import ClientTLSOptions
     sslverify = True
 except:
     sslverify = False
-
 if sslverify:
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
-
         def getContext(self):
             ctx = self._contextFactory(self.method)
             if self.hostname:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
-
-def trace_error():
-    import traceback
-    try:
-        traceback.print_exc(file=sys.stdout)
-        traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
-    except:
-        pass
-
 
 def make_request(url):
     link = []
@@ -217,15 +158,11 @@ def make_request(url):
         print("Here in client2 link =", link)
         return link
     except:
-        return
-    return
-
-def deletetmp():
-    os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
+        return ''
     return
 
 def TvsApi():
-    DownUrl = '%s/apigen' % UrlLst
+    DownUrl = '%s/apigen' %UrlLst
     live = ''
     movie = ''
     series = ''
@@ -267,7 +204,6 @@ try:
 except:
     if os.path.exists("/usr/bin/apt-get"):
         config.plugins.revolution.movie   = ConfigDirectory(default='/media/hdd/movie')
-
 config.plugins.revolution.services = ConfigSelection(default='4097', choices = modechoices)
 config.plugins.revolution.cachefold = ConfigDirectory("/media/hdd", False)
 cfg = config.plugins.revolution
@@ -278,11 +214,9 @@ if Path_Movies.endswith("\/\/") is True:
     Path_Movies = Path_Movies[:-1]
 print('patch movies: ', Path_Movies)
 
-HD = getDesktop(0).size()
 currversion = getversioninfo()
 title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
-# skin_path = plugin_path
 ico_path = plugin_path + '/logo.png'
 no_cover = plugin_path + '/no_coverArt.png'
 res_plugin_path = plugin_path + '/res/'
@@ -299,12 +233,9 @@ pixmaps = res_picon_plugin_path + 'backg.png'
 revol = config.plugins.revolution.cachefold.value.strip()
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 pngori = plugin_path + '/res/pics/fulltop.jpg'
-
-# defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('defaultL.png'))
-
-
 Path_Tmp = "/tmp"
 pictmp = Path_Tmp + "/poster.jpg"
+# defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('defaultL.png'))
 if revol.endswith('/'):
     revol = revol[:-1]
 if not os.path.exists(revol):
@@ -312,10 +243,8 @@ if not os.path.exists(revol):
         os.makedirs(revol)
     except OSError as e:
         print(('Error creating directory %s:\n%s') % (revol, str(e)))
-
 logdata("path picons: ", str(revol))
-
-if HD.width() > 1280:
+if isFHD:
     skin_path = res_plugin_path + 'skins/fhd/'
     # defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('defaultL.png'))
 else:
@@ -323,6 +252,7 @@ else:
     # defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('default.png'))
 if os.path.exists('/var/lib/dpkg/status'):
     skin_path = skin_path + 'dreamOs/'
+logdata("path picons: ", str(skin_path))
 
 REGEX = re.compile(
 		r'([\(\[]).*?([\)\]])|'
@@ -360,7 +290,7 @@ class rvList(MenuList):
         self.l.setFont(7, gFont('Regular', 34))
         self.l.setFont(8, gFont('Regular', 36))
         self.l.setFont(9, gFont('Regular', 40))
-        if HD.width() > 1280:
+        if isFHD:
             self.l.setItemHeight(50)
         else:
             self.l.setItemHeight(40)
@@ -369,17 +299,18 @@ def rvListEntry(name, idx):
     pngs = ico1_path
     res = [name]
     if fileExists(pngs):
-        if HD.width() > 1280:
+        if isFHD:
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
             res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =7, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
         else:
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
             res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =2, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT))
         return res
+
 def rvoneListEntry(name):
     pngx = ico1_path
     res = [name]
-    if HD.width() > 1280:
+    if isFHD:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -466,16 +397,18 @@ class Revolmain(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
-                print("[XCF] imdb: ", e)            
+                print("[XCF] imdb: ", e)       
         else:
             inf = idx
             if inf and inf != '':
@@ -660,12 +593,14 @@ class live_stream(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -900,12 +835,10 @@ class live_stream(Screen):
 
     def poster_resize(self, png):
         self["poster"].hide()
-
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             self.scale = AVSwitch().getFramebufferScale()
-
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
             if os.path.exists('/var/lib/dpkg/status'):
                 self.picload.startDecode(png, False)
@@ -983,12 +916,14 @@ class video3(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -1231,7 +1166,7 @@ class nextvideo3(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
-        self.readJsonFile(self.name, self.url, self.pic)
+        self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
         # self.onFirstExecBegin.append(self.download)
@@ -1243,12 +1178,14 @@ class nextvideo3(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -1488,9 +1425,9 @@ class video4(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
+        self.readJsonFile(name, url, pic)         
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        self.readJsonFile(self.name, self.url, self.pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1500,12 +1437,14 @@ class video4(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -1754,12 +1693,14 @@ class nextvideo4(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -2012,12 +1953,14 @@ class video1(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -2272,9 +2215,9 @@ class nextvideo1(Screen):
          'epg': self.showIMDB,
          'info': self.showIMDB,
          'cancel': self.cancel}, -2)
+        self.readJsonFile(name, url, pic)         
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        self.readJsonFile(self.name, self.url, self.pic)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2284,12 +2227,14 @@ class nextvideo1(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -2521,7 +2466,6 @@ class video5(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.name = name
@@ -2555,12 +2499,14 @@ class video5(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
@@ -2728,7 +2674,6 @@ class video5(Screen):
 
     def poster_resize(self, png):
         self["poster"].hide()
-
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
@@ -3065,14 +3010,12 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
-
             if idx == 0:
                 # self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.runRec()
                 # return
-
             if idx == 1:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -3100,7 +3043,6 @@ class Playstream1(Screen):
                     os.remove('/tmp/hls.avi')
                 except:
                     pass
-
                 cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/tsclient.py" "' + url + '" "1" + &'
                 print('hls cmd = ', cmd)
                 os.system(cmd)
@@ -3108,7 +3050,6 @@ class Playstream1(Screen):
                 self.url = '/tmp/hls.avi'
                 self.name = self.names[idx]
                 self.play()
-
             else:
                 if idx == 4:
                     self.name = self.names[idx]
@@ -3277,7 +3218,6 @@ class Playstream2(
         self.session = session
         global _session
         _session = session
-        
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
@@ -3397,17 +3337,18 @@ class Playstream2(
         text_clear = self.name    
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
-
         else:
             inf = self.desc
             if inf and inf != '':
@@ -3567,6 +3508,7 @@ class plgnstrt(Screen):
                 pass
 
     def loadDefaultImage(self, failure=None):
+        import random
         print("*** failure *** %s" % failure)
         global pngori
         fldpng = '/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/'
@@ -3619,111 +3561,21 @@ class plgnstrt(Screen):
     def clsgo(self):
         self.session.openWithCallback(self.close, Revolmain)
 
-
-def charRemove(text):
-        char = ["1080p",
-                 "2018",
-                 "2019",
-                 "2020",
-                 "2021",
-                 "2022"
-                 "PF1",
-                 "PF2",
-                 "PF3",
-                 "PF4",
-                 "PF5",
-                 "PF6",
-                 "PF7",
-                 "PF8",
-                 "PF9",
-                 "PF10",
-                 "PF11",
-                 "PF12",
-                 "PF13",
-                 "PF14",
-                 "PF15",
-                 "PF16",
-                 "PF17",
-                 "PF18",
-                 "PF19",
-                 "PF20",
-                 "PF21",
-                 "PF22",
-                 "PF23",
-                 "PF24",
-                 "PF25",
-                 "PF26",
-                 "PF27",
-                 "PF28",
-                 "PF29",
-                 "PF30"
-                 "480p",
-                 "4K",
-                 "720p",
-                 "ANIMAZIONE",
-                 # "APR",
-                 # "AVVENTURA",
-                 "BIOGRAFICO",
-                 "BDRip",
-                 "BluRay",
-                 "CINEMA",
-                 # "COMMEDIA",
-                 "DOCUMENTARIO",
-                 "DRAMMATICO",
-                 "FANTASCIENZA",
-                 "FANTASY",
-                 # "FEB",
-                 # "GEN",
-                 # "GIU",
-                 "HDCAM",
-                 "HDTC",
-                 "HDTS",
-                 "LD",
-                 "MAFIA",
-                 # "MAG",
-                 "MARVEL",
-                 "MD",
-                 # "ORROR",
-                 "NEW_AUDIO",
-                 "POLIZ",
-                 "R3",
-                 "R6",
-                 "SD",
-                 "SENTIMENTALE",
-                 "TC",
-                 "TEEN",
-                 "TELECINE",
-                 "TELESYNC",
-                 "THRILLER",
-                 "Uncensored",
-                 "V2",
-                 "WEBDL",
-                 "WEBRip",
-                 "WEB",
-                 "WESTERN",
-                 "-",
-                 "_",
-                 ".",
-                 "+",
-                 "[",
-                 "]"
-                 ]
-
-        myreplace = text.lower()
-        for ch in char:
-            ch= ch.lower()
-            # if myreplace == ch:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
-        return myreplace
-
 def checks():
+    from Plugins.Extensions.revolution.Utils import checkInternet
+    checkInternet()
     chekin= False
     if checkInternet():
-            chekin = True
-    return
+        chekin = True
+    return chekin
 
 def main(session, **kwargs):
     if checks:
+        try:
+            from Plugins.Extensions.revolution.Update import upd_done
+            upd_done()
+        except:       
+            pass
         if six.PY3:
             session.open(Revolmain)
         elif os.path.exists('/var/lib/dpkg/status'):

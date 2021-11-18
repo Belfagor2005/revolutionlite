@@ -106,14 +106,7 @@ class HttpFD(FileDownloader):
                 set_range(request, range_start, range_end)
             # Establish connection
             try:
-                try:
-                    ctx.data = self.ydl.urlopen(request)
-                except (compat_urllib_error.URLError, ) as err:
-                    # reason may not be available, e.g. for urllib2.HTTPError on python 2.6
-                    reason = getattr(err, 'reason', None)
-                    if isinstance(reason, socket.timeout):
-                        raise RetryDownload(err)
-                    raise err
+                ctx.data = self.ydl.urlopen(request)
                 # When trying to resume, Content-Range HTTP header of response has to be checked
                 # to match the value of requested Range HTTP header. This is due to a webservers
                 # that don't support resuming and serve a whole file with no Content-Range
@@ -225,10 +218,9 @@ class HttpFD(FileDownloader):
 
             def retry(e):
                 to_stdout = ctx.tmpfilename == '-'
-                if ctx.stream is not None:
-                    if not to_stdout:
-                        ctx.stream.close()
-                    ctx.stream = None
+                if not to_stdout:
+                    ctx.stream.close()
+                ctx.stream = None
                 ctx.resume_len = byte_counter if to_stdout else os.path.getsize(encodeFilename(ctx.tmpfilename))
                 raise RetryDownload(e)
 
@@ -241,11 +233,9 @@ class HttpFD(FileDownloader):
                 except socket.timeout as e:
                     retry(e)
                 except socket.error as e:
-                    # SSLError on python 2 (inherits socket.error) may have
-                    # no errno set but this error message
-                    if e.errno in (errno.ECONNRESET, errno.ETIMEDOUT) or getattr(e, 'message', None) == 'The read operation timed out':
-                        retry(e)
-                    raise
+                    if e.errno not in (errno.ECONNRESET, errno.ETIMEDOUT):
+                        raise
+                    retry(e)
 
                 byte_counter += len(data_block)
 
