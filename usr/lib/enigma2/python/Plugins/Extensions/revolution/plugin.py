@@ -73,6 +73,7 @@ from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import urlencode
 from Plugins.Extensions.revolution.Utils import *
+# from . import Utils
 if six.PY3:
     print('six.PY3: True ')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
@@ -3030,7 +3031,7 @@ class Playstream1(Screen):
                 except:
                     pass
                 header = ''
-                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/Exodus/resolver/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
                 print('In playVideo cmd =', cmd)
                 os.system(cmd)
                 os.system('sleep 3')
@@ -3074,7 +3075,7 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        if os.path.exists("/usr/sbin/streamlinksrv"):
+        if isStreamlinkAvailable():
             desc = self.desc
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
@@ -3326,7 +3327,7 @@ class Playstream2(
             sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
             sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
             sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec:' + str(sTagAudioCodec)
+            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec: ' + str(sTagAudioCodec)
             self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
@@ -3352,7 +3353,7 @@ class Playstream2(
         else:
             inf = self.desc
             if inf and inf != '':
-                text_clear = inf
+                text_clear = self.infos[inf]
             else:
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
@@ -3389,10 +3390,10 @@ class Playstream2(
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if os.path.exists("/usr/sbin/streamlinksrv"):
+        if isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
+        if DreamOS():
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
             streamtypelist.append("5002")
