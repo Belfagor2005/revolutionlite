@@ -147,29 +147,6 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
-def make_request(url):
-    link = []
-    try:
-        import requests
-        if six.PY3:
-            url = url.encode()
-        link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        return link
-    except ImportError:
-        print("Here in client2 getUrl url =", url)
-        if six.PY3:
-            url = url.encode()
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urlopen(req, None, 3)
-        link=response.read().decode('utf-8') #03/09/2021
-        response.close()
-        print("Here in client2 link =", link)
-        return link
-    except:
-        return ''
-    return
-
 def TvsApi():
     DownUrl = '%s/apigen' %UrlLst
     live = ''
@@ -487,14 +464,9 @@ class Revolmain(Screen):
     def goConfig(self):
         self.session.open(myconfig)
 
-
-
     def up(self):
         self[self.currentList].up()
         self.load_poster()
-
-
-
 
     def down(self):
         self[self.currentList].down()
@@ -633,7 +605,7 @@ class live_stream(Screen):
 
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = make_request(url)
+        content = ReadUrl2(url)
         # if six.PY3:
             # content = six.ensure_str(content)
         print('live_stream content B =', content)
@@ -841,7 +813,6 @@ class live_stream(Screen):
             except:
                 pass
 
-
     def downloadError(self, png):
         try:
             if fileExists(png):
@@ -913,8 +884,6 @@ class video3(Screen):
         self.currentList = 'text'
         self['title'] = Label(name)
         self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-
-
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -984,7 +953,7 @@ class video3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1247,7 +1216,7 @@ class nextvideo3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("nextVideos3 content A =", content)
@@ -1507,7 +1476,7 @@ class video4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("content Video4 =", content)
@@ -1766,7 +1735,7 @@ class nextvideo4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("content A =", content)
@@ -2030,7 +1999,7 @@ class video1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("content Video1 =", content)
@@ -2301,7 +2270,7 @@ class nextvideo1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("content nextvideo1 =", content)
@@ -2572,7 +2541,7 @@ class video5(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = make_request(url)
+        content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
         print("content A =", content)
@@ -2918,7 +2887,7 @@ class Playstream1(Screen):
         # self['list'] = RSList([])
         self['info'] = Label()
         self['info'].setText(name)
-        self['key_red'] = Button(_('Exit'))
+        self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('Select'))
         self['progress'] = ProgressBar()
         self['progresstext'] = StaticText()
