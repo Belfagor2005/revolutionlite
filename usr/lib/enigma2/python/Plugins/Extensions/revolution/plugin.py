@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-Info http://t.me/tivustream
+                      
 ****************************************
 *        coded by Lululla              *
 *                                      *
 *             01/12/2021               *
 ****************************************
+Info http://t.me/tivustream
 '''
 from __future__ import print_function
 from . import _
@@ -59,25 +60,42 @@ from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
 from os.path import splitext
 import base64
+                            
+                  
+                                 
+                                                           
 import glob
 import hashlib
 import json
 import os
 import re
+             
 import six
 import ssl
 import sys
 import time             
+    
+                                                 
+       
+                       
+                
+
+                                 
+                  
+
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 # from six.moves.urllib.error import HTTPError
 # from six.moves.urllib.error import URLError
 from six.moves.urllib.parse import urlparse
-from six.moves.urllib.parse import quote
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.request import urlretrieve                                                
+# from six.moves.urllib.parse import quote
+# from six.moves.urllib.parse import urlencode
+# from six.moves.urllib.request import urlretrieve                                                
 try:
     from Plugins.Extensions.stvcl.Utils import *
+                                                    
+                                                                                           
+
 except:
     from . import Utils
 if six.PY3:
@@ -3198,6 +3216,7 @@ class Playstream2(
     InfoBarSeek,
     InfoBarAudioSelection,
     InfoBarSubtitleSupport,
+    InfoBarMoviePlayerSummarySupport,                                     
     InfoBarNotifications,
     TvInfoBarShowHide,
     Screen
@@ -3253,11 +3272,10 @@ class Playstream2(
         self.allowPiP = False
         self.service = None
         service = None
-        self.url = url.replace(':', '%3a').replace(' ','%20')
+
+        self.pcip = 'None' 
         self.icount = 0
         self.desc = desc
-        # self.pcip = 'None'
-        # self.name = name
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()

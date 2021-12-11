@@ -14,9 +14,10 @@ import base64
 PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
-    PY3 = True; unicode = str; unichr = chr; long = int
+    PY3 = True
+    unicode = str; unichr = chr; long = int
     # str = unicode = basestring = str
-    unichr = chr; long = int
+    # unichr = chr; long = int
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
