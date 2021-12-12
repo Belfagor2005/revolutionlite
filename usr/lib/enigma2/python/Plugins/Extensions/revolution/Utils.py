@@ -15,8 +15,8 @@ PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
     PY3 = True
-    unicode = str; unichr = chr; long = int
-    # str = unicode = basestring = str
+    # unicode = str; unichr = chr; long = int
+    # # str = unicode = basestring = str
     # unichr = chr; long = int
     from urllib.parse import quote
     from urllib.request import urlopen
@@ -24,12 +24,12 @@ if PY3:
     from urllib.error import HTTPError, URLError
     
 else:
-    # Python 2
-    _str = str
-    str = unicode
-    range = xrange
-    unicode = unicode
-    basestring = basestring
+    # # Python 2
+    # _str = str
+    # str = unicode
+    # range = xrange
+    # unicode = unicode
+    # basestring = basestring
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -186,20 +186,42 @@ def freespace():
         return ''
 
 def b64encoder(source):
+    import base64
     if PY3:
-        import base64
         source = source.encode('utf-8')
     content = base64.b64encode(source).decode('utf-8')
     return content
 
-def b64decoder(source):
-    if PY3:
-        # source = source.decode('utf-8')
-        import base64
-        source = base64.b64decode(source).decode('utf-8')
-    content = source
-    return content
-
+   
+def b64decoder(s):
+    """Add missing padding to string and return the decoded base64 string."""
+    import base64
+    s = str(s).strip()
+    try:
+        # return base64.b64decode(s)
+        outp = base64.b64decode(s)
+        print('outp1 ', outp)
+        if PY3:   
+            outp = outp.decode('utf-8')
+            print('outp2 ', outp)
+        return outp
+        
+    except TypeError:
+        padding = len(s) % 4
+        if padding == 1:
+            print("Invalid base64 string: {}".format(s))
+            return ''
+        elif padding == 2:
+            s += b'=='
+        elif padding == 3:
+            s += b'='
+        outp = base64.b64decode(s)
+        print('outp1 ', outp)
+        if PY3:   
+            outp = outp.decode('utf-8')
+            print('outp2 ', outp)
+        return outp
+        
 def __createdir(list):
     dir = ''
     for line in list[1:].split('/'):
