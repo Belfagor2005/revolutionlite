@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-                      
 ****************************************
 *        coded by Lululla              *
 *                                      *
@@ -15,7 +14,8 @@ from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
-from Components.ConfigList import ConfigListScreen
+from Components.ConfigList import ConfigList, ConfigListScreen
+from Components.FileList import FileList
 from Components.Input import Input
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -36,16 +36,19 @@ from Components.config import *
 from Plugins.Plugin import PluginDescriptor
 from Screens.ChoiceBox import ChoiceBox
 from Screens.Console import Console
-from Screens.InfoBar import MoviePlayer, InfoBar
-from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
-    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
+from Screens.InfoBar import InfoBar
+from Screens.InfoBar import MoviePlayer
+from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
+	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.PluginBrowser import PluginBrowser
 from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop, Standby
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_PLUGINS, SCOPE_LANGUAGE
+from ServiceReference import ServiceReference
+from Tools.Directories import SCOPE_PLUGINS
 from Tools.Directories import pathExists, resolveFilename, fileExists, copyfile
 from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
@@ -54,62 +57,49 @@ from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT
 from enigma import eListbox, eTimer
 from enigma import eListboxPythonMultiContent, eConsoleAppContainer
-from enigma import eSize, iServiceInformation, eServiceReference
-from enigma import getDesktop, loadPNG, gFont
+from enigma import iServiceInformation
+from enigma import eServiceCenter
+from enigma import eServiceReference
+from enigma import eSize, ePicLoad
+from enigma import loadPNG, gFont
+from enigma import quitMainloop
+from enigma import iPlayableService 
+from os.path import splitext
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
-from os.path import splitext
+
 import base64
-                            
-                  
-                                 
-                                                           
 import glob
 import hashlib
 import json
 import os
 import re
-             
 import six
 import ssl
 import sys
-import time             
-    
-                                                 
-       
-                       
-                
-
-                                 
-                  
+import time
 
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
-# from six.moves.urllib.error import HTTPError
-# from six.moves.urllib.error import URLError
 from six.moves.urllib.parse import urlparse
-# from six.moves.urllib.parse import quote
-# from six.moves.urllib.parse import urlencode
-# from six.moves.urllib.request import urlretrieve                                                
-try:
-    from Plugins.Extensions.stvcl.Utils import *
-                                                    
-                                                                                           
 
+try:
+    from Plugins.Extensions.revolution.Utils import *
 except:
     from . import Utils
 if six.PY3:
     print('six.PY3: True ')
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
+
 search = False
 _session = None
 UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
 UrlSvr = UrlSvr.replace('+', '')
-# UrlLst = base64.b64decode(UrlSvr)
 UrlLst = b64decoder(UrlSvr)
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
+
 streamlink = False
 if isStreamlinkAvailable:
     streamlink = True
@@ -222,26 +212,24 @@ print('patch movies: ', Path_Movies)
 currversion = getversioninfo()
 title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
-ico_path = plugin_path + '/logo.png'
-no_cover = plugin_path + '/no_coverArt.png'
-res_plugin_path = plugin_path + '/res/'
+ico_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/logo.png".format('revolution'))
+no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_coverArt.png".format('revolution'))
+res_plugin_path =  resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/".format('revolution'))
 ico1_path = res_plugin_path + 'pics/plugin.png'
 ico3_path = res_plugin_path + 'pics/setting.png'
-res_picon_plugin_path = res_plugin_path + 'picons/'
-piconlive = res_picon_plugin_path + 'tv.png'
-piconmovie = res_picon_plugin_path + 'cinema.png'
-piconseries = res_picon_plugin_path + 'series.png'
-# piconsearch = res_picon_plugin_path + 'search.png'
-piconsearch = "https://tivustream.website/php_filter/kodi19/img/search.png"
-piconinter = res_picon_plugin_path + 'inter.png'
-pixmaps = res_picon_plugin_path + 'backg.png'
-revol = config.plugins.revolution.cachefold.value.strip()
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
-pngori = plugin_path + '/res/pics/fulltop.jpg'
+piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/picons/".format('revolution'))
+piconlive = piccons + 'tv.png'
+piconmovie = piccons + 'cinema.png'
+piconseries = piccons + 'series.png'
+piconsearch = piccons + 'search.png'
+piconinter = piccons + 'inter.png'
+pixmaps = piccons + 'backg.png'
+pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
 Path_Tmp = "/tmp"
 pictmp = Path_Tmp + "/poster.jpg"
-# defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('defaultL.png'))
-if revol.endswith('/'):
+revol = config.plugins.revolution.cachefold.value.strip()
+if revol.endswith('\/\/'):
     revol = revol[:-1]
 if not os.path.exists(revol):
     try:
@@ -250,12 +238,10 @@ if not os.path.exists(revol):
         print(('Error creating directory %s:\n%s') % (revol, str(e)))
 logdata("path picons: ", str(revol))
 if isFHD():
-    skin_path = res_plugin_path + 'skins/fhd/'
-    # defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('defaultL.png'))
+    skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('revolution'))
 else:
-    skin_path = res_plugin_path + 'skins/hd/'
-    # defpic = resolveFilename(SCOPE_PLUGINS, "Extensions/stvcl/res/pics/{}".format('default.png'))
-if os.path.exists('/var/lib/dpkg/status'):
+    skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('revolution'))
+if DreamOS():
     skin_path = skin_path + 'dreamOs/'
 logdata("path picons: ", str(skin_path))
 
@@ -298,10 +284,10 @@ class rvList(MenuList):
         if isFHD():
             self.l.setItemHeight(50)
         else:
-            self.l.setItemHeight(40)
+            self.l.setItemHeight(50)
 
 def rvListEntry(name, idx):
-    pngs = ico1_path
+    pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
     res = [name]
     if fileExists(pngs):
         if isFHD():
@@ -309,18 +295,18 @@ def rvListEntry(name, idx):
             res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =7, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
         else:
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
-            res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =2, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT))
+            res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =2, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
         return res
 
 def rvoneListEntry(name):
-    pngx = ico1_path
+    pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugin.png".format('revolution')) #ico1_path
     res = [name]
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlist(data, list):
@@ -416,6 +402,7 @@ class Revolmain(Screen):
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
+
         else:
             inf = idx
             if inf and inf != '':
@@ -510,7 +497,7 @@ class Revolmain(Screen):
             else:
                 pixmaps = piconinter
             size = self['poster'].instance.size()
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self['poster'].instance.setPixmap(gPixmapPtr())
             else:
                 self['poster'].instance.setPixmap(None)
@@ -524,7 +511,7 @@ class Revolmain(Screen):
              1,
              '#FF000000'))
             ptr = self.picload.getData()
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 if self.picload.startDecode(pixmaps, False) == 0:
                     ptr = self.picload.getData()
             else:
@@ -545,7 +532,7 @@ class live_stream(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -632,6 +619,7 @@ class live_stream(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         i = 0
         while i < 100:
             try:
@@ -847,7 +835,7 @@ class live_stream(Screen):
             self.picload = ePicLoad()
             self.scale = AVSwitch().getFramebufferScale()
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -867,7 +855,7 @@ class video3(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -1098,6 +1086,7 @@ class video3(Screen):
             self.poster_resize(pictmp)
         else:
             print('logo not found')
+               
 
     def poster_resize(self, png):
         self["poster"].show()
@@ -1108,7 +1097,7 @@ class video3(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1128,7 +1117,7 @@ class nextvideo3(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -1164,7 +1153,6 @@ class nextvideo3(Screen):
         self.currentList = 'text'
         self['title'] = Label(name)
         self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-
          # 'green': self.start_download,
          # 'yellow': self.readJsonFile,
          'red': self.cancel,
@@ -1178,7 +1166,6 @@ class nextvideo3(Screen):
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1187,6 +1174,7 @@ class nextvideo3(Screen):
         name = self.names[idx]
         text_clear = name
         if is_tmdb:
+                                            
             try:
                 from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
@@ -1197,6 +1185,7 @@ class nextvideo3(Screen):
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
+       
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -1211,9 +1200,9 @@ class nextvideo3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-
         self.load_infos()
         self.load_poster()
+ 
 
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
@@ -1234,6 +1223,8 @@ class nextvideo3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+               
+                                             
         content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
@@ -1369,7 +1360,7 @@ class nextvideo3(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1389,7 +1380,7 @@ class video4(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -1414,7 +1405,6 @@ class video4(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.pic = pic
@@ -1474,7 +1464,6 @@ class video4(Screen):
         self.load_poster()
 
     def load_infos(self):
-
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx != None or idx != -1:
@@ -1628,7 +1617,7 @@ class video4(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1648,7 +1637,7 @@ class nextvideo4(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -1707,8 +1696,6 @@ class nextvideo4(Screen):
             try:
                 from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
-
-
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
@@ -1740,7 +1727,6 @@ class nextvideo4(Screen):
         name = self.names[idx]
         self['desc'].setText(str(info))
         self['space'].setText(str(name))
-
 
     def selectionChanged(self):
         if self["text"].getCurrent():
@@ -1890,7 +1876,7 @@ class nextvideo4(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1910,7 +1896,7 @@ class video1(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -1935,7 +1921,9 @@ class video1(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-        # idx = 0
+                        
+                      
+                                                                             
         self.name = name
         self.url = url
         self.pic = pic
@@ -2017,6 +2005,8 @@ class video1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+               
+                                             
         content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
@@ -2164,7 +2154,7 @@ class video1(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -2184,7 +2174,7 @@ class nextvideo1(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -2436,7 +2426,7 @@ class nextvideo1(Screen):
             self.scale = AVSwitch().getFramebufferScale()
 
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -2456,7 +2446,7 @@ class video5(Screen):
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.setup_title = ('Revolution List')
+        self.setup_title = ('HOME REVOLUTION')
         Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
@@ -2483,7 +2473,6 @@ class video5(Screen):
         self['key_green'].hide()
         self.name = name
         self.url = url
-        self.name = name
         self.pic = pic
         print('self.name: ', self.name)
         print('self.url: ', self.url)
@@ -2505,7 +2494,6 @@ class video5(Screen):
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2546,8 +2534,11 @@ class video5(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-            self['desc'].setText(str(info))
-            self['space'].setText(str(name))
+        else:
+            info = ''
+            name = ''
+        self['desc'].setText(str(info))
+        self['space'].setText(str(name))
 
     def selectionChanged(self):
         if self["text"].getCurrent():
@@ -2695,7 +2686,7 @@ class video5(Screen):
             self.scale = AVSwitch().getFramebufferScale()
 
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if os.path.exists('/var/lib/dpkg/status'):
+            if DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -2899,10 +2890,11 @@ class Playstream1(Screen):
         skin = skin_path + 'Playstream1.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
+        print('self.skin: ', skin)
+        f.close()
         self.setup_title = ('Select Player Stream')
         self.list = []
         self['list'] = rvList([])
-        # self['list'] = RSList([])
         self['info'] = Label()
         self['info'].setText(name)
         self['key_red'] = Button(_('Back'))
@@ -2965,7 +2957,6 @@ class Playstream1(Screen):
                 self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
         else:
             self.downloading = False
-        # return
 
     def downloadProgress(self, recvbytes, totalbytes):
         self["progress"].show()
@@ -2990,7 +2981,7 @@ class Playstream1(Screen):
         self.names = []
         self.urls = []
         self.names.append('Play Now')
-        self.urls.append(checkStr(url))        
+        self.urls.append(checkStr(url))
         self.names.append('Download Now')
         self.urls.append(checkStr(url))
         self.names.append('Play HLS')
@@ -3025,17 +3016,18 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
+            if idx == 0:
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.play()                        
             if idx == 1:
                 # self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.runRec()
                 # return
-            if idx == 0:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play()
+
             elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
@@ -3097,10 +3089,9 @@ class Playstream1(Screen):
             url = url.replace(':', '%3a')
             print('In revolution url =', url)
             ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
-            # ref = '4097:0:1:0:0:0:0:0:0:0:' + url
             sref = eServiceReference(ref)
             print('SREF: ', sref)
-            sref.setName(self.name1)
+            sref.setName(name)
             self.session.open(Playstream2, name, sref, desc)
             self.close()
         else:
@@ -3216,7 +3207,6 @@ class Playstream2(
     InfoBarSeek,
     InfoBarAudioSelection,
     InfoBarSubtitleSupport,
-    InfoBarMoviePlayerSummarySupport,                                     
     InfoBarNotifications,
     TvInfoBarShowHide,
     Screen
@@ -3242,7 +3232,6 @@ class Playstream2(
                 InfoBarMenu, \
                 InfoBarSeek, \
                 InfoBarAudioSelection, \
-                InfoBarMoviePlayerSummarySupport, \
                 InfoBarSubtitleSupport, \
                 InfoBarNotifications, \
                 TvInfoBarShowHide:
@@ -3272,10 +3261,10 @@ class Playstream2(
         self.allowPiP = False
         self.service = None
         service = None
-
-        self.pcip = 'None' 
+        self.pcip = 'None'
         self.icount = 0
         self.desc = desc
+        self.url = url
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -3289,7 +3278,6 @@ class Playstream2(
             # self.onLayoutFinish.append(self.cicleStreamType)
             self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
-        # return
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -3397,6 +3385,9 @@ class Playstream2(
         self.servicetype = '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
+        if str(os.path.splitext(self.url)[-1]) == ".m3u8":
+            if self.servicetype == "1":
+                self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
         # if "youtube" in str(self.url):
@@ -3484,7 +3475,7 @@ class plgnstrt(Screen):
 
     def poster_resize(self, pngori):
         pixmaps = pngori
-        if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self['poster'].instance.setPixmap(gPixmapPtr())
         else:
             self['poster'].instance.setPixmap(None)
@@ -3499,7 +3490,7 @@ class plgnstrt(Screen):
          1,
          '#FF000000'))
         ptr = self.picload.getData()
-        if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             if self.picload.startDecode(pixmaps, False) == 0:
                 ptr = self.picload.getData()
         else:
@@ -3513,7 +3504,7 @@ class plgnstrt(Screen):
         return
 
     def image_downloaded(self):
-        pngori = res_plugin_path + 'pics/fulltop.jpg'
+        pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
         if os.path.exists(pngori):
             print('image pngori: ', pngori)
             try:
@@ -3538,7 +3529,7 @@ class plgnstrt(Screen):
         self['text'].setText(_('\n\n\nCheck Connection wait please...'))
         self.timer = eTimer()
         self.timer.start(2000, 1)
-        if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
