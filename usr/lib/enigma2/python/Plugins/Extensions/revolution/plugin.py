@@ -215,17 +215,18 @@ desc_plug = 'TivuStream Pro Revolution Lite'
 ico_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/logo.png".format('revolution'))
 no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_coverArt.png".format('revolution'))
 res_plugin_path =  resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/".format('revolution'))
+pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
+piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/picons/".format('revolution'))
 ico1_path = res_plugin_path + 'pics/plugin.png'
 ico3_path = res_plugin_path + 'pics/setting.png'
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
-piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/picons/".format('revolution'))
 piconlive = piccons + 'tv.png'
 piconmovie = piccons + 'cinema.png'
 piconseries = piccons + 'series.png'
 piconsearch = piccons + 'search.png'
 piconinter = piccons + 'inter.png'
 pixmaps = piccons + 'backg.png'
-pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
+
 Path_Tmp = "/tmp"
 pictmp = Path_Tmp + "/poster.jpg"
 revol = config.plugins.revolution.cachefold.value.strip()
@@ -268,23 +269,35 @@ REGEX = re.compile(
 		r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
 		r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
 
+# class rvList(MenuList):
+    # def __init__(self, list):
+        # MenuList.__init__(self, list, False, eListboxPythonMultiContent)
+        # self.l.setFont(0, gFont('Regular', 20))
+        # self.l.setFont(1, gFont('Regular', 22))
+        # self.l.setFont(2, gFont('Regular', 24))
+        # self.l.setFont(3, gFont('Regular', 26))
+        # self.l.setFont(4, gFont('Regular', 28))
+        # self.l.setFont(5, gFont('Regular', 30))
+        # self.l.setFont(6, gFont('Regular', 32))
+        # self.l.setFont(7, gFont('Regular', 34))
+        # self.l.setFont(8, gFont('Regular', 36))
+        # self.l.setFont(9, gFont('Regular', 40))
+        # if isFHD():
+            # self.l.setItemHeight(50)
+        # else:
+            # self.l.setItemHeight(50)
+
 class rvList(MenuList):
     def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 20))
-        self.l.setFont(1, gFont('Regular', 22))
-        self.l.setFont(2, gFont('Regular', 24))
-        self.l.setFont(3, gFont('Regular', 26))
-        self.l.setFont(4, gFont('Regular', 28))
-        self.l.setFont(5, gFont('Regular', 30))
-        self.l.setFont(6, gFont('Regular', 32))
-        self.l.setFont(7, gFont('Regular', 34))
-        self.l.setFont(8, gFont('Regular', 36))
-        self.l.setFont(9, gFont('Regular', 40))
+        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if isFHD():
             self.l.setItemHeight(50)
+            textfont = int(34)
+            self.l.setFont(0, gFont('Regular', textfont))
         else:
             self.l.setItemHeight(50)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
 
 def rvListEntry(name, idx):
     pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
@@ -292,10 +305,10 @@ def rvListEntry(name, idx):
     if fileExists(pngs):
         if isFHD():
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
-            res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =7, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+            res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =0, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
         else:
             res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
-            res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =2, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+            res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
         return res
 
 def rvoneListEntry(name):
@@ -303,10 +316,10 @@ def rvoneListEntry(name):
     res = [name]
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlist(data, list):
@@ -326,14 +339,13 @@ PanelMain = [
 
 class Revolmain(Screen):
     def __init__(self, session):
+        Screen.__init__(self, session)    
         self.session = session
         global _session
         _session = session
         skin = skin_path + 'revall.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
-
-        Screen.__init__(self, session)
         # self.setTitle(title_plug)
         global nextmodule
         nextmodule = 'revolmain'
@@ -526,6 +538,7 @@ class Revolmain(Screen):
 
 class live_stream(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -533,7 +546,6 @@ class live_stream(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -849,6 +861,7 @@ class live_stream(Screen):
 
 class video3(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -856,7 +869,6 @@ class video3(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -1111,6 +1123,7 @@ class video3(Screen):
 
 class nextvideo3(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -1118,7 +1131,6 @@ class nextvideo3(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -1374,6 +1386,7 @@ class nextvideo3(Screen):
 
 class video4(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -1381,7 +1394,6 @@ class video4(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -1631,6 +1643,7 @@ class video4(Screen):
 
 class nextvideo4(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -1638,7 +1651,6 @@ class nextvideo4(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -1890,6 +1902,7 @@ class nextvideo4(Screen):
 
 class video1(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -1897,7 +1910,6 @@ class video1(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -1921,9 +1933,6 @@ class video1(Screen):
         self['key_yellow'].hide()
         self['key_blue'].hide()
         self['key_green'].hide()
-                        
-                      
-                                                                             
         self.name = name
         self.url = url
         self.pic = pic
@@ -2168,6 +2177,7 @@ class video1(Screen):
 
 class nextvideo1(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -2175,7 +2185,6 @@ class nextvideo1(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -2440,6 +2449,7 @@ class nextvideo1(Screen):
 
 class video5(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
+        Screen.__init__(self, session)        
         self.session = session
         global _session
         _session = session
@@ -2447,7 +2457,6 @@ class video5(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-        Screen.__init__(self, session)
         self.setTitle(title_plug)
         self.list = []
         self['text'] = self.list
@@ -2700,11 +2709,11 @@ class video5(Screen):
 
 class myconfig(Screen, ConfigListScreen):
     def __init__(self, session):
+        Screen.__init__(self, session)        
         skin = skin_path + 'myconfig.xml'
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-        Screen.__init__(self, session)
         self.setup_title = _("Config")
         self.onChangedEntry = []
         self.session = session
@@ -3452,12 +3461,13 @@ class Playstream2(
 
 class plgnstrt(Screen):
     def __init__(self, session):
+        Screen.__init__(self, session)
         self.session = session
         skin = skin_path + '/Plgnstrt.xml'
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-        Screen.__init__(self, session)
+        
         self["poster"] = Pixmap()
         self["poster"].hide()
         self.picload = ePicLoad()
