@@ -269,23 +269,6 @@ REGEX = re.compile(
 		r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
 		r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
 
-# class rvList(MenuList):
-    # def __init__(self, list):
-        # MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        # self.l.setFont(0, gFont('Regular', 20))
-        # self.l.setFont(1, gFont('Regular', 22))
-        # self.l.setFont(2, gFont('Regular', 24))
-        # self.l.setFont(3, gFont('Regular', 26))
-        # self.l.setFont(4, gFont('Regular', 28))
-        # self.l.setFont(5, gFont('Regular', 30))
-        # self.l.setFont(6, gFont('Regular', 32))
-        # self.l.setFont(7, gFont('Regular', 34))
-        # self.l.setFont(8, gFont('Regular', 36))
-        # self.l.setFont(9, gFont('Regular', 40))
-        # if isFHD():
-            # self.l.setItemHeight(50)
-        # else:
-            # self.l.setItemHeight(50)
 
 class rvList(MenuList):
     def __init__(self, list):
@@ -3271,10 +3254,10 @@ class Playstream2(
         self.service = None
         service = None
         self.pcip = 'None'
-        self.icount = 0
-        self.desc = desc
-        self.url = url
         self.name = decodeHtml(name)
+        self.icount = 0
+        self.url = url
+        self.desc = desc
         self.state = self.STATE_PLAYING
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
@@ -3366,7 +3349,7 @@ class Playstream2(
 
     def slinkPlay(self, url):
         name = self.name
-        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:{1}".format(url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(name)
@@ -3375,11 +3358,11 @@ class Playstream2(
 
     def openPlay(self, servicetype, url):
         name = self.name
-        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('reference:   ', ref)
         if streaml == True:
             url = 'http://127.0.0.1:8088/' + str(url)
-            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
             print('streaml reference:   ', ref)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
