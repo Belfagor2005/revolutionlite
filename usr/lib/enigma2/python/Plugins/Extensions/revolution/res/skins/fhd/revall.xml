@@ -7,12 +7,20 @@
 	<!-- Menu List -->
 	<widget name="info" position="220,130" size="970,50" font="Regular;30" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
 	<widget name="text" position="220,190" size="970,550" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sliderb.png" />
+	
 	<!--    	
 	<widget source="desc" render="rvRunningText" position="1353,410" size="523,566" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="#003366" halign="center" transparent="0" zPosition="5" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap" />
 	 -->	
-	<eLabel position="1340,395" size="550,590" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />	
- 
+	<eLabel position="1340,395" size="550,590" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />	 -->
+<!-- 	
+	<eLabel position="1340,395" size="550,590" backgroundColor="#30000000" zPosition="1" />
+	 -->
+<!-- 	
 	<widget source="desc" render="rvRunningText" position="1353,410" size="523,566" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="#80000000" halign="center" transparent="0" zPosition="5" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap" />
+	 -->
+	<widget source="desc" render="rvRunningText" position="1353,410" size="523,566" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="#101010" halign="center" transparent="1" zPosition="2"
+		options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1"  />
+
 
 	<ePixmap position="220,760" size="970,5" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" alphatest="blend" zPosition="5" />
 	<widget name="space" position="220,768" size="970,87" font="Regular;28" halign="left" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="1" zPosition="5" />
@@ -23,7 +31,6 @@
 	<eLabel position="1340,40" size="540,320" backgroundColor="#30000000" zPosition="1" />
 	-->
 	<eLabel position="1340,40" size="540,320" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />	
-	
 	<widget name="poster" position="1360,60" size="500,281" backgroundColor="#30000000" transparent="1" borderWidth="3" borderColor="#00ffffff" alphatest="blend" zPosition="4" />
 	
   	<!-- Colors 1220 -->
@@ -36,5 +43,5 @@
   	<widget name="key_green" position="270,1005" size="300,40" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
   	<widget name="key_yellow" position="835,950" size="300,40" font="Regular;30" halign="right" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
   	<widget name="key_blue" position="835,1005" size="300,40" font="Regular;30" halign="right" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
-  	<ePixmap position="1230,1005" size="90,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/menu.png" alphatest="blend" zPosition="5" />	
+  	<ePixmap position="654,1007" size="90,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/menu.png" alphatest="blend" zPosition="5" />	
 </screen>

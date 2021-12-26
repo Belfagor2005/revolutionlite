@@ -82,6 +82,7 @@ import time
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.parse import urlparse
+from Components.Renderer import rvRunningText
 
 try:
     from Plugins.Extensions.revolution.Utils import *
@@ -629,10 +630,14 @@ class live_stream(Screen):
                 # print("In live_stream pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In live_stream info =", info)
+                
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -730,7 +735,7 @@ class live_stream(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-            self['desc'].setText(str(info))
+            self['desc'].setText(info)
             self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -941,7 +946,7 @@ class video3(Screen):
         else:
             info = ''
             name = ''
-        self['desc'].setText(str(info))
+        self['desc'].setText(info)
         self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -980,10 +985,13 @@ class video3(Screen):
                 # print("In Videos3 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In Videos3 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -1205,7 +1213,7 @@ class nextvideo3(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-            self['desc'].setText(str(info))
+            self['desc'].setText(info)
             self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -1247,10 +1255,13 @@ class nextvideo3(Screen):
                 # print("In nextVideos3 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In nextVideos3 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -1464,7 +1475,7 @@ class video4(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-            self['desc'].setText(str(info))
+            self['desc'].setText(info)
             self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -1504,10 +1515,14 @@ class video4(Screen):
                 # print("In video4 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In video4 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                
+                info = checkStr(info)
+                info = info.replace("\r\n","")                
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -1720,7 +1735,7 @@ class nextvideo4(Screen):
         print('idx: ', idx)
         info = self.infos[idx]
         name = self.names[idx]
-        self['desc'].setText(str(info))
+        self['desc'].setText(info)
         self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -1764,10 +1779,13 @@ class nextvideo4(Screen):
                 # print("In nextvideo4 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In nextvideo4 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -1983,7 +2001,7 @@ class video1(Screen):
         else:
             info = ''
             name = ''
-            self['desc'].setText(str(info))
+            self['desc'].setText(info)
             self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -2029,10 +2047,13 @@ class video1(Screen):
                 # print("In Video1 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In Video1 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -2256,7 +2277,7 @@ class nextvideo1(Screen):
         if idx != None or idx != -1:
             info = self.infos[idx]
             name = self.names[idx]
-            self['desc'].setText(str(info))
+            self['desc'].setText(info)
             self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -2296,10 +2317,13 @@ class nextvideo1(Screen):
                 # print("In nextvideo1 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In nextvideo1 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -2529,7 +2553,7 @@ class video5(Screen):
         else:
             info = ''
             name = ''
-        self['desc'].setText(str(info))
+        self['desc'].setText(info)
         self['space'].setText(str(name))
 
     def selectionChanged(self):
@@ -2571,10 +2595,13 @@ class video5(Screen):
                 # print("In Videos5 pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In Videos5 info =", info)
+                # info = [x.replace("\r\n","") for x in info]
+                info = checkStr(info)
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
-                self.urls.append(checkStr(url))
-                self.pics.append(checkStr(pic))
-                self.infos.append(checkStr(info))
+                self.urls.append(url)
+                self.pics.append(pic)
+                self.infos.append(info)
                 i = i+1
             except:
                 break
@@ -2973,15 +3000,15 @@ class Playstream1(Screen):
         self.names = []
         self.urls = []
         self.names.append('Play Now')
-        self.urls.append(checkStr(url))
+        self.urls.append(url)
         self.names.append('Download Now')
-        self.urls.append(checkStr(url))
+        self.urls.append(url)
         self.names.append('Play HLS')
-        self.urls.append(checkStr(url))
+        self.urls.append(url)
         self.names.append('Play TS')
-        self.urls.append(checkStr(url))
+        self.urls.append(url)
         self.names.append('Streamlink')
-        self.urls.append(checkStr(url))
+        self.urls.append(url)
         showlist(self.names, self['list'])
 
     def okClicked(self):
