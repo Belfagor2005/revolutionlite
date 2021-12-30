@@ -48,22 +48,22 @@ from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop, Standby
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from ServiceReference import ServiceReference
-from Tools.Directories import SCOPE_PLUGINS
-from Tools.Directories import pathExists, resolveFilename, fileExists, copyfile
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename
+from Tools.Directories import pathExists, fileExists, copyfile
 from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
 from enigma import *
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT
-from enigma import eListbox, eTimer
-from enigma import eListboxPythonMultiContent, eConsoleAppContainer
+from enigma import eTimer
+from enigma import eListbox, eListboxPythonMultiContent, eConsoleAppContainer
+from enigma import iPlayableService 
 from enigma import iServiceInformation
 from enigma import eServiceCenter
 from enigma import eServiceReference
 from enigma import eSize, ePicLoad
 from enigma import loadPNG, gFont
 from enigma import quitMainloop
-from enigma import iPlayableService 
 from os.path import splitext
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
@@ -316,6 +316,7 @@ def showlist(data, list):
         list.setList(plist)
 
 PanelMain = [
+ ('SEARCH'),
  ('LIVE'),
  ('MOVIE'),
  ('SERIES'),
@@ -359,7 +360,7 @@ class Revolmain(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        idx = 0
+        self.idx = 0
         self.menulist = []
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', 'DirectionActions', "EPGSelectActions", 'ColorActions', "MenuActions"], {'ok': self.okRun,
@@ -381,8 +382,10 @@ class Revolmain(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        itype = idx
-        name = self.names[itype]
+        idx = self["text"].getSelectionIndex()
+        name = self.names[idx]
+        # itype = idx
+        # name = self.names[itype]
         text_clear = name
         if is_tmdb:
             try:
@@ -420,23 +423,69 @@ class Revolmain(Screen):
         for x in self.menu_list:
             del self.menu_list[0]
         list = []
-        idx = 0
+        self.idx = 0
 
         for x in PanelMain:
-            list.append(rvListEntry(x, idx))
+            list.append(rvListEntry(x, self.idx))
             self.menu_list.append(x)
-            idx += 1
+            self.idx += 1
         self['text'].setList(list)
         self.load_poster()
 
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
 
+
+    def search_text(self, name, url, pic):
+        self.namex = name
+        self.urlx=url
+        self.picx = pic
+        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
+
+    def filterChannels(self, result):
+        if result:
+            global search
+            search = False
+            pic = self.picx
+            name = str(result)
+            url = self.urlx + str(result)
+            try:
+                # if nextmodule == 'Videos4':
+                    search = True
+                    self.session.open(nextvideo4, name, url, pic, nextmodule)
+            except:
+                return
+        else:
+            self.resetSearch()
+
+    def resetSearch(self):
+        global search
+        search = False
+        return
+
+
     def keyNumberGlobalCB(self, idx):
         global nextmodule
         sel = self.menu_list[idx]
         live, movie, series, other = TvsApi()
-        if sel == ('LIVE'):
+
+        if sel == ('SEARCH'):
+            name = 'Search'
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=' #live #all_channel_live
+            pic = piconsearch
+            nextmodule = "Videos4"
+            # self.session.open(search_text, name, url, pic, nextmodule) 
+            self.search_text(name, url, pic)
+        
+        # if 'Search' in str(name):
+            # search = True
+            # from Screens.VirtualKeyBoard import VirtualKeyBoard
+            # print('Search go movie: ', search)
+            # self.search_text(name, url, pic)
+
+
+                
+        elif sel == ('LIVE'):
             name = 'LIVE'
             url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1' #live #all_channel_live
             pic = piconlive
@@ -485,10 +534,12 @@ class Revolmain(Screen):
         sel = self['text'].getSelectedIndex()
         if sel != None or sel != -1:
             if sel == 0:
-                pixmaps = piconlive
+                pixmaps = piconsearch        
             elif sel == 1:
-                pixmaps = piconmovie
+                pixmaps = piconlive
             elif sel == 2:
+                pixmaps = piconmovie
+            elif sel == 3:
                 pixmaps = piconseries
             else:
                 pixmaps = piconinter
@@ -559,7 +610,7 @@ class live_stream(Screen):
         self.type = self.name
         self.downloading = False
         self.currentList = 'text'
-        idx = 0
+        self.idx = 0
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
          # 'green': self.start_download,
@@ -636,7 +687,7 @@ class live_stream(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -990,7 +1041,7 @@ class video3(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1042,7 +1093,6 @@ class video3(Screen):
         self.load_poster()
 
     def load_poster(self):
-
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
 
@@ -1260,7 +1310,7 @@ class nextvideo3(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1521,7 +1571,7 @@ class video4(Screen):
                 info = info.replace("\r\n","")                
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1784,7 +1834,7 @@ class nextvideo4(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2052,7 +2102,7 @@ class video1(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2322,7 +2372,7 @@ class nextvideo1(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2600,7 +2650,7 @@ class video5(Screen):
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
-                self.pics.append(pic)
+                self.pics.append(checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:

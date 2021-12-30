@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#25.11.2021
+#25.12.2021
 #a common tips used from Lululla
 #
 import sys
@@ -15,9 +15,7 @@ PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
     PY3 = True
-    # unicode = str; unichr = chr; long = int
-    # # str = unicode = basestring = str
-    # unichr = chr; long = int
+    unicode = str; unichr = chr; long = int; xrange = range
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
@@ -62,6 +60,12 @@ def mySkin():
     currentSkin = config.skin.primary_skin.value.replace('/skin.xml', '')
     return currentSkin
 
+if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
+    from Plugins.Extensions.MediaPlayer import *
+    MediaPlayerInstalled = True
+else:
+    MediaPlayerInstalled = False
+
 def listDir(what):
     f = None
     try:
@@ -79,7 +83,31 @@ def remove_line(filename, what):
             if what not in line:
                 file_write.write(line)
         file_write.close()
-
+        
+#from kiddac plugin
+def badcar(name):
+    name = name
+    bad_chars = ["sd", "hd", "fhd", "uhd", "4k", "1080p", "720p", "blueray", "x264", "aac", "ozlem", "hindi", "hdrip", "(cache)", "(kids)", "[3d-en]", "[iran-dubbed]", "imdb", "top250", "multi-audio",
+                 "multi-subs", "multi-sub", "[audio-pt]", "[nordic-subbed]", "[nordic-subbeb]",
+                 "SD", "HD", "FHD", "UHD", "4K", "1080P", "720P", "BLUERAY", "X264", "AAC", "OZLEM", "HINDI", "HDRIP", "(CACHE)", "(KIDS)", "[3D-EN]", "[IRAN-DUBBED]", "IMDB", "TOP250", "MULTI-AUDIO",
+                 "MULTI-SUBS", "MULTI-SUB", "[AUDIO-PT]", "[NORDIC-SUBBED]", "[NORDIC-SUBBEB]",
+                 "-ae-", "-al-", "-ar-", "-at-", "-ba-", "-be-", "-bg-", "-br-", "-cg-", "-ch-", "-cz-", "-da-", "-de-", "-dk-", "-ee-", "-en-", "-es-", "-ex-yu-", "-fi-", "-fr-", "-gr-", "-hr-", "-hu-", "-in-", "-ir-", "-it-", "-lt-", "-mk-",
+                 "-mx-", "-nl-", "-no-", "-pl-", "-pt-", "-ro-", "-rs-", "-ru-", "-se-", "-si-", "-sk-", "-tr-", "-uk-", "-us-", "-yu-",
+                 "-AE-", "-AL-", "-AR-", "-AT-", "-BA-", "-BE-", "-BG-", "-BR-", "-CG-", "-CH-", "-CZ-", "-DA-", "-DE-", "-DK-", "-EE-", "-EN-", "-ES-", "-EX-YU-", "-FI-", "-FR-", "-GR-", "-HR-", "-HU-", "-IN-", "-IR-", "-IT-", "-LT-", "-MK-",
+                 "-MX-", "-NL-", "-NO-", "-PL-", "-PT-", "-RO-", "-RS-", "-RU-", "-SE-", "-SI-", "-SK-", "-TR-", "-UK-", "-US-", "-YU-",
+                 "|ae|", "|al|", "|ar|", "|at|", "|ba|", "|be|", "|bg|", "|br|", "|cg|", "|ch|", "|cz|", "|da|", "|de|", "|dk|", "|ee|", "|en|", "|es|", "|ex-yu|", "|fi|", "|fr|", "|gr|", "|hr|", "|hu|", "|in|", "|ir|", "|it|", "|lt|", "|mk|",
+                 "|mx|", "|nl|", "|no|", "|pl|", "|pt|", "|ro|", "|rs|", "|ru|", "|se|", "|si|", "|sk|", "|tr|", "|uk|", "|us|", "|yu|",
+                 "|AE|", "|AL|", "|AR|", "|AT|", "|BA|", "|BE|", "|BG|", "|BR|", "|CG|", "|CH|", "|CZ|", "|DA|", "|DE|", "|DK|", "|EE|", "|EN|", "|ES|", "|EX-YU|", "|FI|", "|FR|", "|GR|", "|HR|", "|HU|", "|IN|", "|IR|", "|IT|", "|LT|", "|MK|",
+                 "|MX|", "|NL|", "|NO|", "|PL|", "|PT|", "|RO|", "|RS|", "|RU|", "|SE|", "|SI|", "|SK|", "|TR|", "|UK|", "|US|", "|YU|",
+                 "|Ae|", "|Al|", "|Ar|", "|At|", "|Ba|", "|Be|", "|Bg|", "|Br|", "|Cg|", "|Ch|", "|Cz|", "|Da|", "|De|", "|Dk|", "|Ee|", "|En|", "|Es|", "|Ex-Yu|", "|Fi|", "|Fr|", "|Gr|", "|Hr|", "|Hu|", "|In|", "|Ir|", "|It|", "|Lt|", "|Mk|",
+                 "|Mx|", "|Nl|", "|No|", "|Pl|", "|Pt|", "|Ro|", "|Rs|", "|Ru|", "|Se|", "|Si|", "|Sk|", "|Tr|", "|Uk|", "|Us|", "|Yu|",
+                 "(", ")", "[", "]", "u-", "3d", "'", "#", "/"]
+    for j in range(1900, 2025):
+        bad_chars.append(str(j))
+    for i in bad_chars:
+        name = name.replace(i, '')
+    return name
+    
 def getLanguage():
     try:
         from Components.config import config
@@ -225,7 +253,16 @@ def b64decoder(s):
             outp = outp.decode('utf-8')
             print('outp2 ', outp)
         return outp
-        
+
+def MemClean():
+    try:
+        os.system("sync")
+        os.system("echo 1 > /proc/sys/vm/drop_caches")
+        os.system("echo 2 > /proc/sys/vm/drop_caches")
+        os.system("echo 3 > /proc/sys/vm/drop_caches")
+    except:
+        pass
+
 def __createdir(list):
     dir = ''
     for line in list[1:].split('/'):
@@ -338,6 +375,18 @@ def trace_error():
     except:
         pass
 
+def log(label,data):
+    data=str(data)
+    open("/tmp/my__debug.log","a").write("\n"+label+":>"+data)
+
+def del_jpg():
+    for i in glob.glob(os.path.join("/tmp", "*.jpg")):
+        try:
+            os.chmod(i, 0o777)
+            os.remove(i)
+        except OSError:
+            pass
+            
 def ConverDate(data):
     year = data[:2]
     month = data[-4:][:2]
@@ -409,7 +458,23 @@ def isStreamlinkAvailable():
         # return urlopen(url, context=sslContext)
     # else:
         # return urlopen(url)
-
+def AdultUrl(url):
+        if sys.version_info.major == 3:
+             import urllib.request as urllib2
+        elif sys.version_info.major == 2:
+             import urllib2
+        req = urllib2.Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+        r = urllib2.urlopen(req, None, 15)
+        link = r.read()
+        r.close()
+        tlink = link
+        if str(type(tlink)).find('bytes') != -1:
+            try:
+                tlink = tlink.decode("utf-8")
+            except Exception as e:
+                   print("Error: %s." % e)
+        return tlink
 from random import choice
 ListAgent = [
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
@@ -745,6 +810,92 @@ def decodeHtml(text):
     text = text.replace('&#8234;','')
     return text
 
+
+conversion = {
+    str("\xd0\xb0"): "a",
+    str("\xd0\x90"): "A",
+    str("\xd0\xb1"): "b",
+    str("\xd0\x91"): "B",
+    str("\xd0\xb2"): "v",
+    str("\xd0\x92"): "V",
+    str("\xd0\xb3"): "g",
+    str("\xd0\x93"): "G",
+    str("\xd0\xb4"): "d",
+    str("\xd0\x94"): "D",
+    str("\xd0\xb5"): "e",
+    str("\xd0\x95"): "E",
+    str("\xd1\x91"): "jo",
+    str("\xd0\x81"): "jo",
+    str("\xd0\xb6"): "zh",
+    str("\xd0\x96"): "ZH",
+    str("\xd0\xb7"): "z",
+    str("\xd0\x97"): "Z",
+    str("\xd0\xb8"): "i",
+    str("\xd0\x98"): "I",
+    str("\xd0\xb9"): "j",
+    str("\xd0\x99"): "J",
+    str("\xd0\xba"): "k",
+    str("\xd0\x9a"): "K",
+    str("\xd0\xbb"): "l",
+    str("\xd0\x9b"): "L",
+    str("\xd0\xbc"): "m",
+    str("\xd0\x9c"): "M",
+    str("\xd0\xbd"): "n",
+    str("\xd0\x9d"): "N",
+    str("\xd0\xbe"): "o",
+    str("\xd0\x9e"): "O",
+    str("\xd0\xbf"): "p",
+    str("\xd0\x9f"): "P",
+    str("\xd1\x80"): "r",
+    str("\xd0\xa0"): "R",
+    str("\xd1\x81"): "s",
+    str("\xd0\xa1"): "S",
+    str("\xd1\x82"): "t",
+    str("\xd0\xa2"): "T",
+    str("\xd1\x83"): "u",
+    str("\xd0\xa3"): "U",
+    str("\xd1\x84"): "f",
+    str("\xd0\xa4"): "F",
+    str("\xd1\x85"): "h",
+    str("\xd0\xa5"): "H",
+    str("\xd1\x86"): "c",
+    str("\xd0\xa6"): "C",
+    str("\xd1\x87"): "ch",
+    str("\xd0\xa7"): "CH",
+    str("\xd1\x88"): "sh",
+    str("\xd0\xa8"): "SH",
+    str("\xd1\x89"): "sh",
+    str("\xd0\xa9"): "SH",
+    str("\xd1\x8a"): "",
+    str("\xd0\xaa"): "",
+    str("\xd1\x8b"): "y",
+    str("\xd0\xab"): "Y",
+    str("\xd1\x8c"): "j",
+    str("\xd0\xac"): "J",
+    str("\xd1\x8d"): "je",
+    str("\xd0\xad"): "JE",
+    str("\xd1\x8e"): "ju",
+    str("\xd0\xae"): "JU",
+    str("\xd1\x8f"): "ja",
+    str("\xd0\xaf"): "JA"}
+
+def cyr2lat(text):
+    i = 0
+    text = text.strip(" \t\n\r")
+    text = str(text)
+    retval = ""
+    bukva_translit = ""
+    bukva_original = ""
+    while i < len(text):
+        bukva_original = text[i]
+        try:
+            bukva_translit = conversion[bukva_original]
+        except:
+            bukva_translit = bukva_original
+        i = i + 1
+        retval += bukva_translit
+    return retval
+    
 def charRemove(text):
     char = ["1080p",
              "2018",
