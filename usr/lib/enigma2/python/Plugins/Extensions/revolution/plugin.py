@@ -82,7 +82,7 @@ import time
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.parse import urlparse
-from Components.Renderer import rvRunningText
+# from Components.Renderer import rvRunningText
 
 try:
     from Plugins.Extensions.revolution.Utils import *
@@ -383,32 +383,36 @@ class Revolmain(Screen):
 
     def showIMDB(self):
         idx = self["text"].getSelectionIndex()
-        name = self.names[idx]
-        # itype = idx
-        # name = self.names[itype]
-        text_clear = name
-        if is_tmdb:
-            try:
-                from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
-                _session.open(tmdb.tmdbScreen, text, 0)
-            except Exception as e:
-                print("[XCF] Tmdb: ", e)
-        elif is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as e:
-                print("[XCF] imdb: ", e)
+        if idx and (idx != '' or idx != None):
+            name = self.names[idx]
+            # itype = idx
+            # name = self.names[itype]
+            text_clear = name
+            if is_tmdb:
+                try:
+                    from Plugins.Extensions.tmdb import tmdb
+                    text = charRemove(text_clear)
+                    _session.open(tmdb.tmdbScreen, text, 0)
+                except Exception as e:
+                    print("[XCF] Tmdb: ", e)
+            elif is_imdb:
+                try:
+                    from Plugins.Extensions.IMDb.plugin import main as imdb
+                    text = charRemove(text_clear)
+                    imdb(_session, text)
+                except Exception as e:
+                    print("[XCF] imdb: ", e)
 
-        else:
-            inf = idx
-            if inf and inf != '':
-                text_clear = self.infos[inf]
             else:
-                text_clear = name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+                # inf = idx
+                if idx and (idx != '' or idx != None):
+                    text_clear = self.infos[idx]
+                else:
+                    # text_clear = name
+                self.session.open(MessageBox, name, MessageBox.TYPE_INFO)
+        else:
+            self.session.open(MessageBox, _("I'm Sorry!!!") , MessageBox.TYPE_INFO)
+            return
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -483,8 +487,6 @@ class Revolmain(Screen):
             # print('Search go movie: ', search)
             # self.search_text(name, url, pic)
 
-
-                
         elif sel == ('LIVE'):
             name = 'LIVE'
             url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1' #live #all_channel_live
@@ -666,7 +668,6 @@ class live_stream(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
         i = 0
         while i < 100:
             try:
@@ -1052,7 +1053,6 @@ class video3(Screen):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         if idx != None or idx != -1:
-
             name = self.names[idx]
             url = self.urls[idx]
             pic = self.pics[idx]
@@ -1227,7 +1227,6 @@ class nextvideo3(Screen):
         name = self.names[idx]
         text_clear = name
         if is_tmdb:
-                                            
             try:
                 from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
@@ -1256,7 +1255,6 @@ class nextvideo3(Screen):
         self.load_infos()
         self.load_poster()
  
-
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
@@ -1276,8 +1274,6 @@ class nextvideo3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-               
-                                             
         content = ReadUrl2(url)
         if six.PY3:
             content = six.ensure_str(content)
