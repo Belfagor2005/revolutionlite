@@ -409,7 +409,7 @@ class Revolmain(Screen):
                     text_clear = self.infos[idx]
                 else:
                     # text_clear = name
-                self.session.open(MessageBox, name, MessageBox.TYPE_INFO)
+                    self.session.open(MessageBox, name, MessageBox.TYPE_INFO)
         else:
             self.session.open(MessageBox, _("I'm Sorry!!!") , MessageBox.TYPE_INFO)
             return
@@ -420,6 +420,7 @@ class Revolmain(Screen):
         self.load_poster()
 
     def closerm(self):
+        deletetmp()
         self.close()
 
     def updateMenuList(self):
