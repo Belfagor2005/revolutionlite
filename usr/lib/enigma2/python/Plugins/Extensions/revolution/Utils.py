@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#30.12.2021
+#05.01.2021
 #a common tips used from Lululla
 #
 import sys
@@ -329,6 +329,7 @@ def deletetmp():
     return
 
 def del_jpg():
+    import glob
     for i in glob.glob(os.path.join("/tmp", "*.jpg")):
         try:
             os.chmod(i, 0o777)
