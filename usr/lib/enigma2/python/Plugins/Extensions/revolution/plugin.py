@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla              *
 *                                      *
-*             01/12/2021               *
+*             14/01/2022               *
 ****************************************
 Info http://t.me/tivustream
 '''
@@ -320,7 +320,7 @@ PanelMain = [
  ('LIVE'),
  ('MOVIE'),
  ('SERIES'),
- ('INTERNATIONAL')]
+ ('INTERNATIONAL'),]
 
 class Revolmain(Screen):
     def __init__(self, session):
