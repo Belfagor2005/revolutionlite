@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla              *
 *                                      *
-*             14/01/2022               *
+*             22/01/2022               *
 ****************************************
 Info http://t.me/tivustream
 '''
@@ -79,17 +79,34 @@ import ssl
 import sys
 import time
 
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.request import Request
-from six.moves.urllib.parse import urlparse
-# from Components.Renderer import rvRunningText
+PY3 = False
+PY3 = sys.version_info.major >= 3
+print('Py3: ',PY3)
+
+try:
+    import http.cookiejar as cookielib
+    from urllib.parse import urlencode
+    from urllib.parse import quote
+    from urllib.parse import urlparse
+    from urllib.request import Request
+    from urllib.request import urlopen
+    from urllib import request as urllib2     
+    PY3 = True; unicode = str; unichr = chr; long = int; xrange = range
+except:
+    import cookielib
+    from urllib import urlencode
+    from urllib import quote
+    from urlparse import urlparse
+    from urllib2 import Request
+    from urllib2 import urlopen
 
 try:
     from Plugins.Extensions.revolution.Utils import *
 except:
     from . import Utils
-if six.PY3:
+if PY3:
     print('six.PY3: True ')
+    
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
 
@@ -274,36 +291,43 @@ REGEX = re.compile(
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
+        self.l.setItemHeight(50)
+        textfont = int(24)
+        self.l.setFont(0, gFont('Regular', textfont))        
         if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-        else:
-            self.l.setItemHeight(50)
-            textfont = int(24)
-            self.l.setFont(0, gFont('Regular', textfont))
+        # else:
+            # self.l.setItemHeight(50)
+            # textfont = int(24)
+            # self.l.setFont(0, gFont('Regular', textfont))
 
 def rvListEntry(name, idx):
     pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
     res = [name]
-    if fileExists(pngs):
-        if isFHD():
-            res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
-            res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =0, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-        else:
-            res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
-            res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-        return res
+    res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
+    res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    # if fileExists(pngs):
+    if isFHD():
+        res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =0, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # else:
+        # res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 6), size=(34, 25), png =loadPNG(pngs)))
+        # res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    return res
 
 def rvoneListEntry(name):
     pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugin.png".format('revolution')) #ico1_path
     res = [name]
+    res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
+    res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # else:
+        # res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
+        # res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlist(data, list):
@@ -844,7 +868,7 @@ class live_stream(Screen):
                     return
                 else:
                     try:
-                        if six.PY3:
+                        if PY3:
                             pixmaps = six.ensure_binary(self.pics[idx])
                         # print("debug: pixmaps:",pixmaps)
                         # print("debug: pixmaps:",type(pixmaps))
@@ -1013,7 +1037,7 @@ class video3(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1276,7 +1300,7 @@ class nextvideo3(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("nextVideos3 content A =", content)
         y = json.loads(content)
@@ -1537,7 +1561,7 @@ class video4(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("content Video4 =", content)
         y = json.loads(content)
@@ -1797,7 +1821,7 @@ class nextvideo4(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
         y = json.loads(content)
@@ -2065,7 +2089,7 @@ class video1(Screen):
                
                                              
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("content Video1 =", content)
         y = json.loads(content)
@@ -2339,7 +2363,7 @@ class nextvideo1(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("content nextvideo1 =", content)
         y = json.loads(content)
@@ -2614,7 +2638,7 @@ class video5(Screen):
         self.pics = []
         self.infos = []
         content = ReadUrl2(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
         y = json.loads(content)
@@ -3163,16 +3187,17 @@ class Playstream1(Screen):
         else:
             self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
+
     def cancel(self):
-        try:
-            password_mgr = HTTPPasswordMgrWithDefaultRealm()
-            password_mgr.add_password(None, self.hostaddr, '', 'Admin')
-            handler = HTTPBasicAuthHandler(password_mgr)
-            opener = build_opener(handler)
-            f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_stop')
-            f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_empty')
-        except:
-            pass
+        # try:
+            # password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            # password_mgr.add_password(None, self.hostaddr, '', 'Admin')
+            # handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+            # opener = urllib2.build_opener(handler)
+            # f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_stop')
+            # f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_empty')
+        # except:
+            # pass
         self.session.nav.stopService()
         self.session.nav.playService(srefInit)
         self.close()
@@ -3651,7 +3676,7 @@ def main(session, **kwargs):
             upd_done()
         except:
             pass
-        if six.PY3:
+        if PY3:
             session.open(Revolmain)
         elif os.path.exists('/var/lib/dpkg/status'):
             session.open(Revolmain)
