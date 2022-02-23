@@ -3,8 +3,9 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*                                      *
-*             22/01/2022               *
+*           thank's Pcd                *
+*             22/02/2022               *
+*       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
 '''
@@ -57,7 +58,7 @@ from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT
 from enigma import eTimer
 from enigma import eListbox, eListboxPythonMultiContent, eConsoleAppContainer
-from enigma import iPlayableService 
+from enigma import iPlayableService
 from enigma import iServiceInformation
 from enigma import eServiceCenter
 from enigma import eServiceReference
@@ -90,7 +91,7 @@ try:
     from urllib.parse import urlparse
     from urllib.request import Request
     from urllib.request import urlopen
-    from urllib import request as urllib2     
+    from urllib import request as urllib2
     PY3 = True; unicode = str; unichr = chr; long = int; xrange = range
 except:
     import cookielib
@@ -106,7 +107,7 @@ except:
     from . import Utils
 if PY3:
     print('six.PY3: True ')
-    
+
 plugin_path = os.path.dirname(sys.modules[__name__].__file__)
 global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
 
@@ -155,7 +156,7 @@ def getversioninfo():
     return (currversion)
 
 try:
-    from OpenSSL import SSL
+    # from OpenSSL import SSL
     from twisted.internet import ssl
     from twisted.internet._sslverify import ClientTLSOptions
     sslverify = True
@@ -163,6 +164,10 @@ except:
     sslverify = False
 
 if sslverify:
+    try:
+        from urlparse import urlparse
+    except:
+        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -235,8 +240,8 @@ no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_coverArt.png".format
 res_plugin_path =  resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/".format('revolution'))
 pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
 piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/picons/".format('revolution'))
-ico1_path = res_plugin_path + 'pics/plugin.png'
-ico3_path = res_plugin_path + 'pics/setting.png'
+# ico1_path = res_plugin_path + 'pics/plugin.png'
+# ico3_path = res_plugin_path + 'pics/setting.png'
 imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
 piconlive = piccons + 'tv.png'
 piconmovie = piccons + 'cinema.png'
@@ -293,34 +298,54 @@ class rvList(MenuList):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         self.l.setItemHeight(50)
         textfont = int(24)
-        self.l.setFont(0, gFont('Regular', textfont))        
+        self.l.setFont(0, gFont('Regular', textfont))
         if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-        # else:
-            # self.l.setItemHeight(50)
-            # textfont = int(24)
-            # self.l.setFont(0, gFont('Regular', textfont))
 
 def rvListEntry(name, idx):
-    pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
+    # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
     res = [name]
-    res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size=(34, 25), png =loadPNG(pngs)))
-    res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+
+    if 'radio' in name.lower():
+        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
+    elif 'webcam' in name.lower():    
+        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('revolution'))  
+    elif 'music' in name.lower():    
+        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('revolution')) 
+    elif 'sport' in name.lower():    
+        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))         
+    else:
+        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))  
+
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
         res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =0, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size=(34, 25), png =loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(60, 0), size =(1000, 50), font =0, text =name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
     return res
 
 def rvoneListEntry(name):
-    pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugin.png".format('revolution')) #ico1_path
+    # pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugin.png".format('revolution')) #ico1_path
     res = [name]
-    res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
-    res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    if 'radio' in name.lower():
+        pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
+    elif 'webcam' in name.lower():    
+        pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('revolution'))  
+    elif 'music' in name.lower():    
+        pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('revolution')) 
+    elif 'sport' in name.lower():    
+        pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))         
+    else:
+        pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))  
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlist(data, list):
@@ -341,7 +366,7 @@ PanelMain = [
 
 class Revolmain(Screen):
     def __init__(self, session):
-        Screen.__init__(self, session)    
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -457,7 +482,6 @@ class Revolmain(Screen):
     def okRun(self):
         self.keyNumberGlobalCB(self['text'].getSelectedIndex())
 
-
     def search_text(self, name, url, pic):
         self.namex = name
         self.urlx=url
@@ -485,26 +509,22 @@ class Revolmain(Screen):
         search = False
         return
 
-
     def keyNumberGlobalCB(self, idx):
         global nextmodule
         sel = self.menu_list[idx]
         live, movie, series, other = TvsApi()
-
         if sel == ('SEARCH'):
             name = 'Search'
             url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=' #live #all_channel_live
             pic = piconsearch
             nextmodule = "Videos4"
-            # self.session.open(search_text, name, url, pic, nextmodule) 
+            # self.session.open(search_text, name, url, pic, nextmodule)
             self.search_text(name, url, pic)
-        
         # if 'Search' in str(name):
             # search = True
             # from Screens.VirtualKeyBoard import VirtualKeyBoard
             # print('Search go movie: ', search)
             # self.search_text(name, url, pic)
-
         elif sel == ('LIVE'):
             name = 'LIVE'
             url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1' #live #all_channel_live
@@ -554,7 +574,7 @@ class Revolmain(Screen):
         sel = self['text'].getSelectedIndex()
         if sel != None or sel != -1:
             if sel == 0:
-                pixmaps = piconsearch        
+                pixmaps = piconsearch
             elif sel == 1:
                 pixmaps = piconlive
             elif sel == 2:
@@ -593,7 +613,7 @@ class Revolmain(Screen):
 
 class live_stream(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -700,7 +720,7 @@ class live_stream(Screen):
                 # print("In live_stream pic =", pic)
                 info = (y["items"][i]["info"])
                 # print("In live_stream info =", info)
-                
+
                 # info = [x.replace("\r\n","") for x in info]
                 info = checkStr(info)
                 info = info.replace("\r\n","")
@@ -747,6 +767,7 @@ class live_stream(Screen):
             #movie
             # if nextmodule == 'Videos4':
             if 'listMovie' in str(url):
+
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
                 print('video4 and listMovie : ', nextmodule)
             else:
@@ -919,7 +940,7 @@ class live_stream(Screen):
 
 class video3(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -1157,7 +1178,7 @@ class video3(Screen):
             self.poster_resize(pictmp)
         else:
             print('logo not found')
-               
+
 
     def poster_resize(self, png):
         self["poster"].show()
@@ -1182,7 +1203,7 @@ class video3(Screen):
 
 class nextvideo3(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -1255,7 +1276,7 @@ class nextvideo3(Screen):
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
-       
+
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -1272,7 +1293,7 @@ class nextvideo3(Screen):
         self['info'].setText('Select')
         self.load_infos()
         self.load_poster()
- 
+
     def load_infos(self):
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
@@ -1444,7 +1465,7 @@ class nextvideo3(Screen):
 
 class video4(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -1580,9 +1601,9 @@ class video4(Screen):
                 info = (y["items"][i]["info"])
                 # print("In video4 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                
+
                 info = checkStr(info)
-                info = info.replace("\r\n","")                
+                info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(url)
                 self.pics.append(checkStr(pic))
@@ -1705,7 +1726,7 @@ class video4(Screen):
 
 class nextvideo4(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -1813,6 +1834,8 @@ class nextvideo4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
+
         content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
@@ -1967,7 +1990,7 @@ class nextvideo4(Screen):
 
 class video1(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -2079,8 +2102,8 @@ class video1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-               
-                                             
+
+
         content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
@@ -2496,10 +2519,8 @@ class nextvideo1(Screen):
             print(ex)
             print('exe downloadError')
 
-
     def poster_resize(self, png):
         self["poster"].hide()
-
         if os.path.exists(png):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
@@ -2520,7 +2541,7 @@ class nextvideo1(Screen):
 
 class video5(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
@@ -2783,7 +2804,7 @@ class video5(Screen):
 
 class myconfig(Screen, ConfigListScreen):
     def __init__(self, session):
-        Screen.__init__(self, session)        
+        Screen.__init__(self, session)
         skin = skin_path + 'myconfig.xml'
         f = open(skin, 'r')
         self.skin = f.read()
@@ -3049,7 +3070,7 @@ class Playstream1(Screen):
     def check(self, fplug):
         checkfile = self.in_tmp
         if os.path.exists(checkfile):
-            self.downloading = False
+            # self.downloading = False
             self['progresstext'].text = ''
             self.progclear = 0
             self['progress'].setValue(self.progclear)
@@ -3103,14 +3124,13 @@ class Playstream1(Screen):
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
-                self.play()                        
-            if idx == 1:
+                self.play()
+            elif idx == 1:
                 # self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.runRec()
                 # return
-
             elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
@@ -3180,7 +3200,6 @@ class Playstream1(Screen):
         else:
             self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
-
     def cancel(self):
         # try:
             # password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -3195,7 +3214,6 @@ class Playstream1(Screen):
         self.session.nav.playService(srefInit)
         self.close()
 
-
 class TvInfoBarShowHide():
     """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
     fancy animations. """
@@ -3207,8 +3225,10 @@ class TvInfoBarShowHide():
 
     def __init__(self):
         self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.OkPressed,
-         "hide": self.hide}, 0)
-        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
+         "hide": self.hide}, 1)
+        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
+            iPlayableService.evStart: self.serviceStarted,
+        })
         self.__state = self.STATE_SHOWN
         self.__locked = 0
         self.hideTimer = eTimer()
@@ -3223,6 +3243,35 @@ class TvInfoBarShowHide():
     def OkPressed(self):
         self.toggleShow()
 
+    def __onShow(self):
+        self.__state = self.STATE_SHOWN
+        self.startHideTimer()
+
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
+
+    def serviceStarted(self):
+        if self.execing:
+            if config.usage.show_infobar_on_zap.value:
+                self.doShow()
+
+    def startHideTimer(self):
+        if self.__state == self.STATE_SHOWN and not self.__locked:
+            self.hideTimer.stop()
+            idx = config.usage.infobar_timeout.index
+            if idx:
+                self.hideTimer.start(idx * 1500, True)
+
+    def doShow(self):
+        self.hideTimer.stop()
+        self.show()
+        self.startHideTimer()
+
+    def doTimerHide(self):
+        self.hideTimer.stop()
+        if self.__state == self.STATE_SHOWN:
+            self.hide()
+
     def toggleShow(self):
         if self.skipToggleShow:
             self.skipToggleShow = False
@@ -3234,34 +3283,6 @@ class TvInfoBarShowHide():
             self.hide()
             self.startHideTimer()
 
-    def serviceStarted(self):
-        if self.execing:
-            if config.usage.show_infobar_on_zap.value:
-                self.doShow()
-
-    def __onShow(self):
-        self.__state = self.STATE_SHOWN
-        self.startHideTimer()
-
-    def startHideTimer(self):
-        if self.__state == self.STATE_SHOWN and not self.__locked:
-            self.hideTimer.stop()
-            idx = config.usage.infobar_timeout.index
-            if idx:
-                self.hideTimer.start(idx * 1500, True)
-
-    def __onHide(self):
-        self.__state = self.STATE_HIDDEN
-
-    def doShow(self):
-        self.hideTimer.stop()
-        self.show()
-        self.startHideTimer()
-
-    def doTimerHide(self):
-        self.hideTimer.stop()
-        if self.__state == self.STATE_SHOWN:
-            self.hide()
     def lockShow(self):
         try:
             self.__locked += 1
@@ -3285,23 +3306,23 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-class Playstream2(
-    InfoBarBase,
-    InfoBarMenu,
-    InfoBarSeek,
-    InfoBarAudioSelection,
-    InfoBarSubtitleSupport,
-    InfoBarNotifications,
-    TvInfoBarShowHide,
-    Screen
-):
+class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+# class Playstream2(
+    # InfoBarBase,
+    # InfoBarMenu,
+    # InfoBarSeek,
+    # InfoBarAudioSelection,
+    # InfoBarSubtitleSupport,
+    # InfoBarNotifications,
+    # TvInfoBarShowHide,
+    # Screen
+# ):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
-    screen_timeout = 5000
-
+    # screen_timeout = 4000
     def __init__(self, session, name, url, desc):
         global SREF, streaml
         Screen.__init__(self, session)
@@ -3311,16 +3332,21 @@ class Playstream2(
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-
-        for x in InfoBarBase, \
-                InfoBarMenu, \
-                InfoBarSeek, \
-                InfoBarAudioSelection, \
-                InfoBarSubtitleSupport, \
-                InfoBarNotifications, \
-                TvInfoBarShowHide:
-            x.__init__(self)
-
+        # for x in InfoBarBase, \
+                # InfoBarMenu, \
+                # InfoBarSeek, \
+                # InfoBarAudioSelection, \
+                # InfoBarSubtitleSupport, \
+                # InfoBarNotifications, \
+                # TvInfoBarShowHide:
+            # x.__init__(self)
+        InfoBarMenu.__init__(self)
+        InfoBarNotifications.__init__(self)
+        InfoBarBase.__init__(self, steal_current_service=True)
+        TvInfoBarShowHide.__init__(self)
+        InfoBarSubtitleSupport.__init__(self)
+        InfoBarAudioSelection.__init__(self)
+        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -3340,14 +3366,16 @@ class Playstream2(
          'info': self.showinfo,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
+         'red': self.cicleStreamType,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
-        self.allowPiP = False
+        # self.allowPiP = False
         self.service = None
         service = None
-        self.pcip = 'None'
+        # self.pcip = 'None'
         self.name = decodeHtml(name)
         self.icount = 0
+        url = url.replace(':', '%3a')
         self.url = url
         self.desc = desc
         self.state = self.STATE_PLAYING
@@ -3418,7 +3446,6 @@ class Playstream2(
             self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
-
         return
 
     def showIMDB(self):
@@ -3433,8 +3460,7 @@ class Playstream2(
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+            self.session.open(IMDB, text)
         else:
             text_clear = self.name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
@@ -3466,32 +3492,33 @@ class Playstream2(
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = '4097'
+        # self.servicetype = '4097'
+        self.servicetype = int(config.plugins.revolution.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-        if str(os.path.splitext(self.url)[-1]) == ".m3u8":
+        if str(os.path.splitext(url)[-1]) == ".m3u8":
             if self.servicetype == "1":
                 self.servicetype = "4097"
-        currentindex = 0
-        streamtypelist = ["4097"]
-        # if "youtube" in str(self.url):
-            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            # return
-        if isStreamlinkAvailable():
-            streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
-            streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
-        if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
-        if os.path.exists("/usr/bin/apt-get"):
-            streamtypelist.append("8193")
-        for index, item in enumerate(streamtypelist, start=0):
-            if str(item) == str(self.servicetype):
-                currentindex = index
-                break
-        nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
-        self.servicetype = str(next(nextStreamType))
+        # currentindex = 0
+        # streamtypelist = ["4097"]
+        # # if "youtube" in str(url):
+            # # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # # return
+        # if isStreamlinkAvailable():
+            # streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            # streaml = True
+        # if os.path.exists("/usr/bin/gstplayer"):
+            # streamtypelist.append("5001")
+        # if os.path.exists("/usr/bin/exteplayer3"):
+            # streamtypelist.append("5002")
+        # if os.path.exists("/usr/bin/apt-get"):
+            # streamtypelist.append("8193")
+        # for index, item in enumerate(streamtypelist, start=0):
+            # if str(item) == str(self.servicetype):
+                # currentindex = index
+                # break
+        # nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
+        # self.servicetype = int(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
@@ -3499,7 +3526,6 @@ class Playstream2(
         pass
 
     def down(self):
-        # pass
         self.up()
 
     def doEofInternal(self, playing):
@@ -3518,6 +3544,7 @@ class Playstream2(
     def showAfterSeek(self):
         if isinstance(self, TvInfoBarShowHide):
             self.doShow()
+
     def cancel(self):
         if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
@@ -3542,7 +3569,7 @@ class plgnstrt(Screen):
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-        
+
         self["poster"] = Pixmap()
         self["poster"].hide()
         self.picload = ePicLoad()
