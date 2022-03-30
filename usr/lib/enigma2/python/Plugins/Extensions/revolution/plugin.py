@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             22/02/2022               *
+*             22/03/2022               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -68,7 +68,6 @@ from enigma import quitMainloop
 from os.path import splitext
 from twisted.web.client import downloadPage, getPage
 from xml.dom import Node, minidom
-
 import base64
 import glob
 import hashlib
@@ -156,7 +155,6 @@ def getversioninfo():
     return (currversion)
 
 try:
-    # from OpenSSL import SSL
     from twisted.internet import ssl
     from twisted.internet._sslverify import ClientTLSOptions
     sslverify = True
@@ -305,9 +303,7 @@ class rvList(MenuList):
             self.l.setFont(0, gFont('Regular', textfont))
 
 def rvListEntry(name, idx):
-    # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugins.png".format('revolution')) #ico1_path
     res = [name]
-
     if 'radio' in name.lower():
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
     elif 'webcam' in name.lower():    
@@ -328,7 +324,6 @@ def rvListEntry(name, idx):
     return res
 
 def rvoneListEntry(name):
-    # pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/plugin.png".format('revolution')) #ico1_path
     res = [name]
     if 'radio' in name.lower():
         pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
@@ -2809,19 +2804,19 @@ class myconfig(Screen, ConfigListScreen):
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-        self.setup_title = _("Config")
+        self.setTitle(title_plug)        
+        self.setup_title = title_plug
         self.onChangedEntry = []
         self.session = session
-        self.setTitle(title_plug)
         self['description'] = Label('')
         info = ''
-        self['info'] = Label(_('Config Revolution'))
+        self['info'] = Label('')
         self['key_yellow'] = Button(_('Choice'))
         self['key_green'] = Button(_('Save'))
         self['key_red'] = Button(_('Back'))
         self["key_blue"] = Button(_('Empty Cache'))
         # self['key_blue'].hide()
-        self['title'] = Label('Config')
+        self['title'] = Label(title_plug)
         self["setupActions"] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'VirtualKeyboardActions', 'ActiveCodeActions'], {'cancel': self.extnok,
          'red': self.extnok,
          'back': self.close,
@@ -2864,7 +2859,7 @@ class myconfig(Screen, ConfigListScreen):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
         currentip1 = open('/tmp/currentip', 'r')
         currentip = currentip1.read()
-        self['info'].setText(_('Config Panel Addon\nYour current IP is %s') % currentip)
+        self['info'].setText(_('Config Revolution Panel\nYour current IP is %s') % currentip)
 
     def createSetup(self):
         self.editListEntry = None
@@ -3201,15 +3196,6 @@ class Playstream1(Screen):
             self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
     def cancel(self):
-        # try:
-            # password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            # password_mgr.add_password(None, self.hostaddr, '', 'Admin')
-            # handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-            # opener = urllib2.build_opener(handler)
-            # f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_stop')
-            # f = opener.open(self.hostaddr + '/requests/status.xml?command=pl_empty')
-        # except:
-            # pass
         self.session.nav.stopService()
         self.session.nav.playService(srefInit)
         self.close()
@@ -3307,16 +3293,6 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
-# class Playstream2(
-    # InfoBarBase,
-    # InfoBarMenu,
-    # InfoBarSeek,
-    # InfoBarAudioSelection,
-    # InfoBarSubtitleSupport,
-    # InfoBarNotifications,
-    # TvInfoBarShowHide,
-    # Screen
-# ):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -3332,14 +3308,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-        # for x in InfoBarBase, \
-                # InfoBarMenu, \
-                # InfoBarSeek, \
-                # InfoBarAudioSelection, \
-                # InfoBarSubtitleSupport, \
-                # InfoBarNotifications, \
-                # TvInfoBarShowHide:
-            # x.__init__(self)
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
@@ -3569,7 +3537,6 @@ class plgnstrt(Screen):
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-
         self["poster"] = Pixmap()
         self["poster"].hide()
         self.picload = ePicLoad()
