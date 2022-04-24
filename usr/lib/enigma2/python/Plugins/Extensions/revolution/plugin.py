@@ -4,7 +4,7 @@
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             14/04/2022               *
+*             24/04/2022               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -100,10 +100,8 @@ except:
     from urllib2 import Request
     from urllib2 import urlopen
 
-try:
-    from Plugins.Extensions.revolution.Utils import *
-except:
-    from . import Utils
+
+from . import Utils
 if PY3:
     print('six.PY3: True ')
 
@@ -114,12 +112,12 @@ search = False
 _session = None
 UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
 UrlSvr = UrlSvr.replace('+', '')
-UrlLst = b64decoder(UrlSvr)
+UrlLst = Utils.b64decoder(UrlSvr)
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 
 streamlink = False
-if isStreamlinkAvailable:
+if Utils.isStreamlinkAvailable:
     streamlink = True
 
 def trace_error():
@@ -162,10 +160,6 @@ except:
     sslverify = False
 
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -259,11 +253,11 @@ if not os.path.exists(revol):
     except OSError as e:
         print(('Error creating directory %s:\n%s') % (revol, str(e)))
 logdata("path picons: ", str(revol))
-if isFHD():
+if Utils.isFHD():
     skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('revolution'))
 else:
     skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('revolution'))
-if DreamOS():
+if Utils.DreamOS():
     skin_path = skin_path + 'dreamOs/'
 logdata("path picons: ", str(skin_path))
 
@@ -294,14 +288,15 @@ REGEX = re.compile(
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        self.l.setItemHeight(50)
-        textfont = int(24)
-        self.l.setFont(0, gFont('Regular', textfont))
-        if isFHD():
+        if Utils.isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-
+        else:     
+            self.l.setItemHeight(50)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
+        
 def rvListEntry(name, idx):
     res = [name]
     if 'radio' in name.lower():
@@ -314,8 +309,7 @@ def rvListEntry(name, idx):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))
     else:
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
-
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos =(10, 12), size =(34, 25), png =loadPNG(pngs)))
         res.append(MultiContentEntryText(pos=(60, 0), size =(1900, 50), font =0, text=name, color = 0xa6d1fe, flags =RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -335,7 +329,7 @@ def rvoneListEntry(name):
         pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))
     else:
         pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -431,14 +425,14 @@ class Revolmain(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -455,7 +449,7 @@ class Revolmain(Screen):
         self.load_poster()
 
     def closerm(self):
-        deletetmp()
+        Utils.deletetmp()
         self.close()
 
     def updateMenuList(self):
@@ -582,7 +576,7 @@ class Revolmain(Screen):
             else:
                 pixmaps = piconinter
             size = self['poster'].instance.size()
-            if DreamOS():
+            if Utils.DreamOS():
                 self['poster'].instance.setPixmap(gPixmapPtr())
             else:
                 self['poster'].instance.setPixmap(None)
@@ -596,7 +590,7 @@ class Revolmain(Screen):
              1,
              '#FF000000'))
             ptr = self.picload.getData()
-            if DreamOS():
+            if Utils.DreamOS():
                 if self.picload.startDecode(pixmaps, False) == 0:
                     ptr = self.picload.getData()
             else:
@@ -678,14 +672,14 @@ class live_stream(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -699,7 +693,7 @@ class live_stream(Screen):
 
     def readJsonFile(self, name, url, pic):
         global nextmodule
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         # if six.PY3:
             # content = six.ensure_str(content)
         print('live_stream content B =', content)
@@ -723,11 +717,11 @@ class live_stream(Screen):
                 info = (y["items"][i]["info"])
                 # print("In live_stream info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -937,7 +931,7 @@ class live_stream(Screen):
             self.picload = ePicLoad()
             self.scale = AVSwitch().getFramebufferScale()
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -1018,14 +1012,14 @@ class video3(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -1065,7 +1059,7 @@ class video3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1092,11 +1086,11 @@ class video3(Screen):
                 info = (y["items"][i]["info"])
                 # print("In Videos3 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1209,7 +1203,7 @@ class video3(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1292,14 +1286,14 @@ class nextvideo3(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
 
                 imdb(_session, text)
             except Exception as e:
@@ -1340,7 +1334,7 @@ class nextvideo3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("nextVideos3 content A =", content)
@@ -1368,11 +1362,11 @@ class nextvideo3(Screen):
                 info = (y["items"][i]["info"])
                 # print("In nextVideos3 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1484,7 +1478,7 @@ class nextvideo3(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1566,14 +1560,14 @@ class video4(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -1614,7 +1608,7 @@ class video4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("content Video4 =", content)
@@ -1642,11 +1636,11 @@ class video4(Screen):
                 # print("In video4 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
 
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -1758,7 +1752,7 @@ class video4(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -1840,14 +1834,14 @@ class nextvideo4(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -1889,7 +1883,7 @@ class nextvideo4(Screen):
         self.pics = []
         self.infos = []
 
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
@@ -1920,11 +1914,11 @@ class nextvideo4(Screen):
                 info = (y["items"][i]["info"])
                 # print("In nextvideo4 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2035,7 +2029,7 @@ class nextvideo4(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -2117,14 +2111,14 @@ class video1(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -2171,7 +2165,7 @@ class video1(Screen):
         self.infos = []
 
 
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("content Video1 =", content)
@@ -2202,11 +2196,11 @@ class video1(Screen):
                 info = (y["items"][i]["info"])
                 # print("In Video1 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2328,7 +2322,7 @@ class video1(Screen):
             self.scale = AVSwitch().getFramebufferScale()
             # if self.picload:
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(pixmaps, False)
             else:
                 self.picload.startDecode(pixmaps, 0, 0, False)
@@ -2411,14 +2405,14 @@ class nextvideo1(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -2459,7 +2453,7 @@ class nextvideo1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("content nextvideo1 =", content)
@@ -2486,11 +2480,11 @@ class nextvideo1(Screen):
                 info = (y["items"][i]["info"])
                 # print("In nextvideo1 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2612,9 +2606,8 @@ class nextvideo1(Screen):
             size = self['poster'].instance.size()
             self.picload = ePicLoad()
             self.scale = AVSwitch().getFramebufferScale()
-
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -2695,14 +2688,14 @@ class video5(Screen):
         if is_tmdb:
             try:
                 from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
                 from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
+                text = Utils.charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
@@ -2746,7 +2739,7 @@ class video5(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        content = ReadUrl2(url)
+        content = Utils.ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
@@ -2776,11 +2769,11 @@ class video5(Screen):
                 info = (y["items"][i]["info"])
                 # print("In Videos5 info =", info)
                 # info = [x.replace("\r\n","") for x in info]
-                info = checkStr(info)
+                info = Utils.checkStr(info)
                 info = info.replace("\r\n","")
-                self.names.append(checkStr(name))
+                self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
-                self.pics.append(checkStr(pic))
+                self.pics.append(Utils.checkStr(pic))
                 self.infos.append(info)
                 i = i+1
             except:
@@ -2831,8 +2824,7 @@ class video5(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ',i)
-        # if i < 1:
-            # return
+
         idx = self["text"].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
@@ -2891,7 +2883,7 @@ class video5(Screen):
             self.scale = AVSwitch().getFramebufferScale()
 
             self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-            if DreamOS():
+            if Utils.DreamOS():
                 self.picload.startDecode(png, False)
             else:
                 self.picload.startDecode(png, 0, 0, False)
@@ -2978,7 +2970,7 @@ class myconfig(Screen, ConfigListScreen):
         # self.setInfo()
 
     def cachedel(self):
-        fold = config.plugins.tvspro.cachefold.value + "/pic"
+        fold = config.plugins.revolution.cachefold.value + "/pic"
         cmd = "rm " + fold + "/*"
         os.system(cmd)
         self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
@@ -3284,7 +3276,7 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        if isStreamlinkAvailable():
+        if Utils.isStreamlinkAvailable():
             desc = self.desc
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
@@ -3446,7 +3438,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.service = None
         service = None
         # self.pcip = 'None'
-        self.name = decodeHtml(name)
+        self.name = Utils.decodeHtml(name)
         self.icount = 0
         url = url.replace(':', '%3a')
         self.url = url
@@ -3527,12 +3519,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if os.path.exists(TMDB):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
-            text = charRemove(text_clear)
+            text = Utils.charRemove(text_clear)
             self.session.open(TMBD, text, False)
         elif os.path.exists(IMDb):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
-            text = charRemove(text_clear)
+            text = Utils.charRemove(text_clear)
             self.session.open(IMDB, text)
         else:
             text_clear = self.name
@@ -3577,7 +3569,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # # if "youtube" in str(url):
             # # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # # return
-        # if isStreamlinkAvailable():
+        # if Utils.isStreamlinkAvailable():
             # streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             # streaml = True
         # if os.path.exists("/usr/bin/gstplayer"):
@@ -3659,7 +3651,7 @@ class plgnstrt(Screen):
 
     def poster_resize(self, pngori):
         pixmaps = pngori
-        if DreamOS():
+        if Utils.DreamOS():
             self['poster'].instance.setPixmap(gPixmapPtr())
         else:
             self['poster'].instance.setPixmap(None)
@@ -3674,7 +3666,7 @@ class plgnstrt(Screen):
          1,
          '#FF000000'))
         ptr = self.picload.getData()
-        if DreamOS():
+        if Utils.DreamOS():
             if self.picload.startDecode(pixmaps, False) == 0:
                 ptr = self.picload.getData()
         else:
@@ -3713,7 +3705,7 @@ class plgnstrt(Screen):
         self['text'].setText(_('\n\n\nCheck Connection wait please...'))
         self.timer = eTimer()
         self.timer.start(2000, 1)
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
@@ -3754,18 +3746,17 @@ class plgnstrt(Screen):
         self.session.openWithCallback(self.close, Revolmain)
 
 def checks():
-    from Plugins.Extensions.revolution.Utils import checkInternet
-    checkInternet()
+    from . import Utils
     chekin= False
-    if checkInternet():
+    if Utils.checkInternet():
         chekin = True
     return chekin
 
 def main(session, **kwargs):
     if checks:
         try:
-            from Plugins.Extensions.revolution.Update import upd_done
-            upd_done()
+            from . import Update
+            Update.upd_done()
         except:
             pass
         if PY3:
