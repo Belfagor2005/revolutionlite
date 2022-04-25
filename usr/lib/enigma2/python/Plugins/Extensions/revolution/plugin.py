@@ -2907,6 +2907,7 @@ class myconfig(Screen, ConfigListScreen):
         self.onChangedEntry = []
         self.session = session
         self['description'] = Label('')
+        self["paypal"] = Label()
         info = ''
         self['info'] = Label('')
         self['key_yellow'] = Button(_('Choice'))
@@ -2951,7 +2952,15 @@ class myconfig(Screen, ConfigListScreen):
             return
         return
 
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
     def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)  
         self.setTitle(self.setup_title)
         if not os.path.exists('/tmp/currentip'):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
@@ -3558,7 +3567,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         streaml = False
         from itertools import cycle, islice
         # self.servicetype = '4097'
-        self.servicetype = int(config.plugins.revolution.services.value)
+        self.servicetype = str(config.plugins.revolution.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         if str(os.path.splitext(url)[-1]) == ".m3u8":
@@ -3583,7 +3592,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 # currentindex = index
                 # break
         # nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
-        # self.servicetype = int(next(nextStreamType))
+        # self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 

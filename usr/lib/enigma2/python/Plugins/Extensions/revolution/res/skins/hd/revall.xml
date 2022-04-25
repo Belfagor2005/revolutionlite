@@ -1,5 +1,5 @@
 <!-- Skin revall 10/05/2021 -->
-<screen name="revall" position="0,0" size="1280,720" title="::REVOLUTION::.." backgroundColor="transparent" flags="wfNoBorder">
+<screen name="revall" position="0,0" size="1280,720" title="::REVOLUTION::.." backgroundColor="#20000000" flags="wfNoBorder">
 	<widget name="title" position="200,36" size="553,26" font="Regular;22" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5"/>
 	<widget name="info" position="146,86" size="646,33" font="Regular;20" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5"/>
 	<widget name="space" position="146,513" size="643,60" font="Regular;18" halign="left" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="1" zPosition="5"/>
@@ -11,7 +11,7 @@
 	<eLabel position="890,25" size="370,220" backgroundColor="#80000000" cornerRadius="20" zPosition="1"/>
 	<widget name="poster" position="906,40" size="333,187" backgroundColor="#30000000" transparent="1" borderWidth="2" borderColor="#00ffffff" alphatest="blend" zPosition="4"/>
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/main2.png" position="0,0" size="1280,720" zPosition="1"/>
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/tvs.png" position="146,26" size="53,40" scale="1" zPosition="5"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/tvs.png" alphatest="blend" position="146,26" size="53,40" scale="1" zPosition="5"/>
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/sep.png" position="146,73" size="646,5" alphatest="blend" zPosition="5"/>
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/sep.png" position="146,506" size="646,5" alphatest="blend" zPosition="5"/>
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/sep.png" position="146,613" size="646,5" alphatest="blend" zPosition="5"/>
