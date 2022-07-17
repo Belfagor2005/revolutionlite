@@ -379,6 +379,7 @@ class Revolmain(Screen):
         self['key_yellow'] = Button(_(''))
         self["key_blue"] = Button(_(''))
         self['key_yellow'].hide()
+        self['key_green'].hide() 
         self['key_blue'].hide()
         self['progress'] = ProgressBar()
         self['progresstext'] = StaticText()
@@ -446,6 +447,7 @@ class Revolmain(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_poster()
 
     def closerm(self):
@@ -815,6 +817,7 @@ class live_stream(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -1034,6 +1037,7 @@ class video3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -1309,6 +1313,7 @@ class nextvideo3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -1582,6 +1587,7 @@ class video4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -1856,6 +1862,7 @@ class nextvideo4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -2133,6 +2140,7 @@ class video1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -2427,6 +2435,7 @@ class nextvideo1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -2710,6 +2719,7 @@ class video5(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
+        self['key_green'].show() 
         self.load_infos()
         self.load_poster()
 
@@ -3754,28 +3764,52 @@ class plgnstrt(Screen):
     def clsgo(self):
         self.session.openWithCallback(self.close, Revolmain)
 
-def checks():
-    from . import Utils
-    chekin= False
-    if Utils.checkInternet():
-        chekin = True
-    return chekin
+def intCheck():
+    import socket
+    try:
+        socket.setdefaulttimeout(1)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
+        return True
+    except:
+        return False
 
 def main(session, **kwargs):
-    if checks:
-        try:
-            from . import Update
-            Update.upd_done()
-        except:
-            pass
-        if PY3:
-            session.open(Revolmain)
-        elif os.path.exists('/var/lib/dpkg/status'):
-            session.open(Revolmain)
+    try:
+        if intCheck():
+                from . import Update
+                Update.upd_done()
+                if PY3:
+                    session.open(Revolmain)
+                elif os.path.exists('/var/lib/dpkg/status'):
+                    session.open(Revolmain)
+                else:
+                    session.open(plgnstrt)                
         else:
-            session.open(plgnstrt)
-    else:
-        session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
+            from Screens.MessageBox import MessageBox
+            from Tools.Notifications import AddPopup
+            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')  
+    except:
+        import traceback
+        traceback.print_exc() 
+        pass
+
+
+# def main(session, **kwargs):
+    # if Utils.checkInternet():
+        # print('check internet ok')
+        # try:
+            # from . import Update
+            # Update.upd_done()
+        # except:
+            # pass
+        # if PY3:
+            # session.open(Revolmain)
+        # elif os.path.exists('/var/lib/dpkg/status'):
+            # session.open(Revolmain)
+        # else:
+            # session.open(plgnstrt)
+    # else:
+        # session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 
 def menu(menuid, **kwargs):
     if menuid == 'mainmenu':
