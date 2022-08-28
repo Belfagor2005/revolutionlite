@@ -10,7 +10,7 @@
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-from . import _
+from .__init__ import _
 # from Components.HTMLComponent import *
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
@@ -3764,18 +3764,10 @@ class plgnstrt(Screen):
     def clsgo(self):
         self.session.openWithCallback(self.close, Revolmain)
 
-def intCheck():
-    import socket
-    try:
-        socket.setdefaulttimeout(1)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
-        return True
-    except:
-        return False
 
 def main(session, **kwargs):
     try:
-        if intCheck():
+        if Utils.zCheckInternet(0):
                 from . import Update
                 Update.upd_done()
                 if PY3:
@@ -3792,24 +3784,6 @@ def main(session, **kwargs):
         import traceback
         traceback.print_exc() 
         pass
-
-
-# def main(session, **kwargs):
-    # if Utils.checkInternet():
-        # print('check internet ok')
-        # try:
-            # from . import Update
-            # Update.upd_done()
-        # except:
-            # pass
-        # if PY3:
-            # session.open(Revolmain)
-        # elif os.path.exists('/var/lib/dpkg/status'):
-            # session.open(Revolmain)
-        # else:
-            # session.open(plgnstrt)
-    # else:
-        # session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 
 def menu(menuid, **kwargs):
     if menuid == 'mainmenu':
