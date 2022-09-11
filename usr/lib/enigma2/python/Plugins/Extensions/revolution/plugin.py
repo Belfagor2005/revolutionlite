@@ -3767,7 +3767,7 @@ class plgnstrt(Screen):
 
 def main(session, **kwargs):
     try:
-        if Utils.zCheckInternet(0):
+        if Utils.zCheckInternet(1):
                 from . import Update
                 Update.upd_done()
                 if PY3:
