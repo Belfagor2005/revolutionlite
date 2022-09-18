@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 '''
 ****************************************
 *        coded by Lululla              *
@@ -40,8 +41,8 @@ from Screens.Console import Console
 from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
-	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
-	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
+    InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+    InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.PluginBrowser import PluginBrowser
@@ -262,27 +263,27 @@ if Utils.DreamOS():
 logdata("path picons: ", str(skin_path))
 
 REGEX = re.compile(
-		r'([\(\[]).*?([\)\]])|'
-		r'(: odc.\d+)|'
-		r'(\d+: odc.\d+)|'
-		r'(\d+ odc.\d+)|(:)|'
-		r'( -(.*?).*)|(,)|'
-		r'!|'
-		r'/.*|'
-		r'\|\s[0-9]+\+|'
-		r'[0-9]+\+|'
-		r'\s\d{4}\Z|'
-		r'([\(\[\|].*?[\)\]\|])|'
-		r'(\"|\"\.|\"\,|\.)\s.+|'
-		r'\"|:|'
-		r'Премьера\.\s|'
-		r'(х|Х|м|М|т|Т|д|Д)/ф\s|'
-		r'(х|Х|м|М|т|Т|д|Д)/с\s|'
-		r'\s(с|С)(езон|ерия|-н|-я)\s.+|'
-		r'\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
-		r'\.\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
-		r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
-		r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
+        r'([\(\[]).*?([\)\]])|'
+        r'(: odc.\d+)|'
+        r'(\d+: odc.\d+)|'
+        r'(\d+ odc.\d+)|(:)|'
+        r'( -(.*?).*)|(,)|'
+        r'!|'
+        r'/.*|'
+        r'\|\s[0-9]+\+|'
+        r'[0-9]+\+|'
+        r'\s\d{4}\Z|'
+        r'([\(\[\|].*?[\)\]\|])|'
+        r'(\"|\"\.|\"\,|\.)\s.+|'
+        r'\"|:|'
+        r'Премьера\.\s|'
+        r'(х|Х|м|М|т|Т|д|Д)/ф\s|'
+        r'(х|Х|м|М|т|Т|д|Д)/с\s|'
+        r'\s(с|С)(езон|ерия|-н|-я)\s.+|'
+        r'\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
+        r'\.\s\d{1,3}\s(ч|ч\.|с\.|с)\s.+|'
+        r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
+        r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
 
 
 class rvList(MenuList):
@@ -292,11 +293,11 @@ class rvList(MenuList):
             self.l.setItemHeight(50)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-        else:     
+        else:
             self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
-        
+
 def rvListEntry(name, idx):
     res = [name]
     if 'radio' in name.lower():
@@ -379,7 +380,7 @@ class Revolmain(Screen):
         self['key_yellow'] = Button(_(''))
         self["key_blue"] = Button(_(''))
         self['key_yellow'].hide()
-        self['key_green'].hide() 
+        self['key_green'].hide()
         self['key_blue'].hide()
         self['progress'] = ProgressBar()
         self['progresstext'] = StaticText()
@@ -447,7 +448,7 @@ class Revolmain(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_poster()
 
     def closerm(self):
@@ -521,19 +522,19 @@ class Revolmain(Screen):
             # self.search_text(name, url, pic)
         elif sel == ('LIVE'):
             name = 'LIVE'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1' #live #all_channel_live
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1'  # live #all_channel_live
             pic = piconlive
             nextmodule = 'live'
             self.session.open(live_stream, name, url, pic, nextmodule)
         elif sel == 'MOVIE':
             name = 'MOVIE'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listGenMovie&page=1' #movie #all_channel_movie
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listGenMovie&page=1'  # movie #all_channel_movie
             pic = piconmovie
             nextmodule = 'movie'
             self.session.open(live_stream, name, url, pic, nextmodule)
         elif sel == ('SERIES'):
             name = 'SERIES'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listSerie&page=1' #series #all_channel_series
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listSerie&page=1'  # series #all_channel_series
             pic = piconseries
             nextmodule = 'series'
             self.session.open(live_stream, name, url, pic, nextmodule)
@@ -625,7 +626,7 @@ class live_stream(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -759,12 +760,12 @@ class live_stream(Screen):
             from Screens.VirtualKeyBoard import VirtualKeyBoard
             print('Search go movie: ', search)
             self.search_text(name, url, pic)
-        #live
+        # live
         if nextmodule == 'Videos3':
             # openCat
             print('Videos3 play next: ', nextmodule)
             self.session.open(video3, name, url, pic, nextmodule)
-        #movie
+        # movie
         # if nextmodule == 'Videos4':
         if 'listMovie' in str(url):
 
@@ -774,9 +775,9 @@ class live_stream(Screen):
             if 'movieId' in str(url):
                 print('video4 and play : ', nextmodule)
                 self.session.open(video5, name, url, pic, nextmodule)
-        #series
+        # series
         # if nextmodule == 'Videos1':
-        if '&page' in str(url) and nextmodule == 'Videos1': #work
+        if '&page' in str(url) and nextmodule == 'Videos1':  # work
             self.session.open(nextvideo1, name, url, pic, nextmodule)
         if '&page' not in str(url) and nextmodule == 'Videos1':
             print('video1 and play next: ', nextmodule)
@@ -817,7 +818,7 @@ class live_stream(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -966,7 +967,7 @@ class video3(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -1037,7 +1038,7 @@ class video3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -1239,7 +1240,7 @@ class nextvideo3(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -1313,7 +1314,7 @@ class nextvideo3(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -1515,7 +1516,7 @@ class video4(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -1587,7 +1588,7 @@ class video4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -1862,7 +1863,7 @@ class nextvideo4(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -2068,7 +2069,7 @@ class video1(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -2140,7 +2141,7 @@ class video1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -2230,9 +2231,9 @@ class video1(Screen):
             pic = self.pics[idx]
             desc = self.infos[idx]
             print('Video1 nextmodule is: ', nextmodule)
-            if '&page' in str(url) and nextmodule == 'Videos1': #wooork
+            if '&page' in str(url) and nextmodule == 'Videos1':  # wooork
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
-            if '&page' not in str(url) and nextmodule == 'Videos1': #in series not appears
+            if '&page' not in str(url) and nextmodule == 'Videos1':  # in series not appears
                 print('video1 and play next: ', nextmodule)
                 if 'tvseriesId' in str(url):
                     self.session.open(nextvideo1, name, url, pic, nextmodule)
@@ -2362,7 +2363,7 @@ class nextvideo1(Screen):
         self['desc'] = StaticText()
         self['space'] = Label('')
         self["poster"] = Pixmap()
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -2435,7 +2436,7 @@ class nextvideo1(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -2514,9 +2515,9 @@ class nextvideo1(Screen):
         pic = self.pics[idx]
         desc = self.infos[idx]
         print('nextvideo1 nextmodule is: ', nextmodule)
-        if '&page' in str(url) and nextmodule == 'Videos1': #wooork
+        if '&page' in str(url) and nextmodule == 'Videos1':  # wooork
             self.session.open(video1, name, url, pic, nextmodule)
-        if '&page' not in str(url) and nextmodule == 'Videos1': #in series not appears
+        if '&page' not in str(url) and nextmodule == 'Videos1':  # in series not appears
             print('nextvideo1 and play next: ', nextmodule)
             if 'tvseriesId' in str(url):
                 self.session.open(video1, name, url, pic, nextmodule)
@@ -2648,7 +2649,7 @@ class video5(Screen):
         self["poster"] = Pixmap()
         self['desc'] = StaticText()
         self['space'] = Label('')
-        #self["poster"].hide()
+        # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self['progress'] = ProgressBar()
@@ -2719,7 +2720,7 @@ class video5(Screen):
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
         self['info'].setText('Select')
-        self['key_green'].show() 
+        self['key_green'].show()
         self.load_infos()
         self.load_poster()
 
@@ -2967,10 +2968,10 @@ class myconfig(Screen, ConfigListScreen):
         conthelp += " can contribute with a coffee\n\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
-    
+
     def layoutFinished(self):
         paypal = self.paypal2()
-        self["paypal"].setText(paypal)  
+        self["paypal"].setText(paypal)
         self.setTitle(self.setup_title)
         if not os.path.exists('/tmp/currentip'):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
@@ -3144,7 +3145,7 @@ class Playstream1(Screen):
             self.session.open(MessageBox, _('You are already downloading!!!'), MessageBox.TYPE_INFO, timeout=5)
             return
         else:
-            if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u: # or 'm3u8':
+            if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:  # or 'm3u8':
                 self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" %self.namem3u ) , type=MessageBox.TYPE_YESNO, timeout = 10, default = False)
             else:
                 self.downloading = False
@@ -3466,7 +3467,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
         # self.onClose.append(self.cancel)
-		# self.onClose.append(self.__onClose)
+        # self.onClose.append(self.__onClose)
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
@@ -3775,14 +3776,14 @@ def main(session, **kwargs):
                 elif os.path.exists('/var/lib/dpkg/status'):
                     session.open(Revolmain)
                 else:
-                    session.open(plgnstrt)                
+                    session.open(plgnstrt)
         else:
             from Screens.MessageBox import MessageBox
             from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')  
+            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')
     except:
         import traceback
-        traceback.print_exc() 
+        traceback.print_exc()
         pass
 
 def menu(menuid, **kwargs):
