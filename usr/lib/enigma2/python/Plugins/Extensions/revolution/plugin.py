@@ -5,7 +5,7 @@
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             24/04/2022               *
+*             24/09/2022               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -16,17 +16,14 @@ from .__init__ import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
-from Components.ConfigList import ConfigList, ConfigListScreen
+from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap
 from Components.PluginComponent import plugins
 from Components.ProgressBar import ProgressBar
-from Components.ScrollLabel import ScrollLabel
-from Components.SelectionList import SelectionList
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from Components.ServiceList import ServiceList
 from Components.Sources.List import List
 from Components.Sources.Progress import Progress
 from Components.Sources.Source import Source
@@ -34,30 +31,23 @@ from Components.Sources.StaticText import StaticText
 from Components.config import config, ConfigEnableDisable, ConfigYesNo, ConfigSelection
 from Components.config import getConfigListEntry, ConfigDirectory, ConfigSubsection
 from Plugins.Plugin import PluginDescriptor
-from Screens.ChoiceBox import ChoiceBox
-from Screens.Console import Console
-from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
-from Screens.PluginBrowser import PluginBrowser
 from Screens.Screen import Screen
-from Screens.Standby import TryQuitMainloop, Standby
+from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from ServiceReference import ServiceReference
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Directories import fileExists
 from Tools.Downloader import downloadWithProgress
-from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_VALIGN_CENTER, RT_HALIGN_LEFT
-from enigma import eTimer
-from enigma import eListbox, eListboxPythonMultiContent, eConsoleAppContainer
-from enigma import iPlayableService
-from enigma import iServiceInformation
-from enigma import eServiceReference
+from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad, loadPNG, gFont, gPixmapPtr
-from enigma import quitMainloop
+from enigma import eServiceReference
+from enigma import eTimer
+from enigma import iPlayableService
 from os.path import splitext
 from twisted.web.client import downloadPage
 import base64
@@ -119,7 +109,7 @@ def trace_error():
 
 def logdata(name='', data=None):
     try:
-        data=str(data)
+        data = str(data)
         fp = open('/tmp/revolution.log', 'a')
         fp.write(str(name) + ': ' + data + "\n")
         fp.close()
@@ -208,7 +198,7 @@ except:
     if os.path.exists("/usr/bin/apt-get"):
         config.plugins.revolution.movie = ConfigDirectory(default='/media/hdd/movie/')
 config.plugins.revolution.services = ConfigSelection(default='4097', choices=modechoices)
-config.plugins.revolution.cachefold = ConfigDirectory("/media/hdd", False)
+# config.plugins.revolution.cachefold = ConfigDirectory("/media/hdd", False)
 cfg = config.plugins.revolution
 
 global Path_Movies
@@ -218,7 +208,7 @@ if Path_Movies.endswith("\/\/"):
 print('patch movies: ', Path_Movies)
 
 currversion = getversioninfo()
-title_plug = '..:: TivuStream Pro Revolution Lite V. %s ::..' % currversion
+title_plug = 'Pro Lite V. %s' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
 ico_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/logo.png".format('revolution'))
 no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_coverArt.png".format('revolution'))
@@ -363,27 +353,16 @@ class Revolmain(Screen):
         # self.setTitle(title_plug)
         global nextmodule
         nextmodule = 'revolmain'
-        self['text'] = rvList([])
+        self['list'] = rvList([])
         self.setup_title = ('HOME REVOLUTION')
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['poster'] = Pixmap()
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self['info'] = Label('')
         self['info'].setText(_('Loading data... Please wait'))
-        self['key_green'] = Button(_('Select'))
         self['key_red'] = Button(_('Exit'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_green'].hide()
-        self['key_blue'].hide()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['progresstext'].text = ''
-        self.currentList = 'text'
+        self.currentList = 'list'
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self.names = []
@@ -420,7 +399,7 @@ class Revolmain(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -447,9 +426,9 @@ class Revolmain(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
+        self.load_poster()
         self['info'].setText('Select')
         self['key_green'].show()
-        self.load_poster()
 
     def closerm(self):
         Utils.deletetmp()
@@ -466,11 +445,11 @@ class Revolmain(Screen):
             list.append(rvListEntry(x, self.idx))
             self.menu_list.append(x)
             self.idx += 1
-        self['text'].setList(list)
+        self['list'].setList(list)
         self.load_poster()
 
     def okRun(self):
-        self.keyNumberGlobalCB(self['text'].getSelectedIndex())
+        self.keyNumberGlobalCB(self['list'].getSelectedIndex())
 
     def search_text(self, name, url, pic):
         self.namex = name
@@ -504,7 +483,6 @@ class Revolmain(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-
         global nextmodule
         sel = self.menu_list[idx]
         live, movie, series, other = TvsApi()
@@ -566,7 +544,7 @@ class Revolmain(Screen):
         self.load_poster()
 
     def load_poster(self):
-        sel = self['text'].getSelectedIndex()
+        sel = self['list'].getSelectedIndex()
         if sel is not None or sel != -1:
             if sel == 0:
                 pixmaps = piconsearch
@@ -619,36 +597,26 @@ class live_stream(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
         self.type = self.name
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self.idx = 0
         self['title'] = Label(title_plug)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
+        self['actions'] = ActionMap(['SetupActions', 'EPGSelectActions', 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
                                                                                                                # 'green': self.start_download,
                                                                                                                # 'yellow': self.readJsonFile,
                                                                                                                'red': self.cancel,
@@ -665,13 +633,12 @@ class live_stream(Screen):
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
-
     def showIMDB(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -745,14 +712,14 @@ class live_stream(Screen):
             print('=====================')
             print(nextmodule)
             print('=====================')
-        showlist(self.names, self['text'])
+        showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -819,27 +786,22 @@ class live_stream(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
+        # self['key_green'].show()
 
     def load_infos(self):
         i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        # if idx and (idx != '' or idx > -1):
-        info = self.infos[idx]
-        name = self.names[idx]
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def cancel(self):
@@ -854,7 +816,7 @@ class live_stream(Screen):
         self.close(None)
 
     def up(self):
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         if idx and (idx != '' or idx > -1):
             self[self.currentList].up()
@@ -883,7 +845,7 @@ class live_stream(Screen):
         print('iiiiii= ', i)
         # if i < 1:
             # return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = self.pics[idx]
         # pixmaps = six.ensure_binary(self.pics[idx])
@@ -962,47 +924,40 @@ class video3(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -1013,7 +968,7 @@ class video3(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -1040,26 +995,21 @@ class video3(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        if idx and (idx != '' or idx > -1):
+        i = len(self.names)
+        print('iiiiii= ', i)
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
-            name = self.names[idx]
-        else:
-            info = ''
-            name = ''
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -1103,14 +1053,14 @@ class video3(Screen):
                 i = i+1
             except:
                 break
-            showlist(self.names, self['text'])
+            showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
@@ -1154,9 +1104,8 @@ class video3(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
+        # if i > 1:
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -1235,52 +1184,43 @@ class nextvideo3(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1288,7 +1228,7 @@ class nextvideo3(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -1315,26 +1255,21 @@ class nextvideo3(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        info = self.infos[idx]
-        name = self.names[idx]
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -1379,16 +1314,16 @@ class nextvideo3(Screen):
                 i = i+1
             except:
                 break
-            showlist(self.names, self['text'])
+            showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('video1 idx: ', idx)
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
@@ -1430,9 +1365,8 @@ class nextvideo3(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
+        # if i > 1:
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -1511,51 +1445,43 @@ class video4(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1563,7 +1489,7 @@ class video4(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -1590,26 +1516,21 @@ class video4(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        info = self.infos[idx]
-        name = self.names[idx]
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -1656,15 +1577,14 @@ class video4(Screen):
             except:
                 break
             nextmodule = "Videos4"
-        showlist(self.names, self['text'])
-            # self.load_poster()
+        showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('video4 idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
@@ -1705,9 +1625,8 @@ class video4(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
+        # if i > 1:
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -1733,7 +1652,6 @@ class video4(Screen):
                 downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
             else:
                 downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
-
         except Exception as ex:
             print(ex)
             print("Error: can't find file or read data")
@@ -1787,35 +1705,25 @@ class nextvideo4(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
         self['actions'] = ActionMap(['SetupActions',
                                      'EPGSelectActions',
@@ -1834,7 +1742,6 @@ class nextvideo4(Screen):
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1842,7 +1749,7 @@ class nextvideo4(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -1869,26 +1776,21 @@ class nextvideo4(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        info = self.infos[idx]
-        name = self.names[idx]
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -1938,14 +1840,14 @@ class nextvideo4(Screen):
             except:
                 break
             nextmodule = "Videos4"
-        showlist(self.names, self['text'])
+        showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('video4 idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
@@ -1987,9 +1889,8 @@ class nextvideo4(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
+        # if i > 1:
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -2068,51 +1969,43 @@ class video1(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2120,7 +2013,7 @@ class video1(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -2147,30 +2040,21 @@ class video1(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        if idx and (idx != '' or idx > -1):
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
-            name = self.names[idx]
-        else:
-            info = ''
-            name = ''
             self['desc'].setText(info)
-            self['space'].setText(str(name))
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -2220,15 +2104,14 @@ class video1(Screen):
             except:
                 break
             nextmodule = "Videos1"
-        showlist(self.names, self['text'])
-            # self.load_poster()
+        showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('Video1 idx: ', idx)
         if idx and (idx != '' or idx > -1):
             name = self.names[idx]
@@ -2280,9 +2163,8 @@ class video1(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
+        # if i > 1:
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -2361,52 +2243,43 @@ class nextvideo1(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-        self['space'] = Label('')
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
-        # idx = 0
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-        # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2414,7 +2287,7 @@ class nextvideo1(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -2441,26 +2314,22 @@ class nextvideo1(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
+        # self['key_green'].show()
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        # if i < 1:
-            # return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        info = self.infos[idx]
-        name = self.names[idx]
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -2506,15 +2375,14 @@ class nextvideo1(Screen):
             except:
                 break
             nextmodule = "Videos1"
-        showlist(self.names, self['text'])
-            # self.load_poster()
+        showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('nextvideo1 idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
@@ -2566,7 +2434,7 @@ class nextvideo1(Screen):
         print('iiiiii= ', i)
         # if i < 1:
             # return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -2648,47 +2516,40 @@ class video5(Screen):
         self.setup_title = ('HOME REVOLUTION')
         self.setTitle(title_plug)
         self.list = []
-        self['text'] = self.list
-        self['text'] = rvList([])
+        self['list'] = self.list
+        self['list'] = rvList([])
         self['info'] = Label(_('Loading data... Please wait'))
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
-        self["poster"] = Pixmap()
         self['desc'] = StaticText()
-        self['space'] = Label('')
+        self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['progress'] = ProgressBar()
-        self['progresstext'] = StaticText()
-        self["progress"].hide()
-        self['key_green'] = Button(_('Download'))
         self['key_red'] = Button(_('Back'))
-        self['key_yellow'] = Button(_(''))
-        self["key_blue"] = Button(_(''))
-        self['key_yellow'].hide()
-        self['key_blue'].hide()
-        self['key_green'].hide()
         self.name = name
         self.url = url
         self.pic = pic
-        print('self.name: ', self.name)
-        print('self.url: ', self.url)
-        print('self.pic: ', self.pic)
+        # print('self.name: ', self.name)
+        # print('self.url: ', self.url)
+        # print('self.pic: ', self.pic)
         self.downloading = False
-        self.currentList = 'text'
+        self.currentList = 'list'
         self['title'] = Label(name)
-        self['actions'] = ActionMap(['SetupActions', "EPGSelectActions", 'DirectionActions', 'ColorActions'], {'ok': self.okRun,
-                                                                                                               # 'green': self.start_download,
-                                                                                                               # 'yellow': self.readJsonFile,
-                                                                                                               'red': self.cancel,
-                                                                                                               'up': self.up,
-                                                                                                               'down': self.down,
-                                                                                                               'left': self.left,
-                                                                                                               'right': self.right,
-                                                                                                               'epg': self.showIMDB,
-                                                                                                               'info': self.showIMDB,
-                                                                                                               'cancel': self.cancel}, -2)
+        self['actions'] = ActionMap(['SetupActions',
+                                     'EPGSelectActions',
+                                     'DirectionActions',
+                                     'ColorActions'], {'ok': self.okRun,
+                                                       # 'green': self.start_download,
+                                                       # 'yellow': self.readJsonFile,
+                                                       'red': self.cancel,
+                                                       'up': self.up,
+                                                       'down': self.down,
+                                                       'left': self.left,
+                                                       'right': self.right,
+                                                       'epg': self.showIMDB,
+                                                       'info': self.showIMDB,
+                                                       'cancel': self.cancel}, -2)
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
@@ -2699,7 +2560,7 @@ class video5(Screen):
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if Utils.is_tmdb:
             try:
@@ -2726,30 +2587,21 @@ class video5(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self['info'].setText('Select')
-        self['key_green'].show()
         self.load_infos()
         self.load_poster()
+        self['info'].setText('Select')
 
     def load_infos(self):
-        i = len(self.infos)
+        i = len(self.names)
         print('iiiiii= ', i)
-        if i < 1:
-            return
-        idx = self["text"].getSelectionIndex()
-        print('idx: ', idx)
-        if idx and (idx != '' or idx > -1):
+        if i > 0:
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
-            name = self.names[idx]
-        else:
-            info = ''
-            name = ''
-        self['desc'].setText(info)
-        self['space'].setText(str(name))
+            self['desc'].setText(info)
 
     def selectionChanged(self):
-        if self["text"].getCurrent():
-            currentindex = self["text"].getIndex()
+        if self['list'].getCurrent():
+            currentindex = self['list'].getIndex()
             print(currentindex)
 
     def readJsonFile(self, name, url, pic):
@@ -2796,19 +2648,17 @@ class video5(Screen):
                 i = i+1
             except:
                 break
-            showlist(self.names, self['text'])
+            showlist(self.names, self['list'])
 
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
         if i < 1:
             return
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
-        pic = self.pics[idx]
-        info = self.infos[idx]
         desc = self.infos[idx]
         print('video5 nextmodule is: ', nextmodule)
         self.session.open(Playstream1, name, url, desc)
@@ -2842,7 +2692,7 @@ class video5(Screen):
     def load_poster(self):
         i = len(self.pics)
         print('iiiiii= ', i)
-        idx = self["text"].getSelectionIndex()
+        idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
         pixmaps = six.ensure_binary(self.pics[idx])
         print("debug: pixmaps:", pixmaps)
@@ -2931,7 +2781,6 @@ class myconfig(Screen, ConfigListScreen):
         self['key_green'] = Button(_('Save'))
         self['key_red'] = Button(_('Back'))
         self["key_blue"] = Button(_('Empty Cache'))
-        # self['key_blue'].hide()
         self['title'] = Label(title_plug)
         self["setupActions"] = ActionMap(['OkCancelActions',
                                           'DirectionActions',
@@ -3128,14 +2977,17 @@ class Playstream1(Screen):
         self['progresstext'] = StaticText()
         self["progress"].hide()
         self.downloading = False
-        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions', 'InfobarInstantRecord'], {'red': self.cancel,
-                                                                                                                        'green': self.okClicked,
-                                                                                                                        'back': self.cancel,
-                                                                                                                        'cancel': self.cancel,
-                                                                                                                        'rec': self.runRec,
-                                                                                                                        'instantRecord': self.runRec,
-                                                                                                                        'ShortRecord': self.runRec,
-                                                                                                                        'ok': self.okClicked}, -2)
+        self['setupActions'] = ActionMap(['SetupActions',
+                                          'ColorActions',
+                                          'TimerEditActions',
+                                          'InfobarInstantRecord'], {'red': self.cancel,
+                                                                    'green': self.okClicked,
+                                                                    'back': self.cancel,
+                                                                    'cancel': self.cancel,
+                                                                    'rec': self.runRec,
+                                                                    'instantRecord': self.runRec,
+                                                                    'ShortRecord': self.runRec,
+                                                                    'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
         self.desc = desc
@@ -3219,9 +3071,6 @@ class Playstream1(Screen):
         idx = self['list'].getSelectionIndex()
         self.name = self.names[idx]
         self.url = self.urls[idx]
-        # if "youtube" in str(self.url):
-            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            # return
         if "youtube" in str(self.url):
             desc = self.desc
             try:
@@ -3431,7 +3280,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global _session
         _session = session
         self.skinName = 'MoviePlayer'
-        # title = name
         streaml = False
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
@@ -3462,10 +3310,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                                                              'red': self.cicleStreamType,
                                                              'cancel': self.cancel,
                                                              'back': self.cancel}, -1)
-        # self.allowPiP = False
         self.service = None
-        # service = None
-        # self.pcip = 'None'
         self.name = Utils.decodeHtml(name)
         self.icount = 0
         url = url.replace(':', '%3a')
@@ -3518,33 +3363,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.new_aspect = temp
         self.setAspect(temp)
 
-    # def showinfo(self):
-        # sref = self.srefInit
-        # p = ServiceReference(sref)
-        # servicename = str(p.getServiceName())
-        # serviceurl = str(p.getPath())
-        # sTitle = ''
-        # sServiceref = ''
-        # try:
-            # if servicename is not None:
-                # sTitle = servicename
-            # else:
-                # sTitle = ''
-            # if serviceurl is not None:
-                # sServiceref = serviceurl
-            # else:
-                # sServiceref = ''
-            # currPlay = self.session.nav.getCurrentService()
-            # if currPlay:
-                # sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-                # sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-                # sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-                # message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec: ' + str(sTagAudioCodec)
-                # self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        # except:
-            # pass
-        # return
-
     def showIMDB(self):
         text_clear = self.name
         if Utils.is_tmdb:
@@ -3560,7 +3378,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = Utils.badcar(text_clear)
                 text = Utils.charRemove(text_clear)
-                # _session.open(imdb, text)
                 imdb(_session, text)
             except Exception as ex:
                 print("[XCF] imdb: ", str(ex))
@@ -3596,7 +3413,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(config.plugins.revolution.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-        if str(os.path.splitext(url)[-1]) == ".m3u8":
+        if str(splitext(url)[-1]) == ".m3u8":
             if self.servicetype == "1":
                 self.servicetype = "4097"
         # currentindex = 0
@@ -3668,20 +3485,23 @@ class plgnstrt(Screen):
         Screen.__init__(self, session)
         self.session = session
         skin = skin_path + '/Plgnstrt.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
+        with open(skin, 'r') as f:
+            self.skin = f.read()
+        print('self.skin: ', skin)
         f.close()
         self["poster"] = Pixmap()
         self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self['text'] = StaticText()
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'SetupActions'], {'ok': self.clsgo,
-                                                                                                              'cancel': self.clsgo,
-                                                                                                              'back': self.clsgo,
-                                                                                                              'red': self.clsgo,
-                                                                                                              'green': self.clsgo}, -1)
-        # self.onShown.append(self.checkDwnld)
+        self['list'] = StaticText()
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'DirectionActions',
+                                     'ColorActions',
+                                     'SetupActions'], {'ok': self.clsgo,
+                                                       'cancel': self.clsgo,
+                                                       'back': self.clsgo,
+                                                       'red': self.clsgo,
+                                                       'green': self.clsgo}, -1)
         self.onFirstExecBegin.append(self.loadDefaultImage)
         self.onLayoutFinish.append(self.checkDwnld)
 
@@ -3738,13 +3558,13 @@ class plgnstrt(Screen):
 
     def checkDwnld(self):
         self.icount = 0
-        self['text'].setText(_('\n\n\nCheck Connection wait please...'))
+        self['list'].setText(_('\n\n\nCheck Connection wait please...'))
         self.timer = eTimer()
-        self.timer.start(2000, 1)
         if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
+        self.timer.start(2000, 1)        
 
     def getinfo(self):
         continfo = _("==========       WELCOME     ============\n")
@@ -3770,12 +3590,12 @@ class plgnstrt(Screen):
 
     def OpenCheck(self):
         try:
-            self['text'].setText(self.getinfo())
+            self['list'].setText(self.getinfo())
         except:
-            self['text'].setText(_('\n\n' + 'Error downloading News!'))
+            self['list'].setText(_('\n\n' + 'Error downloading News!'))
 
     def error(self, error):
-        self['text'].setText(_('\n\n' + 'Server Off !') + '\n' + _('check SERVER in config'))
+        self['list'].setText(_('\n\n' + 'Server Off !') + '\n' + _('check SERVER in config'))
 
     def clsgo(self):
         self.session.openWithCallback(self.close, Revolmain)
@@ -3783,26 +3603,28 @@ class plgnstrt(Screen):
 
 def main(session, **kwargs):
     try:
-        if Utils.zCheckInternet(1):
-            try:
-                from . import Update
-                Update.upd_done()
-            except Exception as e:
-                print('error ', str(e))
-            if PY3:
-                session.open(Revolmain)
-            elif os.path.exists('/var/lib/dpkg/status'):
-                session.open(Revolmain)
-            else:
-                session.open(plgnstrt)
+        # from . import Utils
+        # if Utils.zCheckInternet(1):
+        try:
+            from . import Update
+            Update.upd_done()
+        except Exception as e:
+            print('error ', str(e))
+        import sys
+        PY3 = sys.version_info.major >= 3
+        if PY3:
+            session.open(Revolmain)
+        elif os.path.exists('/var/lib/dpkg/status'):
+            session.open(Revolmain)
         else:
-            from Screens.MessageBox import MessageBox
-            from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
+            session.open(plgnstrt)
+        # else:
+            # from Screens.MessageBox import MessageBox
+            # from Tools.Notifications import AddPopup
+            # AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
     except:
         import traceback
         traceback.print_exc()
-        pass
 
 
 def menu(menuid, **kwargs):
