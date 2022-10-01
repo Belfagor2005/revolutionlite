@@ -85,7 +85,7 @@ class rvRunningText(Renderer):
         self.mTimer = eTimer()
 
         try:
-            from boxbranding import getImageDistro, getImageVersion, getOEVersion
+            from boxbranding import getImageDistro, getImageVersion
             self.mTimer.callback.append(self.movingLoop)
         except:
             try:
@@ -93,7 +93,6 @@ class rvRunningText(Renderer):
                     self.mTimer_conn = self.mTimer.timeout.connect(self.movingLoop)
             except:
                 pass
-
 
 
     def preWidgetRemove(self, instance):
