@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: revolution\n"
-"POT-Creation-Date: 2021-09-18 15:15+0200\n"
+"POT-Creation-Date: 2022-10-02 21:07+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -13,191 +13,176 @@ msgstr ""
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:251
-msgid "IPTV(4097)"
+#: plugin.py:176
+msgid "ServiceMp3(4097)"
 msgstr ""
 
-#: plugin.py:252
-msgid "Dvb(1)"
+#: plugin.py:177
+msgid "Hardware(1)"
 msgstr ""
 
-#: plugin.py:253
-msgid "eServiceUri(8193)"
-msgstr ""
-
-#: plugin.py:257
+#: plugin.py:181
 msgid "Gstreamer(5001)"
 msgstr ""
 
-#: plugin.py:259
+#: plugin.py:183
 msgid "Exteplayer3(5002)"
 msgstr ""
 
-#: plugin.py:261
+#: plugin.py:185
 msgid "Streamlink(5002)"
 msgstr ""
 
-#: plugin.py:439 plugin.py:632 plugin.py:950 plugin.py:1205 plugin.py:1456
-#: plugin.py:1707 plugin.py:1962 plugin.py:2227 plugin.py:2487
+#: plugin.py:187
+msgid "eServiceUri(8193)"
+msgstr ""
+
+#: plugin.py:470 plugin.py:719 plugin.py:1046 plugin.py:1302 plugin.py:1559
+#: plugin.py:1815 plugin.py:2075 plugin.py:2345 plugin.py:2613
 msgid "Cache folder "
 msgstr ""
 
-#: plugin.py:444 plugin.py:630 plugin.py:948 plugin.py:1203 plugin.py:1454
-#: plugin.py:1705 plugin.py:1960 plugin.py:2225 plugin.py:2485
-msgid "Load selected filter list, please wait ..."
-msgstr "Carica l'elenco di filtri selezionato, attendi ..."
-
-#: plugin.py:445 plugin.py:2921
-msgid "Select"
-msgstr "Seleziona"
-
-#: plugin.py:446 plugin.py:2920
+#: plugin.py:475
 msgid "Exit"
 msgstr "Uscire"
 
-#: plugin.py:558
-msgid "Use my Plugin Freearhey"
-msgstr ""
-
-#: plugin.py:642 plugin.py:960 plugin.py:1215 plugin.py:1466 plugin.py:1717
-#: plugin.py:1972 plugin.py:2237 plugin.py:2497
-msgid "Download"
-msgstr ""
-
-#: plugin.py:643 plugin.py:961 plugin.py:1216 plugin.py:1467 plugin.py:1718
-#: plugin.py:1973 plugin.py:2238 plugin.py:2498 plugin.py:2739
-msgid "Back"
-msgstr "Indietro"
-
-#: plugin.py:788
+#: plugin.py:565 plugin.py:878
 msgid "Filter this category..."
 msgstr ""
 
-#: plugin.py:2730
-msgid "Config"
-msgstr "Config"
-
-#: plugin.py:2736
-msgid "Config Revolution"
+#: plugin.py:637
+msgid ""
+"freearhey Plugin Not Installed!!\n"
+"Use my Plugin Freearhey"
 msgstr ""
 
-#: plugin.py:2737
+#: plugin.py:725 plugin.py:1052 plugin.py:1308 plugin.py:1565 plugin.py:1821
+#: plugin.py:2081 plugin.py:2351 plugin.py:2619 plugin.py:2868 plugin.py:3060
+msgid "Back"
+msgstr "Indietro"
+
+#: plugin.py:2866
 msgid "Choice"
 msgstr "Scegli"
 
-#: plugin.py:2738
+#: plugin.py:2867
 msgid "Save"
 msgstr "Salva"
 
-#: plugin.py:2740
+#: plugin.py:2869
 msgid "Empty Cache"
 msgstr "Vuota Cache"
 
-#: plugin.py:2762 plugin.py:2771 plugin.py:2791
+#: plugin.py:2893 plugin.py:2899 plugin.py:2927
 msgid "Set the path to the Cache folder"
 msgstr "Configura percorso cache"
 
-#: plugin.py:2763 plugin.py:2772 plugin.py:2791
+#: plugin.py:2894 plugin.py:2900 plugin.py:2927
 msgid "Press Ok to select the folder containing the picons files"
 msgstr "Premere Ok per selezionare la cartella contenente i file picons"
 
-#: plugin.py:2768 plugin.py:2790
+#: plugin.py:2896 plugin.py:2926
 msgid "Set the path Movie folder"
 msgstr "Configura percorso Movie"
 
-#: plugin.py:2769 plugin.py:2790
-msgid "Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required"
-msgstr "Percorso Movie (es.: /media/hdd/movie), premere OK - è necessario riavviare Enigma"
+#: plugin.py:2897 plugin.py:2926
+msgid ""
+"Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required"
+msgstr ""
+"Percorso Movie (es.: /media/hdd/movie), premere OK - è necessario riavviare "
+"Enigma"
 
-#: plugin.py:2774 plugin.py:2792
+#: plugin.py:2902 plugin.py:2928
 msgid "Services Player Reference type"
 msgstr ""
 
-#: plugin.py:2775 plugin.py:2792
+#: plugin.py:2903 plugin.py:2928
 msgid "Configure Service Player Reference"
 msgstr ""
 
-#: plugin.py:2785
+#: plugin.py:2921
 #, python-format
 msgid ""
-"Config Panel Addon\n"
+"Config Revolution Panel\n"
 "Your current IP is %s"
 msgstr ""
-"Config Panel Addon\n"
-"Il tuo IP attuale è %s"
 
-#: plugin.py:2801
+#: plugin.py:2937
 msgid "All cache fold are empty!"
 msgstr "Cache Poster libera!"
 
-#: plugin.py:2817
+#: plugin.py:2953
 msgid "Settings saved correctly!"
 msgstr ""
 
-#: plugin.py:2840
+#: plugin.py:2976
 msgid "Choose Directory:"
 msgstr "Scegli cartella"
 
-#: plugin.py:2841
+#: plugin.py:2977
 msgid "Choose Directory"
 msgstr ""
 
-#: plugin.py:2897
+#: plugin.py:3034
 msgid "Really close without saving the settings?"
 msgstr "Uscire senza salvare le impostazioni?"
 
-#: plugin.py:2948
+#: plugin.py:3061
+msgid "Select"
+msgstr "Seleziona"
+
+#: plugin.py:3089
 msgid "You are already downloading!!!"
 msgstr "Stai già scaricando!!!"
 
-#: plugin.py:2952
+#: plugin.py:3093
 #, python-format
 msgid ""
 "DOWNLOAD VIDEO?\n"
 "%s"
 msgstr ""
 
-#: plugin.py:2955
+#: plugin.py:3096
 msgid "Only VOD Movie allowed or not .ext Filtered!!!"
 msgstr ""
 
-#: plugin.py:2977 plugin.py:2998
+#: plugin.py:3118 plugin.py:3138
 msgid "Download Failed!!!"
 msgstr ""
 
-#: plugin.py:3123
+#: plugin.py:3254
 msgid "Install Streamlink first"
 msgstr ""
 
-#: plugin.py:3298
+#: plugin.py:3422
 msgid "4:3 Letterbox"
 msgstr ""
 
-#: plugin.py:3299
+#: plugin.py:3423
 msgid "4:3 PanScan"
 msgstr ""
 
-#: plugin.py:3300
+#: plugin.py:3424
 msgid "16:9"
 msgstr ""
 
-#: plugin.py:3301
+#: plugin.py:3425
 msgid "16:9 always"
 msgstr ""
 
-#: plugin.py:3302
+#: plugin.py:3426
 msgid "16:10 Letterbox"
 msgstr ""
 
-#: plugin.py:3303
+#: plugin.py:3427
 msgid "16:10 PanScan"
 msgstr ""
 
-#: plugin.py:3304
+#: plugin.py:3428
 msgid "16:9 Letterbox"
 msgstr ""
 
-#: plugin.py:3519
+#: plugin.py:3651
 msgid ""
 "\n"
 "\n"
@@ -205,93 +190,107 @@ msgid ""
 "Check Connection wait please..."
 msgstr ""
 
-#: plugin.py:3528
+#: plugin.py:3660
 msgid "==========       WELCOME     ============\n"
 msgstr ""
 
-#: plugin.py:3529
+#: plugin.py:3661
 msgid "=========     SUPPORT ON:   ============\n"
 msgstr ""
 
-#: plugin.py:3530
+#: plugin.py:3662
 msgid "+WWW.TIVUSTREAM.COM - WWW.CORVOBOYS.COM+\n"
 msgstr ""
 
-#: plugin.py:3531
+#: plugin.py:3663
 msgid ""
 "http://t.me/tivustream\n"
 "\n"
 msgstr ""
 
-#: plugin.py:3532 plugin.py:3539 plugin.py:3546
+#: plugin.py:3664 plugin.py:3671 plugin.py:3678
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:3533
+#: plugin.py:3665
 msgid "NOTA BENE:\n"
 msgstr ""
 
-#: plugin.py:3534
-msgid "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
+#: plugin.py:3666
+msgid ""
+"Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
 msgstr ""
 
-#: plugin.py:3535
+#: plugin.py:3667
 msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
 msgstr ""
 
-#: plugin.py:3536
+#: plugin.py:3668
 msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
 msgstr ""
 
-#: plugin.py:3537
+#: plugin.py:3669
 msgid "non e' fonte di alcun stream/flusso.\n"
 msgstr ""
 
-#: plugin.py:3538
+#: plugin.py:3670
 msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
 msgstr ""
 
-#: plugin.py:3540
+#: plugin.py:3672
 msgid "DISCLAIMER: \n"
 msgstr ""
 
-#: plugin.py:3541
+#: plugin.py:3673
 msgid "The lists created at HOC contain addresses freely and freely found on\n"
 msgstr ""
 
-#: plugin.py:3542
+#: plugin.py:3674
 msgid "the net and not protected by subscription or subscription.\n"
 msgstr ""
 
-#: plugin.py:3543
+#: plugin.py:3675
 msgid "The structural reference server for projects released\n"
 msgstr ""
 
-#: plugin.py:3544
+#: plugin.py:3676
 msgid "is not a source of any stream/flow.\n"
 msgstr ""
 
-#: plugin.py:3545
+#: plugin.py:3677
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
 msgstr ""
 
-#: plugin.py:3553
+#: plugin.py:3685
 msgid ""
 "\n"
 "\n"
 "Error downloading News!"
 msgstr ""
 
-#: plugin.py:3556
+#: plugin.py:3688
 msgid ""
 "\n"
 "\n"
 "Server Off !"
 msgstr ""
 
-#: plugin.py:3556
+#: plugin.py:3688
 msgid "check SERVER in config"
 msgstr ""
+
+#~ msgid "Load selected filter list, please wait ..."
+#~ msgstr "Carica l'elenco di filtri selezionato, attendi ..."
+
+#~ msgid "Config"
+#~ msgstr "Config"
+
+#~ msgid ""
+#~ "Config Panel Addon\n"
+#~ "Your current IP is %s"
+#~ msgstr ""
+#~ "Config Panel Addon\n"
+#~ "Il tuo IP attuale è %s"
 
 #~ msgid "Restart"
 #~ msgstr "Riavviare"

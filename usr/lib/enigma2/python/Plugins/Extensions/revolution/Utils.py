@@ -1210,8 +1210,8 @@ def charRemove(text):
             "[",
             "]", ]
 
-    myreplace = text  #.lower()
-    for ch in char:  #.lower():
+    myreplace = text  # .lower()
+    for ch in char:  # .lower():
         # ch = ch  #.lower()
         if text == ch:
             myreplace = text.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()

@@ -3,10 +3,11 @@
 	<widget name="title" position="517,46" size="522,50" font="Regular;34" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5" />
 	<widget name="info" position="220,130" size="970,50" font="Regular;30" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
 	<widget name="pth" position="589,1003" size="584,44" font="Regular;30" halign="left" foregroundColor="#808080" backgroundColor="#000000" transparent="1" zPosition="5" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/img/tvs.png" alphatest="blend" position="1357,242" size="308,423" scale="1" zPosition="3" />
 	<widget name="poster" position="1357,242" size="308,423" backgroundColor="#30000000" transparent="1" borderWidth="3" borderColor="#00ffffff" alphatest="blend" zPosition="4" />
 	<widget source="desc" render="rvRunningText" position="226,766" size="962,220" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="#101010" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1" />
-	<eLabel position="1357,242" size="308,423" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
-	<eLabel position="226,766" size="962,220" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
+	<!-- <eLabel position="1357,242" size="308,423" backgroundColor="#30000000" zPosition="1" /> -->
+	<eLabel position="226,766" size="962,220" backgroundColor="#30000000" zPosition="1" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" position="-2,0" size="1920,1080" zPosition="1" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="220,40" size="282,60" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="220,110" size="970,8" alphatest="blend" zPosition="5" />
