@@ -288,7 +288,7 @@ def piconlocal(name):
         picolocal = 'romantico.png'
     elif 'horror' in name.lower():
         picolocal = 'horror.png'
-    elif 'music' in name.lower():
+    elif 'musica' in name.lower():
         picolocal = 'musical.png'
     elif 'guerra' in name.lower():
         picolocal = 'guerra.png'
@@ -354,8 +354,6 @@ def piconlocal(name):
         picolocal = 'news.png'
     elif 'piemonte' in name.lower():
         picolocal = 'regioni/piemonte.png'
-    elif 'pluto' in name.lower():
-        picolocal = 'plutotv.png'
     elif 'puglia' in name.lower():
         picolocal = 'regioni/puglia.png'
     elif 'rai' in name.lower():
@@ -364,8 +362,6 @@ def piconlocal(name):
         picolocal = 'relaxweb.png'
     elif 'relax' in name.lower():
         picolocal = 'relaxweb.png'
-    elif 'samsung' in name.lower():
-        picolocal = 'samsung.png'
     elif 'sardegna' in name.lower():
         picolocal = 'regioni/sardegna.png'
     elif 'sicilia' in name.lower():
@@ -392,6 +388,10 @@ def piconlocal(name):
         picolocal = 'fantasia.png'
     elif 'film' in name.lower():
         picolocal = 'movie.png'
+    elif 'plutotv' in name.lower():
+        picolocal = 'plutotv.png'
+    elif 'samsung' in name.lower():
+        picolocal = 'samsung.png'
     elif 'prev' in name.lower():
         picolocal = prevpng
     elif 'next' in name.lower():
@@ -792,9 +792,9 @@ class live_stream(Screen):
                 info = (y["items"][i]["info"])
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
-                # print("In live_stream name =", name)
+                print("In live_stream name =", name)
                 # print("In live_stream url =", url)
-                # print("In live_stream pic =", pic)
+                print("In live_stream pic =", pic)
                 # print("In live_stream info =", info)
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
@@ -958,6 +958,8 @@ class live_stream(Screen):
             pixmaps = str(piccons) + prevpng
         if 'tvseriesId' not in str(url):
             pixmaps = piconlocal(name)
+            if 'plutotv' in name.lower():
+                pixmaps = str(piccons) + 'plutotv.png'
             if os.path.exists(pixmaps):
                 self.downloadPic(None, pixmaps)
                 return
@@ -1134,9 +1136,9 @@ class video3(Screen):
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                # print("In Videos3 name =", name)
+                print("In Videos3 name =", name)
                 # print("In Videos3 url =", url)
-                # print("In Videos3 pic =", pic)
+                print("In Videos3 pic =", pic)
                 # print("In Videos3 info =", info)
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
@@ -1212,6 +1214,11 @@ class video3(Screen):
                 return
         if 'prev' in name.lower():
             pixmaps = str(piccons) + prevpng
+            if os.path.exists(pixmaps):
+                self.downloadPic(None, pixmaps)
+                return
+        if 'plutotv' in name.lower():
+            pixmaps = str(piccons) + 'plutotv.png'
             if os.path.exists(pixmaps):
                 self.downloadPic(None, pixmaps)
                 return
@@ -1389,9 +1396,9 @@ class nextvideo3(Screen):
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                # print("In nextVideos3 name =", name)
+                print("In nextVideos3 name =", name)
                 # print("In nextVideos3 url =", url)
-                # print("In nextVideos3 pic =", pic)
+                print("In nextVideos3 pic =", pic)
                 # print("In nextVideos3 info =", info)
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
@@ -1469,6 +1476,16 @@ class nextvideo3(Screen):
             if os.path.exists(pixmaps):
                 self.downloadPic(None, pixmaps)
                 return
+        if 'plutotv' in name.lower():
+            pixmaps = str(piccons) + 'plutotv.png'
+            if os.path.exists(pixmaps):
+                self.downloadPic(None, pixmaps)
+                return
+        # if 'samsung' in name.lower():
+            # pixmaps = str(piccons) + 'samsung.png'
+            # if os.path.exists(pixmaps):
+                # self.downloadPic(None, pixmaps)
+                # return
         # # pixmaps = six.ensure_binary(self.pics[idx])
         if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
             try:
@@ -1646,9 +1663,9 @@ class video4(Screen):
                 info = (y["items"][i]["info"])
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
-                # print("In video4 name =", name)
+                print("In video4 name =", name)
                 # print("In video4 url =", url)
-                # print("In video4 pic =", pic)
+                print("In video4 pic =", pic)
                 # print("In video4 info =", info)
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
@@ -1723,6 +1740,16 @@ class video4(Screen):
             if os.path.exists(pixmaps):
                 self.downloadPic(None, pixmaps)
                 return
+        if 'plutotv' in name.lower():
+            pixmaps = str(piccons) + 'plutotv.png'
+            if os.path.exists(pixmaps):
+                self.downloadPic(None, pixmaps)
+                return
+        # if 'samsung' in name.lower():
+            # pixmaps = str(piccons) + 'samsung.png'
+            # if os.path.exists(pixmaps):
+                # self.downloadPic(None, pixmaps)
+                # return
         # # pixmaps = six.ensure_binary(self.pics[idx])
         if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
             try:
@@ -1903,9 +1930,9 @@ class nextvideo4(Screen):
                 info = (y["items"][i]["info"])
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
-                # print("In nextvideo4 name =", name)
+                print("In nextvideo4 name =", name)
                 # print("In nextvideo4 url =", url)
-                # print("In nextvideo4 pic =", pic)
+                print("In nextvideo4 pic =", pic)
                 # print("In nextvideo4 info =", info)
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(url)
@@ -2162,9 +2189,9 @@ class video1(Screen):
                 info = Utils.checkStr(info)
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
-                # print("In Video1 name =", name)
+                print("In Video1 name =", name)
                 # print("In Video1 url =", url)
-                # print("In Video1 pic =", pic)
+                print("In Video1 pic =", pic)
                 # print("In Video1 info =", info)
                 self.urls.append(url)
                 self.pics.append(Utils.checkStr(pic))

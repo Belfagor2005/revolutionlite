@@ -410,7 +410,7 @@ def b64encoder(source):
 
 def b64decoder(s):
     """Add missing padding to string and return the decoded base64 string."""
-    import base64
+    # import base64
     s = str(s).strip()
     try:
         # return base64.b64decode(s)
@@ -1212,7 +1212,7 @@ def charRemove(text):
 
     myreplace = text  # .lower()
     for ch in char:  # .lower():
-        # ch = ch  #.lower()
+        # ch = ch  # .lower()
         if text == ch:
             myreplace = text.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
     print('myreplace: ', myreplace)
