@@ -5,7 +5,7 @@
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             24/09/2022               *
+*             10/10/2022               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -39,8 +39,8 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop
 # from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.Directories import SCOPE_PLUGINS, resolveFilename
-from Tools.Directories import fileExists
+from Tools.Directories import SCOPE_PLUGINS
+from Tools.Directories import resolveFilename, fileExists
 from Tools.Downloader import downloadWithProgress
 from enigma import RT_VALIGN_CENTER, RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
@@ -50,12 +50,14 @@ from enigma import eTimer
 from enigma import iPlayableService
 from os.path import splitext
 from twisted.web.client import downloadPage
-import json
 import os
 import re
-import six
-import ssl
 import sys
+import ssl
+import json
+import random
+import six
+
 from . import Utils
 
 PY3 = False
@@ -117,7 +119,7 @@ def logdata(name='', data=None):
 
 
 def getversioninfo():
-    currversion = '1.6'
+    currversion = '1.7'
     version_file = plugin_path + '/version'
     if os.path.exists(version_file):
         try:
@@ -221,7 +223,10 @@ nextpng = 'next.png'
 prevpng = 'prev.png'
 Path_Tmp = "/tmp"
 pictmp = Path_Tmp + "/poster.jpg"
+
 revol = config.plugins.revolution.cachefold.value.strip()
+
+
 
 if revol.endswith('\/\/'):
     revol = revol[:-1]
@@ -231,6 +236,7 @@ if not os.path.exists(revol):
     except OSError as e:
         print(('Error creating directory %s:\n%s') % (revol, str(e)))
 logdata("path picons: ", str(revol))
+
 if Utils.isFHD():
     skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('revolution'))
 else:
@@ -414,6 +420,7 @@ class rvList(MenuList):
 
 
 def rvListEntry(name, idx):
+
     res = [name]
     if 'radio' in name.lower():
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
@@ -426,10 +433,10 @@ def rvListEntry(name, idx):
     else:
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngs)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(50, 50), png=loadPNG(pngs)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngs)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(50, 50), png=loadPNG(pngs)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
@@ -692,6 +699,7 @@ class Revolmain(Screen):
             return
 
 
+
 class live_stream(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
         Screen.__init__(self, session)
@@ -710,6 +718,7 @@ class live_stream(Screen):
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
+
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
@@ -765,8 +774,11 @@ class live_stream(Screen):
             except Exception as ex:
                 print("[XCF] imdb: ", str(ex))
         else:
+
+
             text = Utils.badcar(text_clear)
             text = Utils.charRemove(text_clear)
+
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def readJsonFile(self, name, url, pic):
@@ -780,6 +792,14 @@ class live_stream(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
+
+
+
+
+
+
+
         i = 0
         while i < 100:
             try:
@@ -825,6 +845,7 @@ class live_stream(Screen):
         if i < 1:
             return
         idx = self['list'].getSelectionIndex()
+
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -961,7 +982,13 @@ class live_stream(Screen):
             if 'plutotv' in name.lower():
                 pixmaps = str(piccons) + 'plutotv.png'
             if os.path.exists(pixmaps):
+
+
+
                 self.downloadPic(None, pixmaps)
+
+
+
                 return
         # # pixmaps = six.ensure_binary(self.pics[idx])
         if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
@@ -1262,6 +1289,7 @@ class video3(Screen):
 
     def poster_resize(self, png):
         self["poster"].hide()
+
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
@@ -1290,6 +1318,7 @@ class nextvideo3(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
+
         self.setTitle(title_plug)
         self.list = []
         self['list'] = self.list
@@ -1298,14 +1327,26 @@ class nextvideo3(Screen):
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
+
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
+
+
+
+
         self['key_red'] = Button(_('Back'))
+
+
         self.name = name
         self.url = url
         self.pic = pic
+
+
+
+
+
         self.downloading = False
         self.currentList = 'list'
         self['title'] = Label(title_plug)
@@ -1324,6 +1365,7 @@ class nextvideo3(Screen):
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
+
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1333,6 +1375,7 @@ class nextvideo3(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
+
         if Utils.is_tmdb:
             try:
                 from Plugins.Extensions.TMBD.plugin import TMBD
@@ -1356,6 +1399,7 @@ class nextvideo3(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
+
         self.load_infos()
         self.load_poster()
 
@@ -1384,6 +1428,7 @@ class nextvideo3(Screen):
         y = json.loads(content)
         i = 0
         while i < 100:
+
             try:
                 print('In nextVideos3 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
@@ -1411,6 +1456,8 @@ class nextvideo3(Screen):
                 break
             showlist(self.names, self['list'])
 
+
+
     def okRun(self):
         i = len(self.names)
         print('iiiiii= ', i)
@@ -1418,8 +1465,6 @@ class nextvideo3(Screen):
             return
         idx = self['list'].getSelectionIndex()
         print('video1 idx: ', idx)
-        idx = self['list'].getSelectionIndex()
-        print('idx: ', idx)
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1433,6 +1478,7 @@ class nextvideo3(Screen):
     def cancel(self):
         global nextmodule
         nextmodule = 'Videos3'
+
         print('cancel nextvideos3 nextmodule ', nextmodule)
         self.close(None)
 
@@ -1463,8 +1509,10 @@ class nextvideo3(Screen):
             return
         idx = self['list'].getSelectionIndex()
         print('idx: ', idx)
+
         name = self.names[idx]
         # url = self.urls[idx]
+
         pixmaps = self.pics[idx]
         if 'next' in name.lower():
             pixmaps = str(piccons) + nextpng
@@ -1861,6 +1909,7 @@ class nextvideo4(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
+
         if Utils.is_tmdb:
             try:
                 from Plugins.Extensions.TMBD.plugin import TMBD
@@ -1884,6 +1933,7 @@ class nextvideo4(Screen):
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
+
         self.load_infos()
         self.load_poster()
 
@@ -2891,16 +2941,10 @@ class myconfig(Screen, ConfigListScreen):
         entry = str(self.getCurrentEntry())
         if entry == _('Set the path to the Cache folder'):
             self['description'].setText(_("Press Ok to select the folder containing the picons files"))
-            return
         if entry == _('Set the path Movie folder'):
             self['description'].setText(_("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required"))
-            return
-        if entry == _('Set the path to the Cache folder'):
-            self['description'].setText(_("Press Ok to select the folder containing the picons files"))
-            return
         if entry == _('Services Player Reference type'):
             self['description'].setText(_("Configure Service Player Reference"))
-            return
         return
 
     def paypal2(self):
@@ -2917,7 +2961,7 @@ class myconfig(Screen, ConfigListScreen):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
         currentip1 = open('/tmp/currentip', 'r')
         currentip = currentip1.read()
-        self['info'].setText(_('Config Revolution Panel\nYour current IP is %s') % currentip)
+        self['info'].setText(_('Settings Revolution\nYour current IP is %s') % currentip)
 
     def createSetup(self):
         self.editListEntry = None
@@ -2981,14 +3025,14 @@ class myconfig(Screen, ConfigListScreen):
              inhibitDirs=['/bin', '/boot', '/dev', '/home', '/lib', '/proc', '/run', '/sbin', '/sys', '/var'],
              minFree=15)
         except Exception as e:
-            print(('openDirectoryBrowser get failed: ', str(e)))
+            print('openDirectoryBrowser get failed: ', str(e))
 
     def openDirectoryBrowserCB(self, path):
         if path is not None:
             if self.setting == 'revol':
                 config.plugins.revolution.cachefold.setValue(path)
             if self.setting == 'moviefold':
-                config.plugins.revolution.revolution.setValue(path)
+                config.plugins.revolution.movie.setValue(path)
         return
 
     def KeyText(self):
@@ -3010,7 +3054,6 @@ class myconfig(Screen, ConfigListScreen):
             self.close(True)
 
     def changedEntry(self):
-        # sel = self['config'].getCurrent()
         for x in self.onChangedEntry:
             x()
         try:
@@ -3404,14 +3447,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.desc = desc
         self.state = self.STATE_PLAYING
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
-        # self.onLayoutFinish.append(self.cicleStreamType)
-        # self.onClose.append(self.cancel)
-        # self.onClose.append(self.__onClose)
         if '8088' in str(self.url):
-            # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
         else:
-            # self.onLayoutFinish.append(self.cicleStreamType)
             self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
 
@@ -3702,7 +3740,7 @@ def main(session, **kwargs):
         PY3 = sys.version_info.major >= 3
         if PY3:
             session.open(Revolmain)
-        elif os.path.exists('/var/lib/dpkg/status'):
+        if os.path.exists('/var/lib/dpkg/status'):
             session.open(Revolmain)
         else:
             session.open(plgnstrt)
@@ -3714,7 +3752,8 @@ def main(session, **kwargs):
 def menu(menuid, **kwargs):
     if menuid == 'mainmenu':
         return [(desc_plug, main, title_plug, 44)]
-    return []
+    else:
+        return []
 
 
 def mainmenu(session, **kwargs):
