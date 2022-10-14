@@ -2961,7 +2961,7 @@ class myconfig(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("Set the path to the Cache folder"), config.plugins.revolution.cachefold, _("Press Ok to select the folder containing the picons files")))
         self.list.append(getConfigListEntry(_('Services Player Reference type'), config.plugins.revolution.services, _("Configure Service Player Reference")))
         self["config"].list = self.list
-        self["config"].setList(self.list)
+        self["config"].l.setList(self.list)
         # self.setInfo()
 
     def cachedel(self):
