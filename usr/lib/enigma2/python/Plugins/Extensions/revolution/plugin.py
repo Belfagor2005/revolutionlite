@@ -433,11 +433,11 @@ def rvListEntry(name, idx):
     else:
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(80, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(80, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -544,7 +544,7 @@ class Revolmain(Screen):
         self.load_poster()
 
     def closerm(self):
-        Utils.deletetmp()
+        # Utils.deletetmp()
         self.close()
 
     def updateMenuList(self):
@@ -792,14 +792,6 @@ class live_stream(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
-
-
-
-
-
-
-
         i = 0
         while i < 100:
             try:
@@ -1289,7 +1281,6 @@ class video3(Screen):
 
     def poster_resize(self, png):
         self["poster"].hide()
-
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
