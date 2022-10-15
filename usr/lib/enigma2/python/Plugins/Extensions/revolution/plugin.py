@@ -718,7 +718,6 @@ class live_stream(Screen):
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
@@ -974,13 +973,7 @@ class live_stream(Screen):
             if 'plutotv' in name.lower():
                 pixmaps = str(piccons) + 'plutotv.png'
             if os.path.exists(pixmaps):
-
-
-
                 self.downloadPic(None, pixmaps)
-
-
-
                 return
         # # pixmaps = six.ensure_binary(self.pics[idx])
         if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
@@ -1309,7 +1302,6 @@ class nextvideo3(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
-
         self.setTitle(title_plug)
         self.list = []
         self['list'] = self.list
@@ -1318,26 +1310,14 @@ class nextvideo3(Screen):
         self['pth'] = Label('')
         self['pth'].setText(_('Cache folder ') + revol)
         self['desc'] = StaticText()
-
         self["poster"] = Pixmap()
         # self["poster"].hide()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-
-
-
-
         self['key_red'] = Button(_('Back'))
-
-
         self.name = name
         self.url = url
         self.pic = pic
-
-
-
-
-
         self.downloading = False
         self.currentList = 'list'
         self['title'] = Label(title_plug)
@@ -1356,7 +1336,6 @@ class nextvideo3(Screen):
         self.readJsonFile(name, url, pic)
         self.timer = eTimer()
         self.timer.start(1000, 1)
-
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1446,8 +1425,6 @@ class nextvideo3(Screen):
             except:
                 break
             showlist(self.names, self['list'])
-
-
 
     def okRun(self):
         i = len(self.names)

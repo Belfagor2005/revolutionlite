@@ -3,13 +3,12 @@
 	<widget name="title" position="444,8" size="650,56" font="Regular;34" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5" />
 	<widget name="info" position="146,86" size="646,60" font="Regular;20" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
 	<widget name="description" position="153,521" zPosition="4" size="634,80" font="Regular; 22" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="left" valign="center" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/main2.png" position="0,0" size="1280,720" zPosition="1" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main22.png" position="0,0" size="1280,720" zPosition="1" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="151,7" size="278,60" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="146,73" size="646,5" alphatest="blend" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="146,613" size="646,5" alphatest="blend" zPosition="5" />
-	
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/PayPal.png" position="994,73" size="156,75" zPosition="2" alphatest="on" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/hd/qr-codetvs.png" position="965,156" size="225,225" zPosition="2" alphatest="on" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/qr-codetvshd.png" position="965,156" size="220,220" zPosition="2" alphatest="on" />
 	<widget name="paypal" position="917,391" size="344,305" font="Regular;24" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<eLabel position="909,68" size="361,639" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
 	<!-- Menu List -->
