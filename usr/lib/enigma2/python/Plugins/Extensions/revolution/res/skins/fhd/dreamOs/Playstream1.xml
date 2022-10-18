@@ -1,4 +1,4 @@
-<!-- Skin FullHD1 10/05/2021 -->
+<!-- Skin FullHD1 01/10/2022 -->
 <screen name="Playstream1" position="0,0" size="1920,1080" title=".::REVOLUTION::.." backgroundColor="#FF000000" flags="wfNoBorder">
 	<widget source="Title" render="Label" position="230,7" size="640,110" font="Mmenu;102" foregroundColor="ltbluette" backgroundColor="#000000" transparent="1" zPosition="5" />
 	<eLabel position="230,120" size="810,3" backgroundColor="#303030" zPosition="4" />

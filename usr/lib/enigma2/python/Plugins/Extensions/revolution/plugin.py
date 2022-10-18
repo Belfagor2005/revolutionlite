@@ -208,11 +208,12 @@ currversion = getversioninfo()
 title_plug = 'Pro Lite V. %s' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
 ico_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/logo.png".format('revolution'))
-no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_cover.png".format('revolution'))
+# no_cover = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/no_cover.png".format('revolution'))
 res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/".format('revolution'))
 pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
 piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/img/".format('revolution'))
-imgjpg = ("nasa1.jpg", "nasa2.jpg", "nasa.jpg", "fulltop.jpg")
+imgjpg = ("nasa.jpg", "nasa1.jpg", "nasa2.jpg")
+no_cover = piccons + 'backg.png'
 piconlive = piccons + 'tv.png'
 piconmovie = piccons + 'cinema.png'
 piconseries = piccons + 'series.png'
@@ -434,10 +435,10 @@ def rvListEntry(name, idx):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(80, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(80, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -926,8 +927,11 @@ class live_stream(Screen):
             nextmodule = 'movie'
         if nextmodule == 'Videos1':
             nextmodule = 'series'
+        else:
+            nextmodule = 'revolmain'
         print('cancel nextmodule ', nextmodule)
-        self.close(None)
+        
+        self.close()
 
     def up(self):
         idx = self['list'].getSelectionIndex()
@@ -3660,28 +3664,28 @@ class plgnstrt(Screen):
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
-        self.timer.start(2000, 1)
+        self.timer.start(250, 1)
 
     def getinfo(self):
-        continfo = _("==========       WELCOME     ============\n")
-        continfo += _("=========     SUPPORT ON:   ============\n")
+        continfo = _("========       WELCOME     ==========\n")
+        continfo += _("=======     SUPPORT ON:   ==========\n")
         continfo += _("+WWW.TIVUSTREAM.COM - WWW.CORVOBOYS.COM+\n")
         continfo += _("http://t.me/tivustream\n\n")
-        continfo += _("========================================\n")
+        continfo += _("===================================\n")
         continfo += _("NOTA BENE:\n")
         continfo += _("Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n")
         continfo += _("trovati in rete e non protetti da sottoscrizione o abbonamento.\n")
         continfo += _("Il server di riferimento strutturale ai progetti rilasciati\n")
         continfo += _("non e' fonte di alcun stream/flusso.\n")
         continfo += _("Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n")
-        continfo += _("========================================\n")
+        continfo += _("===================================\n")
         continfo += _("DISCLAIMER: \n")
         continfo += _("The lists created at HOC contain addresses freely and freely found on\n")
         continfo += _("the net and not protected by subscription or subscription.\n")
         continfo += _("The structural reference server for projects released\n")
         continfo += _("is not a source of any stream/flow.\n")
         continfo += _("Absolutely PROHIBITED to use this lists without authorization\n")
-        continfo += _("========================================\n")
+        continfo += _("===================================\n")
         return continfo
 
     def OpenCheck(self):
@@ -3704,14 +3708,14 @@ def main(session, **kwargs):
             Update.upd_done()
         except Exception as e:
             print('error ', str(e))
-        import sys
-        PY3 = sys.version_info.major >= 3
-        if PY3:
-            session.open(Revolmain)
-        if os.path.exists('/var/lib/dpkg/status'):
-            session.open(Revolmain)
-        else:
-            session.open(plgnstrt)
+        # import sys
+        # PY3 = sys.version_info.major >= 3
+        # if PY3:
+            # session.open(Revolmain)
+        # if os.path.exists('/var/lib/dpkg/status'):
+        session.open(Revolmain)
+        # else:
+            # session.open(plgnstrt)
     except:
         import traceback
         traceback.print_exc()
