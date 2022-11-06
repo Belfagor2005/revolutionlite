@@ -268,6 +268,31 @@ REGEX = re.compile(r'([\(\[]).*?([\)\]])|'
                    r'\s(ч|ч\.|с\.|с)\s\d{1,3}.+|'
                    r'\d{1,3}(-я|-й|\sс-н).+|', re.DOTALL)
 
+def returnIMDB(text_clear):
+    TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+    IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    if TMDB:
+        try:
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text = decodeHtml(text_clear)
+            _session.open(TMBD.tmdbScreen, text, 0)
+        except Exception as ex:
+            print("[XCF] Tmdb: ", str(ex))
+        return True
+    elif IMDb:
+        try:
+            from Plugins.Extensions.IMDb.plugin import main as imdb
+            text = decodeHtml(text_clear)
+            imdb(_session, text)
+        except Exception as ex:
+            print("[XCF] imdb: ", str(ex))
+        return True
+    else:
+        text_clear = decodeHtml(text_clear)
+        _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        return True
+    return
+
 
 def piconlocal(name):
     picolocal = 'backg.png'
@@ -283,6 +308,8 @@ def piconlocal(name):
         picolocal = 'azione.png'
     elif 'dramma' in name.lower():
         picolocal = 'dramma.png'
+    elif 'family' in name.lower():
+        picolocal = 'family.png'        
     elif 'drama' in name.lower():
         picolocal = 'dramma.png'
     elif 'western' in name.lower():
@@ -519,26 +546,8 @@ class Revolmain(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -757,29 +766,8 @@ class live_stream(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-
-
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def readJsonFile(self, name, url, pic):
         global nextmodule
@@ -1090,26 +1078,8 @@ class video3(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -1349,27 +1319,8 @@ class nextvideo3(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -1617,26 +1568,8 @@ class video4(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -1881,27 +1814,8 @@ class nextvideo4(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -2141,26 +2055,8 @@ class video1(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -2409,26 +2305,8 @@ class nextvideo1(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -2672,26 +2550,8 @@ class video5(Screen):
             return
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -3460,27 +3320,14 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.setAspect(temp)
 
     def showIMDB(self):
-        text_clear = self.name
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        i = len(self.names)
+        print('iiiiii= ', i)
+        if i < 1:
+            return
+        idx = self['list'].getSelectionIndex()
+        text_clear = self.names[idx]
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def slinkPlay(self, url):
         name = self.name
