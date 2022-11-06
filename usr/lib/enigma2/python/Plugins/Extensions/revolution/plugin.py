@@ -87,6 +87,7 @@ global skin_path, revol, pngs, pngl, pngx, file_json, nextmodule, search, pngori
 
 search = False
 _session = None
+_firstStart = True
 UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
 UrlSvr = UrlSvr.replace('+', '')
 UrlLst = Utils.b64decoder(UrlSvr)
@@ -460,6 +461,7 @@ def rvListEntry(name, idx):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))
     else:
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
+    # pngs = piconlocal(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -3548,21 +3550,41 @@ class plgnstrt(Screen):
         self.session.openWithCallback(self.close, Revolmain)
 
 
-def main(session, **kwargs):
-    try:
+class AutoStartTimertvsl:
+
+    def __init__(self, session):
+        self.session = session
+        global _firstStart
+        print("*** running AutoStartTimertvsl ***")
+        if _firstStarttvsl:
+            self.runUpdate()
+
+    def runUpdate(self):
+        print("*** running update ***")
         try:
             from . import Update
             Update.upd_done()
+            _firstStarttvsl = False
+        except Exception as e:
+            print('error Fxy', str(e))
+
+def autostart(reason, session=None, **kwargs):
+    print("*** running autostart ***")
+    global autoStartTimertvsl
+    global _firstStarttvsl
+    if reason == 0:
+        if session is not None:
+            _firstStarttvsl = True
+            autoStartTimertvsl = AutoStartTimertvsl(session)
+    return
+
+
+def main(session, **kwargs):
+    try:
+        try:
+            session.open(Revolmain)
         except Exception as e:
             print('error ', str(e))
-        # import sys
-        # PY3 = sys.version_info.major >= 3
-        # if PY3:
-            # session.open(Revolmain)
-        # if os.path.exists('/var/lib/dpkg/status'):
-        session.open(Revolmain)
-        # else:
-            # session.open(plgnstrt)
     except:
         import traceback
         traceback.print_exc()
@@ -3583,5 +3605,7 @@ def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = res_plugin_path + 'pics/logo.png'
-    result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=ico_path, fnc=main)]
+    # result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=ico_path, fnc=main)]
+    result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
+              PluginDescriptor(name=desc_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     return result
