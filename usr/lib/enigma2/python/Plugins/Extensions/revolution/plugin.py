@@ -2967,7 +2967,7 @@ class Playstream1(Screen):
             return
         else:
             if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:  # or 'm3u8':
-                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=10, default=False)
+                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=5, default=False)
             else:
                 self.downloading = False
                 self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
@@ -2989,8 +2989,9 @@ class Playstream1(Screen):
                 self.downloading = True
                 self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
                 self.download.addProgress(self.downloadProgress)
-                self.download.start().addCallback(self.check).addErrback(self.showError)
+                self.download.start().addCallback(self.finish).addErrback(self.showError)
             else:
+                self['info'].setText(_('Download failed!'))
                 self.downloading = False
                 self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
         else:
@@ -2998,17 +2999,17 @@ class Playstream1(Screen):
 
     def downloadProgress(self, recvbytes, totalbytes):
         self["progress"].show()
+        self['info'].setText(_('Download...'))
         self['progress'].value = int(100 * recvbytes / float(totalbytes))
         self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (recvbytes / 1024, totalbytes / 1024, 100 * recvbytes / float(totalbytes))
+        print('progress = ok')
 
-    def check(self, fplug):
-        checkfile = self.in_tmp
-        if os.path.exists(checkfile):
-            # self.downloading = False
-            self['progresstext'].text = ''
-            self.progclear = 0
-            self['progress'].setValue(self.progclear)
-            self["progress"].hide()
+    def finish(self, fplug):
+        self['info'].setText(_('Please select ...'))
+        self['progresstext'].text = ''
+        self.progclear = 0
+        self['progress'].setValue(self.progclear)
+        self["progress"].hide()
 
     def showError(self, error):
         self.downloading = False
@@ -3058,7 +3059,7 @@ class Playstream1(Screen):
         elif idx == 1:
             # self.name = self.names[idx]
             self.url = self.urls[idx]
-            print('In playVideo url D=', self.url)
+            print('In playVideo runRec url D=', self.url)
             self.runRec()
             # return
         elif idx == 2:
