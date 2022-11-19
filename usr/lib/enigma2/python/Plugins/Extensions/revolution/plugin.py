@@ -795,8 +795,12 @@ class live_stream(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        # self.timer = eTimer()
-        # self.timer.start(200, 1)
+        self.timer = eTimer()
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1128,8 +1132,13 @@ class video3(Screen):
             self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
+        self.readJsonTimer.start(200, 1)    
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1294,10 +1303,10 @@ class video3(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -1391,7 +1400,11 @@ class nextvideo3(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1564,10 +1577,10 @@ class nextvideo3(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -1661,7 +1674,11 @@ class video4(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1831,10 +1848,11 @@ class video4(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
+
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -1922,7 +1940,11 @@ class nextvideo4(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2087,10 +2109,10 @@ class nextvideo4(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -2178,7 +2200,11 @@ class video1(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2352,10 +2378,10 @@ class video1(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -2443,7 +2469,11 @@ class nextvideo1(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2703,7 +2733,11 @@ class video5(Screen):
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
-        self.timer.start(1000, 1)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.left)
+        except:
+            self.timer.callback.append(self.left)        
+        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2791,6 +2825,7 @@ class video5(Screen):
         name = self.names[idx]
         url = self.urls[idx]
         desc = self.infos[idx]
+        pic = self.pics[idx]
         print('video5 nextmodule is: ', nextmodule)
         self.session.open(Playstream1, name, url, desc, pic)
 
@@ -2860,10 +2895,10 @@ class video5(Screen):
                 except Exception as ex:
                     print(str(ex))
                     print("Error: can't find file or read data")
-            return
         except Exception as ex:
             print(str(ex))
             print("Error: can't find file or read data")
+        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -3113,21 +3148,26 @@ class Playstream1(Screen):
         self['progresstext'] = StaticText()
         self["progress"].hide()
         self.downloading = False
-        self['actions'] = ActionMap(['OkCancelActions',
-                                     'ColorActions',
+        self['actions'] = ActionMap(['MoviePlayerActions',
+                                     'MovieSelectionActions',
+                                     'MediaPlayerActions',
                                      'EPGSelectActions',
-                                     'MenuActions',
-                                     'TimerEditActions',
-                                     'InfobarInstantRecord',
-                                     'DirectionActions'], {'red': self.cancel,
-                                                            'green': self.okClicked,
-                                                            'back': self.cancel,
-                                                            'cancel': self.cancel,
-                                                            'yellow': self.taskManager,
-                                                            'rec': self.runRec,
-                                                            'instantRecord': self.runRec,
-                                                            'ShortRecord': self.runRec,
-                                                            'ok': self.okClicked}, -2)
+                                     'MediaPlayerSeekActions',
+                                     'DirectionActions',
+                                     'ButtonSetupActions',
+                                     'OkCancelActions',
+                                     'InfobarShowHideActions',
+                                     'InfobarActions',
+                                     'InfobarSeekActions'], {'red': self.cancel,
+                                                           'green': self.okClicked,
+                                                           'back': self.cancel,
+                                                           'cancel': self.cancel,
+                                                           'leavePlayer': self.cancel,
+                                                           'yellow': self.taskManager,
+                                                           'rec': self.runRec,
+                                                           'instantRecord': self.runRec,
+                                                           'ShortRecord': self.runRec,
+                                                           'ok': self.okClicked}, -2)
         self.name1 = self.cleantitle(name)
         self.url = url
         self.desc = desc
@@ -3574,29 +3614,55 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+# class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+    # STATE_IDLE = 0
+    # STATE_PLAYING = 1
+    # STATE_PAUSED = 2
+    # ENABLE_RESUME_SUPPORT = True
+    # ALLOW_SUSPEND = True
+    # # screen_timeout = 4000
+class Playstream2(
+                  InfoBarBase,
+                  InfoBarMenu,
+                  InfoBarSeek,
+                  InfoBarAudioSelection,
+                  InfoBarSubtitleSupport,
+                  InfoBarNotifications,
+                  TvInfoBarShowHide,
+                  Screen
+                  ):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
-    # screen_timeout = 4000
+    screen_timeout = 5000
 
     def __init__(self, session, name, url, desc):
         global streaml
+        global _session
         Screen.__init__(self, session)
         self.session = session
-        global _session
-        _session = session
         self.skinName = 'MoviePlayer'
+        _session = session
         streaml = False
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self, steal_current_service=True)
-        TvInfoBarShowHide.__init__(self)
-        InfoBarSubtitleSupport.__init__(self)
-        InfoBarAudioSelection.__init__(self)
-        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
+        # InfoBarMenu.__init__(self)
+        # InfoBarNotifications.__init__(self)
+        # InfoBarBase.__init__(self, steal_current_service=True)
+        # TvInfoBarShowHide.__init__(self)
+        # InfoBarSubtitleSupport.__init__(self)
+        # InfoBarAudioSelection.__init__(self)
+        # InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
+        
+        for x in InfoBarBase, \
+                InfoBarMenu, \
+                InfoBarSeek, \
+                InfoBarAudioSelection, \
+                InfoBarSubtitleSupport, \
+                InfoBarNotifications, \
+                TvInfoBarShowHide:
+            x.__init__(self)
+        
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -3615,9 +3681,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                                                              'info': self.showIMDB,
                                                              'tv': self.cicleStreamType,
                                                              'stop': self.leavePlayer,
+                                                             'playpauseService': self.playpauseService,
                                                              'red': self.cicleStreamType,
                                                              'cancel': self.cancel,
-                                                             'back': self.cancel}, -1)
+                                                             'yellow': self.subtitles,
+                                                             'down': self.av,
+                                                             'back': self.leavePlayer}, -1)
         self.service = None
         self.name = Utils.decodeHtml(name)
         self.icount = 0
@@ -3667,12 +3736,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.setAspect(temp)
 
     def showIMDB(self):
-        i = len(self.names)
-        print('iiiiii= ', i)
-        if i < 1:
-            return
-        idx = self['list'].getSelectionIndex()
-        text_clear = self.names[idx]
+        text_clear = self.name
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
 
@@ -3698,6 +3762,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
+
+    def subtitles(self):
+        self.session.open(MessageBox, _('Please install script.module.SubSupport.'), MessageBox.TYPE_ERROR, timeout=10)
 
     def cicleStreamType(self):
         global streml
@@ -3757,11 +3824,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             self.doShow()
 
     def cancel(self):
-        SREF = self.srefInit
-        if os.path.isfile('/tmp/hls.avi'):
+        srefinit = self.srefInit
+        if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(SREF)
+        self.session.nav.playService(srefinit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
