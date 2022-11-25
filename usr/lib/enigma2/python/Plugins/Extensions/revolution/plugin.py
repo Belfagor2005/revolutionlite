@@ -61,6 +61,7 @@ import time
 from Screens.TaskView import JobView
 from Components.Task import Task, Condition, Job, job_manager
 from . import Utils
+from . import html_conv
 # from .Downloader import downloadWithProgress
 
 PY3 = False
@@ -71,7 +72,7 @@ try:
     from urllib.parse import urlparse
     # from urllib.parse import unquote
     # from urllib.request import urlretrieve
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request
     from urllib.error import URLError
     PY3 = True
     unicode = str
@@ -279,7 +280,7 @@ def returnIMDB(text_clear):
     if Utils.is_tmdb:
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = Utils.decodeHtml(text_clear)
+            text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as ex:
             print("[XCF] Tmdb: ", str(ex))
@@ -287,13 +288,13 @@ def returnIMDB(text_clear):
     elif Utils.is_imdb:
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = Utils.decodeHtml(text_clear)
+            text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as ex:
             print("[XCF] imdb: ", str(ex))
         return True
     else:
-        text_clear = Utils.decodeHtml(text_clear)
+        text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
@@ -464,11 +465,11 @@ class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if Utils.isFHD():
-            self.l.setItemHeight(54)
+            self.l.setItemHeight(60)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(54)
+            self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -547,6 +548,7 @@ class Revolmain(Screen):
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'EPGSelectActions',
+                                     'ButtonSetupActions',
                                      'MenuActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'green': self.okRun,
@@ -779,6 +781,7 @@ class live_stream(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -799,7 +802,7 @@ class live_stream(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         # self.onFirstExecBegin.append(self.download)
         self.onLayoutFinish.append(self.__layoutFinished)
@@ -1118,6 +1121,7 @@ class video3(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1132,12 +1136,12 @@ class video3(Screen):
             self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
-        self.readJsonTimer.start(200, 1)    
+        self.readJsonTimer.start(200, 1)
         self.timer = eTimer()
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1384,6 +1388,7 @@ class nextvideo3(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1403,7 +1408,7 @@ class nextvideo3(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1658,6 +1663,7 @@ class video4(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1677,7 +1683,7 @@ class video4(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -1924,6 +1930,7 @@ class nextvideo4(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1943,7 +1950,7 @@ class nextvideo4(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2184,6 +2191,7 @@ class video1(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2203,7 +2211,7 @@ class video1(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2453,6 +2461,7 @@ class nextvideo1(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2472,7 +2481,7 @@ class nextvideo1(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2717,6 +2726,7 @@ class video5(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
+                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2736,7 +2746,7 @@ class video5(Screen):
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
         except:
-            self.timer.callback.append(self.left)        
+            self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
@@ -2959,6 +2969,7 @@ class myconfig(Screen, ConfigListScreen):
         self["setupActions"] = ActionMap(['OkCancelActions',
                                           'DirectionActions',
                                           'ColorActions',
+                                          'ButtonSetupActions',
                                           'VirtualKeyboardActions'], {'cancel': self.extnok,
                                                                       'red': self.extnok,
                                                                       'back': self.close,
@@ -3221,7 +3232,7 @@ class Playstream1(Screen):
                 fileTitle = re.sub(r'_+', '_', fileTitle)
                 fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
                 fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
-                # fileTitle = Utils.decodeHtml(fileTitle)
+                # fileTitle = html_conv.html_unescape(fileTitle)
                 fileTitle = fileTitle.lower() + ext
                 self.in_tmp = Path_Movies + fileTitle
                 # self.urlm3u = self.urlm3u.replace("[", "").replace("]", "")
@@ -3653,7 +3664,7 @@ class Playstream2(
         # InfoBarSubtitleSupport.__init__(self)
         # InfoBarAudioSelection.__init__(self)
         # InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        
+
         for x in InfoBarBase, \
                 InfoBarMenu, \
                 InfoBarSeek, \
@@ -3662,7 +3673,7 @@ class Playstream2(
                 InfoBarNotifications, \
                 TvInfoBarShowHide:
             x.__init__(self)
-        
+
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -3674,6 +3685,7 @@ class Playstream2(
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
                                      'ColorActions',
+                                     'ButtonSetupActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
@@ -3688,7 +3700,7 @@ class Playstream2(
                                                              'down': self.av,
                                                              'back': self.leavePlayer}, -1)
         self.service = None
-        self.name = Utils.decodeHtml(name)
+        self.name = html_conv.html_unescape(name)
         self.icount = 0
         url = url.replace(':', '%3a')
         self.url = url
@@ -3974,6 +3986,7 @@ class StreamTasks(Screen):
         self["key_green"] = Label(_("Remove"))
         self["key_red"] = Label(_("Close"))
         self['actions'] = ActionMap(['OkCancelActions',
+                                     'ButtonSetupActions',
                                      'SleepTimerEditorActions',
                                      'ColorActions'], {"ok": self.keyOK,
                                                        "esc": self.keyClose,
@@ -4295,7 +4308,6 @@ def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = res_plugin_path + 'pics/logo.png'
-    # result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=ico_path, fnc=main)]
     result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
               PluginDescriptor(name=desc_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     return result
