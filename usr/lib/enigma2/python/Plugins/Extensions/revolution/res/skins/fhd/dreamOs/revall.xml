@@ -4,7 +4,7 @@
 	<widget name="info" position="220,130" size="970,50" font="Regular;30" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
 	<widget name="pth" position="589,1003" size="584,44" font="Regular;30" halign="left" foregroundColor="#808080" backgroundColor="#000000" transparent="1" zPosition="5" />
 	<widget name="poster" position="1250,150" size="420,588" alphatest="blend" scale="1" zPosition="3" />
-	<ePixmap position="1250,150" size="420,588" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/img/tvposter.png" zPosition="2" scale="1" />
+	<!-- <ePixmap position="1250,150" size="420,588" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/img/tvposter.png" zPosition="2" scale="1" /> -->
 	<widget source="desc" render="rvRunningText" position="226,766" size="962,220" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="#101010" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1" />
 	<eLabel position="226,766" size="962,220" backgroundColor="#30000000" zPosition="1" />	
 	<eLabel position="1357,242" size="308,423" backgroundColor="#30000000" zPosition="1" />

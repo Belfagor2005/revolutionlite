@@ -11,7 +11,8 @@
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-from .__init__ import _
+# from .__init__ import _
+from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
@@ -42,7 +43,8 @@ from Screens.Standby import TryQuitMainloop
 from Tools.Directories import SCOPE_PLUGINS
 from Tools.Directories import resolveFilename, fileExists
 from Tools.Downloader import downloadWithProgress
-from enigma import RT_VALIGN_CENTER, RT_HALIGN_LEFT
+from enigma import RT_VALIGN_CENTER
+from enigma import RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad, loadPNG, gFont, gPixmapPtr
 from enigma import eServiceReference
@@ -3170,15 +3172,15 @@ class Playstream1(Screen):
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'red': self.cancel,
-                                                           'green': self.okClicked,
-                                                           'back': self.cancel,
-                                                           'cancel': self.cancel,
-                                                           'leavePlayer': self.cancel,
-                                                           'yellow': self.taskManager,
-                                                           'rec': self.runRec,
-                                                           'instantRecord': self.runRec,
-                                                           'ShortRecord': self.runRec,
-                                                           'ok': self.okClicked}, -2)
+                                                             'green': self.okClicked,
+                                                             'back': self.cancel,
+                                                             'cancel': self.cancel,
+                                                             'leavePlayer': self.cancel,
+                                                             'yellow': self.taskManager,
+                                                             'rec': self.runRec,
+                                                             'instantRecord': self.runRec,
+                                                             'ShortRecord': self.runRec,
+                                                             'ok': self.okClicked}, -2)
         self.name1 = self.cleantitle(name)
         self.url = url
         self.desc = desc
