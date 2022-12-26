@@ -821,8 +821,9 @@ class live_stream(Screen):
 
     def readJsonFile(self):
         global nextmodule
+        referer = 'https://tivustream.website'
         url = self.url
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         # if six.PY3:
             # content = six.ensure_str(content)
         print('live_stream content B =', content)
@@ -1184,8 +1185,9 @@ class video3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1448,12 +1450,13 @@ class nextvideo3(Screen):
             print(currentindex)
 
     def readJsonFile(self):
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("nextVideos3 content A =", content)
@@ -1723,12 +1726,13 @@ class video4(Screen):
 
     def readJsonFile(self):
         global nextmodule
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("content Video4 =", content)
@@ -1991,12 +1995,13 @@ class nextvideo4(Screen):
 
     def readJsonFile(self):
         global nextmodule
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
@@ -2251,12 +2256,13 @@ class video1(Screen):
 
     def readJsonFile(self):
         global nextmodule
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("content Video1 =", content)
@@ -2521,12 +2527,13 @@ class nextvideo1(Screen):
 
     def readJsonFile(self):
         global nextmodule
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("content nextvideo1 =", content)
@@ -2785,12 +2792,13 @@ class video5(Screen):
             print(currentindex)
 
     def readJsonFile(self):
-        url = self.url
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        content = Utils.ReadUrl2(url)
+        referer = 'https://tivustream.website'
+        url = self.url
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         print("content A =", content)
