@@ -4,47 +4,49 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*           thank's Pcd                *
 *             10/10/2022               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-# from .__init__ import _
+# from Screens.VirtualKeyBoard import VirtualKeyBoard
+from . import Utils
 from . import _
+from . import html_conv
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText
 from Components.MultiContent import MultiContentEntryPixmapAlphaTest
+from Components.MultiContent import MultiContentEntryText
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.Progress import Progress
 from Components.Sources.StaticText import StaticText
-from Components.config import config, ConfigEnableDisable
-from Components.config import ConfigYesNo, ConfigSelection
-from Components.config import getConfigListEntry
+from Components.Task import Task, Condition, Job, job_manager
 from Components.config import ConfigDirectory, ConfigSubsection
+from Components.config import ConfigYesNo, ConfigSelection
+from Components.config import config, ConfigEnableDisable
+from Components.config import getConfigListEntry
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
 from Screens.InfoBarGenerics import InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
+from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop
-# from Screens.VirtualKeyBoard import VirtualKeyBoard
+from Screens.TaskView import JobView
 from Tools.Directories import SCOPE_PLUGINS
 from Tools.Directories import resolveFilename, fileExists
 from Tools.Downloader import downloadWithProgress
-from enigma import RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT
+from enigma import RT_VALIGN_CENTER
 from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad, loadPNG, gFont, gPixmapPtr
 from enigma import eServiceReference
@@ -52,18 +54,14 @@ from enigma import eTimer
 from enigma import iPlayableService
 from os.path import splitext
 from twisted.web.client import downloadPage
-import os
-import re
-import sys
-import ssl
 import json
+import os
 import random
+import re
 import six
+import ssl
+import sys
 import time
-from Screens.TaskView import JobView
-from Components.Task import Task, Condition, Job, job_manager
-from . import Utils
-from . import html_conv
 # from .Downloader import downloadWithProgress
 
 PY3 = False
@@ -467,11 +465,11 @@ class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if Utils.isFHD():
-            self.l.setItemHeight(60)
-            textfont = int(34)
+            self.l.setItemHeight(50)
+            textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(50)
+            self.l.setItemHeight(30)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -491,11 +489,11 @@ def rvListEntry(name, idx):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
     # pngs = piconlocal(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(30, 30), png=loadPNG(pngs)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -821,17 +819,16 @@ class live_stream(Screen):
 
     def readJsonFile(self):
         global nextmodule
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         # if six.PY3:
             # content = six.ensure_str(content)
-        print('live_stream content B =', content)
         y = json.loads(content)
-        self.names = []
-        self.urls = []
-        self.pics = []
-        self.infos = []
         i = 0
         while i < 100:
             try:
@@ -1459,7 +1456,6 @@ class nextvideo3(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("nextVideos3 content A =", content)
         y = json.loads(content)
         i = 0
         while i < 100:
@@ -1735,7 +1731,6 @@ class video4(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("content Video4 =", content)
         y = json.loads(content)
         # print("y =", y)
         # print('In video4 y["items"] =', y["items"])
@@ -2004,7 +1999,6 @@ class nextvideo4(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("content A =", content)
         y = json.loads(content)
         # print("y =", y)
         # print('In nextvideo4 y["items"] =', y["items"])
@@ -2265,7 +2259,6 @@ class video1(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("content Video1 =", content)
         y = json.loads(content)
         # print("y =", y)
         # print('In Video1 y["items"] =', y["items"])
@@ -2536,7 +2529,6 @@ class nextvideo1(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("content nextvideo1 =", content)
         y = json.loads(content)
         # print("y =", y)
         # print('In nextvideo1 y["items"] =', y["items"])
@@ -2801,7 +2793,6 @@ class video5(Screen):
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
-        print("content A =", content)
         y = json.loads(content)
         # print("y =", y)
         # print('In video5 y["items"] =', y["items"])
@@ -3363,73 +3354,70 @@ class Playstream1(Screen):
         idx = self['list'].getSelectionIndex()
         self.name = self.names[idx]
         self.url = self.urls[idx]
-        if "youtube" in str(self.url):
-            desc = self.desc
-            try:
-                from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl_opts = {'format': 'bestaudio/best'}
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl = YoutubeDL(ydl_opts)
-                ydl.add_default_info_extractors()
-                result = ydl.extract_info(self.url, download=False)
-                self.url = result["url"]
-            except:
-                pass
-            self.session.open(Playstream2, self.name, self.url, desc)
-        if idx == 0:
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            print('In playVideo url D=', self.url)
-            self.play()
-        elif idx == 1:
-            # self.name = self.names[idx]
-            self.url = self.urls[idx]
-            print('In playVideo runRec url D=', self.url)
-            self.runRec()
-            # return
-        elif idx == 2:
-            print('In playVideo url B=', self.url)
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            try:
-                os.remove('/tmp/hls.avi')
-            except:
-                pass
-            header = ''
-            cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
-            print('In playVideo cmd =', cmd)
-            os.system(cmd)
-            os.system('sleep 3')
-            self.url = '/tmp/hls.avi'
-            self.play()
-        elif idx == 3:
-            print('In playVideo url A=', self.url)
-            url = self.url
-            try:
-                os.remove('/tmp/hls.avi')
-            except:
-                pass
-            cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/tsclient.py" "' + url + '" "1" + &'
-            print('hls cmd = ', cmd)
-            os.system(cmd)
-            os.system('sleep 3')
-            self.url = '/tmp/hls.avi'
-            self.name = self.names[idx]
-            self.play()
-        else:
-            if idx == 4:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
+        if idx != '':
+            if "youtube" in str(self.url):
+                desc = self.desc
+                try:
+                    from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl_opts = {'format': 'bestaudio/best'}
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl = YoutubeDL(ydl_opts)
+                    ydl.add_default_info_extractors()
+                    result = ydl.extract_info(self.url, download=False)
+                    self.url = result["url"]
+                except:
+                    pass
+                self.session.open(Playstream2, self.name, self.url, desc)
+            if idx == 0:
                 print('In playVideo url D=', self.url)
-                self.play2()
-        # else:
-            # self.name = self.names[idx]
-            # self.url = self.urls[idx]
-            # print('In playVideo url D=', self.url)
-            # self.play()
+                self.play()
+            elif idx == 1:
+                # self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo runRec url D=', self.url)
+                self.runRec()
+                # return
+            elif idx == 2:
+                print('In playVideo url B=', self.url)
+                try:
+                    os.remove('/tmp/hls.avi')
+                except:
+                    pass
+                header = ''
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
+                print('In playVideo cmd =', cmd)
+                os.system(cmd)
+                os.system('sleep 3')
+                self.url = '/tmp/hls.avi'
+                self.play()
+            elif idx == 3:
+                print('In playVideo url A=', self.url)
+                url = self.url
+                try:
+                    os.remove('/tmp/hls.avi')
+                except:
+                    pass
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/tsclient.py" "' + url + '" "1" + &'
+                print('hls cmd = ', cmd)
+                os.system(cmd)
+                os.system('sleep 3')
+                self.url = '/tmp/hls.avi'
+                self.name = self.names[idx]
+                self.play()
+            else:
+                if idx == 4:
+                    self.name = self.names[idx]
+                    self.url = self.urls[idx]
+                    print('In playVideo url D=', self.url)
+                    self.play2()
+            # else:
+                # self.name = self.names[idx]
+                # self.url = self.urls[idx]
+                # print('In playVideo url D=', self.url)
+                # self.play()
         return
 
     def playfile(self, serverint):
@@ -3711,9 +3699,7 @@ class Playstream2(
                                                              'back': self.leavePlayer}, -1)
         self.service = None
         self.name = html_conv.html_unescape(name)
-        self.icount = 0
-        url = url.replace(':', '%3a')
-        self.url = url
+        self.url = url  # .replace(':', '%3a')
         self.desc = desc
         self.state = self.STATE_PLAYING
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -3846,11 +3832,10 @@ class Playstream2(
             self.doShow()
 
     def cancel(self):
-        srefinit = self.srefInit
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(srefinit)
+        self.session.nav.playService(self.srefInit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
