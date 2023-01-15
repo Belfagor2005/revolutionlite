@@ -75,9 +75,9 @@ try:
     from urllib.request import urlopen, Request
     from urllib.error import URLError
     PY3 = True
-    unicode = str
-    unichr = chr
-    long = int
+    # unicode = str
+    # unichr = chr
+    # long = int
 except ImportError:
     from urlparse import urlparse
     # from urllib import urlretrieve
@@ -300,6 +300,13 @@ def returnIMDB(text_clear):
     return
 
 
+def paypal():
+    conthelp = "If you like what I do you\n"
+    conthelp += "can contribute with a coffee\n"
+    conthelp += "scan the qr code and donate € 1.00"
+    return conthelp
+
+
 def piconlocal(name):
     picolocal = 'backg.png'
     if 'tv' in name.lower():
@@ -461,6 +468,15 @@ def piconlocal(name):
     return name
 
 
+EXTRAD = "radio", "radyo", "mix", "fm", "kbit", "rap", "metal", "alternative"
+EXTXXX = "adult", "xxx"
+EXTCAM = "webcam", "webcams"
+EXTMUS = "music", "mtv", "deluxe", "djing", "fashion", "kiss", "mpeg", "sluhay", "stingray", "techno", "viva", "country", "vevo"
+EXTSPOR = "spor", "boxing", "racing", "fight", "golf", "knock", "harley", "futbool", "motor", "nba", "nfl", "bull", "poker", "billiar", "fite"
+EXTRLX = "relax", "nature", "escape"
+EXTMOV = "movie", "film"
+
+
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
@@ -475,18 +491,26 @@ class rvList(MenuList):
 
 
 def rvListEntry(name, idx):
-
     res = [name]
-    if 'radio' in name.lower():
+    pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
+    if any(s in name.lower() for s in EXTRAD):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
-    elif 'webcam' in name.lower():
+    elif any(s in name.lower() for s in EXTCAM):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('revolution'))
-    elif 'music' in name.lower():
+    elif any(s in name.lower() for s in EXTMUS):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('revolution'))
-    elif 'sport' in name.lower():
+    elif any(s in name.lower() for s in EXTSPOR):
         pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))
-    else:
-        pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
+    # if 'radio' in name.lower():
+        # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/radio.png".format('revolution'))
+    # elif 'webcam' in name.lower():
+        # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/webcam.png".format('revolution'))
+    # elif 'music' in name.lower():
+        # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/music.png".format('revolution'))
+    # elif 'sport' in name.lower():
+        # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/sport.png".format('revolution'))
+    # else:
+        # pngs = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/tv.png".format('revolution'))
     # pngs = piconlocal(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngs)))
@@ -2998,15 +3022,9 @@ class myconfig(Screen, ConfigListScreen):
             self['description'].setText(_("Configure Service Player Reference"))
         return
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
         if not os.path.exists('/tmp/currentip'):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
