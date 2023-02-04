@@ -929,7 +929,7 @@ class live_stream(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-
+                    name = cleanName(name)
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
 
@@ -942,7 +942,7 @@ class live_stream(Screen):
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
-                name = cleanName(name)
+                
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1172,8 +1172,15 @@ class video6(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
         self.list = []
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
@@ -1391,9 +1398,9 @@ class video6(Screen):
         try:
             if fileExists(png):
                 self.poster_resize(no_cover)
-        except Exception as ex:
+        except Exception as e:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(e)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -1673,6 +1680,10 @@ class nextvideo1(Screen):
         _session = session
         self.setup_title = ('HOME REVOLUTION')
         self.list = []
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []        
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
@@ -3369,7 +3380,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             'cancel': self.cancel,
             'back': self.cancel
         }, -1)
-
         self.allowPiP = False
         self.service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
@@ -3449,7 +3459,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def cicleStreamType(self):
         global streaml
-        # streaml = False
         from itertools import cycle, islice
         self.servicetype = str(cfg.services.value)
         print('servicetype1: ', self.servicetype)
@@ -3482,14 +3491,14 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
+    # def keyNumberGlobal(self, number):
+        # self['text'].number(number)
 
-    def keyLeft(self):
-        self['text'].left()
+    # def keyLeft(self):
+        # self['text'].left()
 
-    def keyRight(self):
-        self['text'].right()
+    # def keyRight(self):
+        # self['text'].right()
 
     def showVideoInfo(self):
         if self.shown:
