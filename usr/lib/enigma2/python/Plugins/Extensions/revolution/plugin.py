@@ -4,7 +4,7 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*             31/01/2023               *
+*             08/02/2023               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -54,7 +54,6 @@ from os.path import splitext
 from twisted.web.client import downloadPage
 import json
 import os
-# import random
 import re
 import six
 import ssl
@@ -256,6 +255,7 @@ def piconlocal(name):
         ["umbria", "regioni/umbria"],
         ["veneto", "regioni/veneto"],
         ["aosta", "regioni/valledaosta"],
+
         ["mediaset", "mediaset"],
         ["nazionali", "nazionali"],
         ["news", "news"],
@@ -367,7 +367,6 @@ print('Path Cache: ', Path_Cache)
 
 
 def cleanName(name):
-    # name = name.strip()
     # filter out non-allowed characters
     non_allowed_characters = "/.\\:*?<>|\""
     name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
@@ -457,8 +456,6 @@ class Revolmain(Screen):
         self['info'].setText('Select')
         self['key_red'] = Button(_('Exit'))
         self.currentList = 'list'
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
         self.names = []
         self.urls = []
         self.pics = []
@@ -856,9 +853,7 @@ class live_stream(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
+        self["poster"].hide()
         self['key_red'] = Button(_('Back'))
         self.names = []
         self.urls = []
@@ -917,8 +912,8 @@ class live_stream(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
-        # if PY3:
-            # content = six.ensure_str(content)
+        if PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i < 100:
@@ -942,7 +937,7 @@ class live_stream(Screen):
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
-                
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1093,24 +1088,31 @@ class live_stream(Screen):
             name = self.names[idx]
             url = self.urls[idx]
             pixmaps = self.pics[idx]
-            if 'next' in name.lower():
-                pixmaps = str(piccons) + nextpng
-            if 'prev' in name.lower():
-                pixmaps = str(piccons) + prevpng
-            if 'tvseriesId' not in str(url):
+            # pixmaps = six.ensure_binary(self.pics[idx])
+
+            # if 'next' in name.lower():
+                # pixmaps = str(piccons) + nextpng
+            # if 'prev' in name.lower():
+                # pixmaps = str(piccons) + prevpng
+            # if 'series' not in str(url):
+                # pixmaps = piconlocal(name)
+            # if 'plutotv' in name.lower():
+                # pixmaps = str(piccons) + 'plutotv.png'
+            # if os.path.exists(pixmaps):
+                # self.downloadPic(None, pixmaps)
+                # return
+            if 'series' not in str(url):
                 pixmaps = piconlocal(name)
-                if 'plutotv' in name.lower():
-                    pixmaps = str(piccons) + 'plutotv.png'
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps t:", pixmaps)
                     # print("debug pixmaps t:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -1122,7 +1124,6 @@ class live_stream(Screen):
                         downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 except Exception as e:
                     print(e)
-            return
         except Exception as e:
             print(e)
 
@@ -1130,8 +1131,8 @@ class live_stream(Screen):
         if os.path.exists(pictmp):
             try:
                 self.poster_resize(pictmp)
-            except Exception as e:
-                print("* error ** %s" % e)
+            except Exception as ex:
+                print("* error ** %s" % ex)
                 pass
 
     def downloadError(self, png):
@@ -1188,10 +1189,7 @@ class video6(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -1352,8 +1350,8 @@ class video6(Screen):
                 return
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
-            # url = self.urls[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1364,13 +1362,13 @@ class video6(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps e:", pixmaps)
                     # print("debug pixmaps e:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -1384,7 +1382,6 @@ class video6(Screen):
                     print(e)
         except Exception as e:
             print(e)
-        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -1426,6 +1423,9 @@ class nextvideo3(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
         self.list = []
         self['list'] = self.list
@@ -1435,10 +1435,7 @@ class nextvideo3(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -1590,6 +1587,7 @@ class nextvideo3(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1600,23 +1598,18 @@ class nextvideo3(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            if 'plutotv' in name.lower():
-                pixmaps = str(piccons) + 'plutotv.png'
-                if os.path.exists(pixmaps):
-                    self.downloadPic(None, pixmaps)
-                    return
-            # if 'samsung' in name.lower():
-                # pixmaps = str(piccons) + 'samsung.png'
+            # if 'plutotv' in name.lower():
+                # pixmaps = str(piccons) + 'plutotv.png'
                 # if os.path.exists(pixmaps):
                     # self.downloadPic(None, pixmaps)
                     # return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps p:", pixmaps)
                     # print("debug pixmaps p:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -1630,7 +1623,6 @@ class nextvideo3(Screen):
                     print(e)
         except Exception as e:
             print(e)
-        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -1678,12 +1670,15 @@ class nextvideo1(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
         self.list = []
         self.names = []
         self.urls = []
         self.pics = []
-        self.infos = []        
+        self.infos = []
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
@@ -1691,10 +1686,7 @@ class nextvideo1(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -1855,6 +1847,7 @@ class nextvideo1(Screen):
             name = self.names[idx]
             # url = self.urls[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1865,13 +1858,13 @@ class nextvideo1(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps z:", pixmaps)
                     # print("debug pixmaps z:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -1883,7 +1876,6 @@ class nextvideo1(Screen):
                         downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 except Exception as e:
                     print(e)
-            return
         except Exception as e:
             print(e)
 
@@ -1927,7 +1919,14 @@ class video3(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         self.list = []
         self['list'] = self.list
         self['list'] = rvList([])
@@ -1936,10 +1935,7 @@ class video3(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -2093,6 +2089,7 @@ class video3(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2103,18 +2100,18 @@ class video3(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            if 'plutotv' in name.lower():
-                pixmaps = str(piccons) + 'plutotv.png'
-                if os.path.exists(pixmaps):
-                    self.downloadPic(None, pixmaps)
-                    return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
+            # if 'plutotv' in name.lower():
+                # pixmaps = str(piccons) + 'plutotv.png'
+                # if os.path.exists(pixmaps):
+                    # self.downloadPic(None, pixmaps)
+                    # return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps s:", pixmaps)
                     # print("debug pixmaps s:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -2128,7 +2125,6 @@ class video3(Screen):
                     print(e)
         except Exception as e:
             print(e)
-        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -2176,8 +2172,15 @@ class video4(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
         self.list = []
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
@@ -2185,10 +2188,7 @@ class video4(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -2274,8 +2274,6 @@ class video4(Screen):
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
 
-
-
                 if "thumbnail" in y["items"][i]:
                     pic = str(y["items"][i]["thumbnail"])
 
@@ -2343,6 +2341,7 @@ class video4(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2353,23 +2352,18 @@ class video4(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            if 'plutotv' in name.lower():
-                pixmaps = str(piccons) + 'plutotv.png'
-                if os.path.exists(pixmaps):
-                    self.downloadPic(None, pixmaps)
-                    return
-            # if 'samsung' in name.lower():
-                # pixmaps = str(piccons) + 'samsung.png'
+            # if 'plutotv' in name.lower():
+                # pixmaps = str(piccons) + 'plutotv.png'
                 # if os.path.exists(pixmaps):
                     # self.downloadPic(None, pixmaps)
                     # return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps x:", pixmaps)
                     # print("debug pixmaps x:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -2381,10 +2375,8 @@ class video4(Screen):
                         downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 except Exception as e:
                     print(e)
-
         except Exception as e:
             print(e)
-        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -2426,7 +2418,14 @@ class nextvideo4(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         self.list = []
         self['list'] = self.list
         self['list'] = rvList([])
@@ -2435,10 +2434,7 @@ class nextvideo4(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -2592,6 +2588,7 @@ class nextvideo4(Screen):
             name = self.names[idx]
             # url = self.urls[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2602,13 +2599,13 @@ class nextvideo4(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps y:", pixmaps)
                     # print("debug pixmaps y:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -2663,7 +2660,14 @@ class video5(Screen):
         self.session = session
         global _session
         _session = session
+        skin = os.path.join(skin_path, 'revall.xml')
+        with open(skin, 'r') as f:
+            self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
         self.list = []
         self['list'] = self.list
         self['list'] = rvList([])
@@ -2672,10 +2676,7 @@ class video5(Screen):
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
-        # self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        # self['key_red'] = Button(_('Back'))
+        self['key_red'] = Button(_('Back'))
         self.name = name
         self.url = url
         self.pic = pic
@@ -2822,6 +2823,7 @@ class video5(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
+            # pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2832,13 +2834,13 @@ class video5(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # # pixmaps = six.ensure_binary(self.pics[idx])
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    if PY3:
-                        pixmaps = six.ensure_binary(self.pics[idx])
+                    # if PY3:
+                        # pixmaps = six.ensure_binary(self.pics[idx])
                     # print("debug pixmaps q:", pixmaps)
                     # print("debug pixmaps q:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -2852,7 +2854,6 @@ class video5(Screen):
                     print(e)
         except Exception as e:
             print(e)
-        return
 
     def downloadPic(self, data, pictmp):
         if os.path.exists(pictmp):
@@ -3184,22 +3185,22 @@ class Playstream1(Screen):
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-            if "youtube" in str(self.url):
-                desc = self.desc
-                try:
-                    from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
-                    '''
-                    ydl_opts = {'format': 'best'}
-                    ydl_opts = {'format': 'bestaudio/best'}
-                    '''
-                    ydl_opts = {'format': 'best'}
-                    ydl = YoutubeDL(ydl_opts)
-                    ydl.add_default_info_extractors()
-                    result = ydl.extract_info(self.url, download=False)
-                    self.url = result["url"]
-                except:
-                    pass
-                self.session.open(Playstream2, self.name, self.url, desc)
+            # if "youtube" in str(self.url):
+                # desc = self.desc
+                # try:
+                    # from Plugins.Extensions.revolution.youtube_dl import YoutubeDL
+                    # '''
+                    # ydl_opts = {'format': 'best'}
+                    # ydl_opts = {'format': 'bestaudio/best'}
+                    # '''
+                    # ydl_opts = {'format': 'best'}
+                    # ydl = YoutubeDL(ydl_opts)
+                    # ydl.add_default_info_extractors()
+                    # result = ydl.extract_info(self.url, download=False)
+                    # self.url = result["url"]
+                # except:
+                    # pass
+                # self.session.open(Playstream2, self.name, self.url, desc)
             if idx == 0:
                 print('In playVideo url D=', self.url)
                 self.play()
@@ -3275,9 +3276,7 @@ class Playstream1(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            # idx = self['list'].getSelectionIndex()
-            # pixmaps = six.ensure_binary(self.pics[idx])
-            pixmaps = self.pic
+            pixmaps = self.pic  # six.ensure_binary(self.pic])
             if str(res_plugin_path) in pixmaps:
                 self.downloadPic(None, pixmaps)
                 return
@@ -3287,6 +3286,7 @@ class Playstream1(Screen):
                         # pixmaps = six.ensure_binary(self.pic)
                     # print("debug pixmaps t:", pixmaps)
                     # print("debug pixmaps t:", type(pixmaps))
+                    pixmaps = Utils.checkRedirect(pixmaps)
                     if pixmaps.startswith(b"https") and sslverify:
                         parsed_uri = urlparse(pixmaps)
                         domain = parsed_uri.hostname
@@ -3298,7 +3298,6 @@ class Playstream1(Screen):
                         downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
                 except Exception as e:
                     print(e)
-            return
         except Exception as e:
             print(e)
 
@@ -3537,8 +3536,8 @@ class plgnstrt(Screen):
             self.skin = f.read()
         self["poster"] = Pixmap()
         self["poster"].hide()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
+        # self.picload = ePicLoad()
+        # self.scale = AVSwitch().getFramebufferScale()
         self['list'] = StaticText()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'DirectionActions',
@@ -3748,7 +3747,6 @@ class StreamTasks(Screen):
         current = self["movielist"].getCurrent()
         path = Path_Movies
         desc = 'local'
-        # pic = ''
         if current:
             if current[0] == "movie":
                 if file1 is True:
@@ -3777,16 +3775,13 @@ class StreamTasks(Screen):
     def message1(self):
         current = self["movielist"].getCurrent()
         sel = Path_Movies + current[1]
-        # sel2 = self.pth + current[1]
         dom = sel
-        # dom2 = sel2
         self.session.openWithCallback(self.callMyMsg1, MessageBox, _("Do you want to remove %s ?") % dom, MessageBox.TYPE_YESNO, timeout=15, default=False)
 
     def callMyMsg1(self, result):
         if result:
             current = self["movielist"].getCurrent()
             sel = Path_Movies + current[1]
-            # sel2 = self.pth + current[1]
             from os.path import exists as file_exists
             if file_exists(sel):
                 if self.Timer:
