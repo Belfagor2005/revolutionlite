@@ -18,8 +18,8 @@ from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import ConfigDirectory, ConfigSubsection
 from Components.config import ConfigYesNo, ConfigSelection
+from Components.config import getConfigListEntry, ConfigText, configfile
 from Components.config import config, ConfigEnableDisable
-from Components.config import getConfigListEntry, configfile
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -347,7 +347,7 @@ if os.path.exists("/usr/bin/apt-get"):
 config.plugins.revolution = ConfigSubsection()
 cfg = config.plugins.revolution
 cfg.services = ConfigSelection(default='4097', choices=modechoices)
-cfg.cachefold = ConfigDirectory("/media/hdd", False)
+cfg.cachefold = ConfigDirectory(default='/media/hdd')
 
 cfg.movie = ConfigDirectory("/media/hdd/movie")
 try:
@@ -377,7 +377,7 @@ logdata("path picons: ", str(Path_Cache))
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
-    if TMDB:
+    if os.path.exists(TMDB):
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
             text = html_conv.html_unescape(text_clear)
@@ -385,7 +385,7 @@ def returnIMDB(text_clear):
         except Exception as e:
             print("[XCF] Tmdb: ", str(e))
         return True
-    elif IMDb:
+    elif os.path.exists(IMDb):
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
             text = html_conv.html_unescape(text_clear)
@@ -397,7 +397,6 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
-    # return
 
 
 def paypal():
@@ -3525,7 +3524,7 @@ class plgnstrt(Screen):
         return
 
     def image_downloaded(self):
-        pngori = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/fulltop.jpg".format('revolution'))
+        pngori = os.path.join(THISPLUG, 'res/pics/fulltop.jpg')
         if os.path.exists(pngori):
             try:
                 self.poster_resize(pngori)
@@ -3536,7 +3535,7 @@ class plgnstrt(Screen):
         import random
         print("*** failure *** %s" % failure)
         global pngori
-        fldpng = '/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/'
+        fldpng = os.path.join(THISPLUG, 'res/pics/')
         npj = random.choice(imgjpg)
         pngori = fldpng + npj
         self.poster_resize(pngori)
