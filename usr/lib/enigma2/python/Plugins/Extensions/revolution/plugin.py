@@ -1343,7 +1343,7 @@ class video6(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1576,7 +1576,7 @@ class nextvideo3(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1834,7 +1834,7 @@ class nextvideo1(Screen):
             name = self.names[idx]
             # url = self.urls[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2074,7 +2074,7 @@ class video3(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2240,6 +2240,7 @@ class video4(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
+        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2260,8 +2261,9 @@ class video4(Screen):
                 if "thumbnail" in y["items"][i]:
                     pic = str(y["items"][i]["thumbnail"])
 
-                if _('serie') not in self.name.lower():
-                    pic = piconlocal(name)
+                # test on dream one
+                # if _('serie') not in self.name.lower():
+                    # pic = piconlocal(name)
 
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
@@ -2324,7 +2326,7 @@ class video4(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2480,10 +2482,10 @@ class nextvideo4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
+        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2568,7 +2570,7 @@ class nextvideo4(Screen):
             name = self.names[idx]
             # url = self.urls[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -2721,6 +2723,7 @@ class video5(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
+        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2801,7 +2804,7 @@ class video5(Screen):
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
-            # pixmaps = six.ensure_binary(self.pics[idx])
+            pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -3029,66 +3032,58 @@ class Playstream1(Screen):
             if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:
                 self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=5, default=False)
             else:
-                self.downloading = False
                 self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
 
     def download_m3u(self, result):
         if result:
-            if 'm3u8' not in self.urlm3u:
-                path = urlparse(self.urlm3u).path
-                ext = splitext(path)[1]
-                if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
-                    ext = '.mp4'
-                fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
-                fileTitle = re.sub(r' ', '_', fileTitle)
-                fileTitle = re.sub(r'_+', '_', fileTitle)
-                fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
-                fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
-                fileTitle = fileTitle.lower() + ext
-                self.in_tmp = os.path.join(Path_Movies, fileTitle)
-                self.downloading = True
+            # if 'm3u8' not in self.urlm3u:
+            path = urlparse(self.urlm3u).path
+            ext = splitext(path)[1]
+            if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
+                ext = '.mp4'
+            fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
+            fileTitle = re.sub(r' ', '_', fileTitle)
+            fileTitle = re.sub(r'_+', '_', fileTitle)
+            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
+            fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
+            fileTitle = fileTitle.lower() + ext
+            self.in_tmp = os.path.join(Path_Movies, fileTitle)
+            self.downloading = True
 
-                try:
-                    '''
-                    # self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
-                    # self.download.addProgress(self.downloadProgress)
-                    # self.download.start().addCallback(self.finish).addErrback(self.showError)
+            try:
+                '''
+                # self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
+                # self.download.addProgress(self.downloadProgress)
+                # self.download.start().addCallback(self.finish).addErrback(self.showError)
 
-                    # useragent = "--header='User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'"
-                    # WGET = '/usr/bin/wget'
-                    # if Utils.DreamOS():
-                        # WGET = '/usr/bin/wget --no-check-certificate'
-                    # cmd = WGET + " %s -c '%s' -O '%s'" % (useragent, self.urlm3u, self.in_tmp)
-                    # cmd2 = WGET + " -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
-                    '''
-                    f = open(self.in_tmp, 'wb')
-                    f.close()
+                # useragent = "--header='User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'"
+                # WGET = '/usr/bin/wget'
+                # if Utils.DreamOS():
+                    # WGET = '/usr/bin/wget --no-check-certificate'
+                # cmd = WGET + " %s -c '%s' -O '%s'" % (useragent, self.urlm3u, self.in_tmp)
+                # cmd2 = WGET + " -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
+                '''
+                f = open(self.in_tmp, 'wb')
+                f.close()
 
-                    cmd = "wget -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
-                    if "https" in str(self.urlm3u):
-                        cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
+                cmd = "wget -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
+                if "https" in str(self.urlm3u):
+                    cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
 
-                    # try:
-                    # print('cmd = ', cmd)
-                    job_manager.AddJob(downloadJob(self, cmd, self.in_tmp, fileTitle))
-                    '''
-                    # except:
-                        # print('cmd2 = ', cmd2)
-                        # job_manager.AddJob(downloadJob(self, cmd2, self.in_tmp, fileTitle))
-                    '''
-                    pmovies = True
-                    # print('self url is : ', self.urlm3u)
-                    # print('url type: ', type(self.urlm3u))
-                    # self.LastJobView()
-                except URLError as e:
-                    # print("Download failed !!\n%s" % e)
-                    self.session.openWithCallback(self.ImageDownloadCB, MessageBox, _("Download Failed !!") + "\n%s" % e, type=MessageBox.TYPE_ERROR)
-                    self.downloading = False
-                    pmovies = False
-            else:
-                self['info'].setText(_('Download failed!\nType m3u8'))
+                # try:
+                # print('cmd = ', cmd)
+                job_manager.AddJob(downloadJob(self, cmd, self.in_tmp, fileTitle))
+                '''
+                # except:
+                    # print('cmd2 = ', cmd2)
+                    # job_manager.AddJob(downloadJob(self, cmd2, self.in_tmp, fileTitle))
+                '''
+                pmovies = True
+            except URLError as e:
+                # print("Download failed !!\n%s" % e)
+                self.session.openWithCallback(self.ImageDownloadCB, MessageBox, _("Download Failed !!") + "\n%s" % e, type=MessageBox.TYPE_ERROR)
                 self.downloading = False
-                self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+                pmovies = False
         else:
             self.downloading = False
 
@@ -3100,7 +3095,6 @@ class Playstream1(Screen):
             self.close()
             return
         if len(job_manager.failed_jobs) == 0:
-            # self.flashWithPostFlashActionMode = 'online'
             self.LastJobView()
         else:
             self.downloading = False
@@ -3122,9 +3116,7 @@ class Playstream1(Screen):
         self["progress"].hide()
         if os.path.exists(self.dest):
             self['info'].setText(_('File Downloaded ...'))
-            self.downloading = False
-        else:
-            self.downloading = False
+        self.downloading = False
 
     def showError(self, error):
         self.downloading = False
@@ -3482,8 +3474,6 @@ class plgnstrt(Screen):
             self.skin = f.read()
         self["poster"] = Pixmap()
         self["poster"].hide()
-        # self.picload = ePicLoad()
-        # self.scale = AVSwitch().getFramebufferScale()
         self['list'] = StaticText()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'DirectionActions',
@@ -3768,12 +3758,6 @@ class downloadJob(Job):
 
     def download_finished(self, filename, filmtitle):
         self.createMetaFile(filename, filmtitle)
-
-
-# class downloadJob(Job):
-    # def __init__(self, url, filename, file):
-        # Job.__init__(self, _("Downloading %s") % file)
-        # downloadTask(self, url, filename)
 
 
 class DownloaderPostcondition(Condition):

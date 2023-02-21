@@ -1,6 +1,6 @@
 <!-- Skin FullHD1 01/10/2022 -->
 <screen name="Playstream1" position="0,0" size="1920,1080" title=".::REVOLUTION::.." backgroundColor="#FF000000" flags="wfNoBorder">
-	<widget source="Title" render="Label" position="230,7" size="640,110" font="Regular;90" foregroundColor="#0000ff" backgroundColor="#000000" transparent="1" zPosition="5" />
+	<widget source="Title" render="Label" position="230,7" size="640,110" font="Regular;50" foregroundColor="#0000ff" backgroundColor="#000000" transparent="1" zPosition="5" />
 	<eLabel position="230,120" size="810,3" backgroundColor="#303030" zPosition="4" />
 	<ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" zPosition="-1" />
 	<eLabel position="230,960" size="810,3" backgroundColor="#303030" zPosition="4" />

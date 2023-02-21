@@ -911,7 +911,7 @@ def ReadUrl(url):
     except:
         CONTEXT = None
 
-    TIMEOUT_URL = 15
+    TIMEOUT_URL = 10
     print('ReadUrl1:\n  url = %s' % url)
     try:
         req = urllib2.Request(url)
