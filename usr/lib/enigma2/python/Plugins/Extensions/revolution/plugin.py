@@ -4,7 +4,7 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*             14/02/2023               *
+*             09/03/2023               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -136,19 +136,16 @@ pictmp = Path_Tmp + "/poster.jpg"
 title_plug = 'Pro Lite V. %s' % currversion
 desc_plug = 'TivuStream Pro Revolution Lite'
 ico_path = os.path.join(THISPLUG, 'logo.png')
-# no_cover = os.path.join(THISPLUG, 'no_cover.png')
 res_plugin_path = os.path.join(THISPLUG, 'res/')
 pngori = os.path.join(THISPLUG, 'res/pics/fulltop.jpg')
 piccons = os.path.join(THISPLUG, 'res/img/')
 imgjpg = ("nasa.jpg", "nasa1.jpg", "nasa2.jpg")
 no_cover = piccons + 'backg.png'
-pmovies = False
 piconinter = piccons + 'inter.png'
 piconlive = piccons + 'tv.png'
 piconmovie = piccons + 'cinema.png'
 piconsearch = piccons + 'search.png'
 piconseries = piccons + 'series.png'
-# pixmaps = piccons + 'backg.png'
 nextpng = 'next.png'
 prevpng = 'prev.png'
 
@@ -448,7 +445,6 @@ class Revolmain(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        # self.idx = 0
         self.menulist = []
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['OkCancelActions',
@@ -477,7 +473,6 @@ class Revolmain(Screen):
         self.load_poster()
 
     def closerm(self):
-        # Utils.deletetmp()
         self.close()
 
     def updateMenuList(self):
@@ -613,7 +608,6 @@ class Revolmain(Screen):
     def filterChannels(self, result):
         if result:
             global search
-            # search = False
             pic = self.picx
             name = str(result)
             url = self.urlx + str(result)
@@ -853,7 +847,6 @@ class live_stream(Screen):
         self.type = self.name
         self.downloading = False
         self.currentList = 'list'
-        # self.idx = 0
         self['title'] = Label(title_plug)
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
@@ -869,7 +862,6 @@ class live_stream(Screen):
                                                            'epg': self.showIMDB,
                                                            'info': self.showIMDB,
                                                            'cancel': self.cancel}, -2)
-        # self.readJsonFile(name, url, pic)
         self.readJsonTimer = eTimer()
         try:
             self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
@@ -885,7 +877,6 @@ class live_stream(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -908,6 +899,7 @@ class live_stream(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ''
             try:
                 if 'movie' in nextmodule:
                     nextmodule = "Videos4"
@@ -916,8 +908,10 @@ class live_stream(Screen):
                     self.pics.append(str(piconsearch))
                     self.infos.append(str('Search Movies'))
                     i += 1
+
                 if 'live' in nextmodule:
                     nextmodule = "Videos3"
+
                 if 'series' in nextmodule:
                     nextmodule = 'Videos1'
                 print('=====================')
@@ -928,7 +922,7 @@ class live_stream(Screen):
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
+
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
 
@@ -950,20 +944,6 @@ class live_stream(Screen):
             except Exception as e:
                 print(e)
                 break
-            # if 'movie' in nextmodule:
-                # nextmodule = "Videos4"
-                # self.names.append('Search')
-                # self.urls.append("https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=")
-                # self.pics.append(str(piconsearch))
-                # self.infos.append(str('Search Movies'))
-                # i += 1
-            # if 'live' in nextmodule:
-                # nextmodule = "Videos3"
-            # if 'series' in nextmodule:
-                # nextmodule = 'Videos1'
-            # print('=====================')
-            # print(nextmodule)
-            # print('=====================')
         showlist(self.names, self['list'])
 
     def okRun(self):
@@ -1013,7 +993,6 @@ class live_stream(Screen):
             name = str(result)
             url = self.urlx + str(result)
             try:
-                # if nextmodule == 'Videos4':
                 search = True
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
 
@@ -1041,10 +1020,6 @@ class live_stream(Screen):
                 self['desc'].setText(info)
         except Exception as e:
             print(e)
-
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
 
     def cancel(self):
         global nextmodule
@@ -1104,9 +1079,6 @@ class live_stream(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -1138,7 +1110,6 @@ class live_stream(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara((size.width(),
                               size.height(),
                               self.scale[0],
@@ -1215,7 +1186,6 @@ class video6(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -1236,10 +1206,6 @@ class video6(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         global nextmodule
         self.names = []
@@ -1258,12 +1224,12 @@ class video6(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ''
             try:
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1310,7 +1276,6 @@ class video6(Screen):
                 return
 
     def cancel(self):
-        # search == False
         global nextmodule
         nextmodule = 'Videos1'
         self.close(None)
@@ -1359,8 +1324,6 @@ class video6(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -1392,7 +1355,6 @@ class video6(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if Utils.DreamOS():
             self.picload.startDecode(png, False)
@@ -1459,7 +1421,6 @@ class nextvideo3(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -1480,10 +1441,6 @@ class nextvideo3(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         self.names = []
         self.urls = []
@@ -1500,12 +1457,12 @@ class nextvideo3(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ''
             try:
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1587,19 +1544,11 @@ class nextvideo3(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # if 'plutotv' in name.lower():
-                # pixmaps = str(piccons) + 'plutotv.png'
-                # if os.path.exists(pixmaps):
-                    # self.downloadPic(None, pixmaps)
-                    # return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -1631,7 +1580,6 @@ class nextvideo3(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara((size.width(),
                               size.height(),
                               self.scale[0],
@@ -1708,7 +1656,6 @@ class nextvideo1(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -1729,10 +1676,6 @@ class nextvideo1(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         global nextmodule
         self.names = []
@@ -1750,12 +1693,12 @@ class nextvideo1(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ''
             try:
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
 
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
@@ -1832,7 +1775,6 @@ class nextvideo1(Screen):
                 return
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
-            # url = self.urls[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
@@ -1850,8 +1792,6 @@ class nextvideo1(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -1883,7 +1823,6 @@ class nextvideo1(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if Utils.DreamOS():
             self.picload.startDecode(png, False)
@@ -1954,7 +1893,6 @@ class video3(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -1974,10 +1912,6 @@ class video3(Screen):
                 self['desc'].setText(info)
         except Exception as e:
             print(e)
-
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
 
     def readJsonFile(self):
         self.names = []
@@ -2085,19 +2019,11 @@ class video3(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # if 'plutotv' in name.lower():
-                # pixmaps = str(piccons) + 'plutotv.png'
-                # if os.path.exists(pixmaps):
-                    # self.downloadPic(None, pixmaps)
-                    # return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -2129,7 +2055,6 @@ class video3(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara((size.width(),
                               size.height(),
                               self.scale[0],
@@ -2206,7 +2131,6 @@ class video4(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -2227,10 +2151,6 @@ class video4(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         global nextmodule
         self.names = []
@@ -2240,7 +2160,6 @@ class video4(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
-        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2249,12 +2168,13 @@ class video4(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ''
             try:
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
+
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
 
@@ -2337,18 +2257,11 @@ class video4(Screen):
                 if os.path.exists(pixmaps):
                     self.downloadPic(None, pixmaps)
                     return
-            # if 'plutotv' in name.lower():
-                # pixmaps = str(piccons) + 'plutotv.png'
-                # if os.path.exists(pixmaps):
-                    # self.downloadPic(None, pixmaps)
-                    # return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -2380,7 +2293,6 @@ class video4(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if Utils.DreamOS():
             self.picload.startDecode(png, False)
@@ -2451,7 +2363,6 @@ class nextvideo4(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -2472,10 +2383,6 @@ class nextvideo4(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         global nextmodule
         self.names = []
@@ -2485,7 +2392,6 @@ class nextvideo4(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
-        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2499,7 +2405,6 @@ class nextvideo4(Screen):
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
 
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
@@ -2517,7 +2422,7 @@ class nextvideo4(Screen):
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
             except Exception as e:
-                print(e)
+                print('nextVideos4: ', e)
                 break
             nextmodule = "Videos4"
         showlist(self.names, self['list'])
@@ -2568,7 +2473,6 @@ class nextvideo4(Screen):
                 return
             idx = self['list'].getSelectionIndex()
             name = self.names[idx]
-            # url = self.urls[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
             if 'next' in name.lower():
@@ -2586,8 +2490,6 @@ class nextvideo4(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -2619,7 +2521,6 @@ class nextvideo4(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        # if self.picload:
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if Utils.DreamOS():
             self.picload.startDecode(png, False)
@@ -2690,7 +2591,6 @@ class video5(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        # idx = self.index
         idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
@@ -2711,10 +2611,6 @@ class video5(Screen):
         except Exception as e:
             print(e)
 
-    def selectionChanged(self):
-        if self['list'].getCurrent():
-            idx = self['list'].getIndex()
-
     def readJsonFile(self):
         self.names = []
         self.urls = []
@@ -2723,7 +2619,6 @@ class video5(Screen):
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
-        # content = Utils.AdultUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2732,12 +2627,13 @@ class video5(Screen):
             name = self.name
             url = self.url
             pic = self.pic
+            info = ''
             try:
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # i += 1
+
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
                 elif "yatse" in y["items"][i]:
@@ -2820,9 +2716,6 @@ class video5(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -3070,20 +2963,11 @@ class Playstream1(Screen):
                 if "https" in str(self.urlm3u):
                     cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
 
-                # try:
-                # print('cmd = ', cmd)
                 job_manager.AddJob(downloadJob(self, cmd, self.in_tmp, fileTitle))
-                '''
-                # except:
-                    # print('cmd2 = ', cmd2)
-                    # job_manager.AddJob(downloadJob(self, cmd2, self.in_tmp, fileTitle))
-                '''
-                pmovies = True
+
             except URLError as e:
-                # print("Download failed !!\n%s" % e)
                 self.session.openWithCallback(self.ImageDownloadCB, MessageBox, _("Download Failed !!") + "\n%s" % e, type=MessageBox.TYPE_ERROR)
                 self.downloading = False
-                pmovies = False
         else:
             self.downloading = False
 
@@ -3204,10 +3088,8 @@ class Playstream1(Screen):
             name = self.name1
             url = self.url
             url = url.replace(':', '%3a')
-            # print('In revolution url =', url)
             ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
             sref = eServiceReference(ref)
-            # print('SREF: ', sref)
             sref.setName(name)
             self.session.open(Playstream2, name, sref, desc)
             self.close()
@@ -3227,7 +3109,7 @@ class Playstream1(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            pixmaps = self.pic  # six.ensure_binary(self.pic])
+            pixmaps = self.pic
             if str(res_plugin_path) in pixmaps:
                 self.downloadPic(None, pixmaps)
                 return
@@ -3236,8 +3118,6 @@ class Playstream1(Screen):
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
-                    if PY3:
-                        pixmaps = pixmaps.encode()
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
                         downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
@@ -3302,7 +3182,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global _session
         _session = session
         self.skinName = 'MoviePlayer'
-
         streaml = False
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
@@ -3780,7 +3659,6 @@ class DownloaderPostcondition(Condition):
 
 
 class downloadTask(Task):
-    # def __init__(self, job, cmdline, filename):
     def __init__(self, job, cmdline, filename, filmtitle):
         Task.__init__(self, job, filmtitle)
         self.postconditions.append(DownloaderPostcondition())
@@ -3849,12 +3727,12 @@ class AutoStartTimertvsl:
 
     def __init__(self, session):
         self.session = session
-        global _firstStart
         print("*** running AutoStartTimertvsl ***")
         if _firstStarttvsl:
             self.runUpdate()
 
     def runUpdate(self):
+        global _firstStart
         print("*** running update ***")
         try:
             from . import Update
@@ -3898,6 +3776,12 @@ def Plugins(**kwargs):
     ico_path = 'logo.png'
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = res_plugin_path + 'pics/logo.png'
-    result = [PluginDescriptor(name=desc_plug, description=title_plug, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-              PluginDescriptor(name=desc_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    result = [PluginDescriptor(name=desc_plug,
+                               description=title_plug,
+                               where=[PluginDescriptor.WHERE_SESSIONSTART],
+                               fnc=autostart),
+              PluginDescriptor(name=desc_plug,
+                               description=title_plug,
+                               where=PluginDescriptor.WHERE_PLUGINMENU,
+                               icon=ico_path, fnc=main)]
     return result
