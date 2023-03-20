@@ -4,7 +4,7 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*             09/03/2023               *
+*             20/03/2023               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -868,12 +868,6 @@ class live_stream(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -941,10 +935,12 @@ class live_stream(Screen):
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
+                
             except Exception as e:
                 print(e)
-                break
-        showlist(self.names, self['list'])
+
+            showlist(self.names, self['list'])
+            self.__layoutFinished()
 
     def okRun(self):
         global search
@@ -1014,10 +1010,11 @@ class live_stream(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -1038,25 +1035,21 @@ class live_stream(Screen):
         idx = self['list'].getSelectionIndex()
         if idx and (idx != '' or idx > -1):
             self[self.currentList].up()
-            self.load_infos()
-            self.load_poster()
+            self.__layoutFinished()
         else:
             return
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -1075,7 +1068,6 @@ class live_stream(Screen):
                     return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-
                     parsed = urlparse(pixmaps)
                     domain = parsed.hostname
                     scheme = parsed.scheme
@@ -1177,12 +1169,6 @@ class video6(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1199,10 +1185,11 @@ class video6(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -1250,9 +1237,9 @@ class video6(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
             nextmodule = "Videos1"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -1282,23 +1269,19 @@ class video6(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -1412,12 +1395,6 @@ class nextvideo3(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1434,10 +1411,11 @@ class nextvideo3(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -1483,8 +1461,8 @@ class nextvideo3(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -1507,23 +1485,19 @@ class nextvideo3(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -1647,12 +1621,6 @@ class nextvideo1(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1669,10 +1637,11 @@ class nextvideo1(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -1719,9 +1688,9 @@ class nextvideo1(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
             nextmodule = "Videos1"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -1750,23 +1719,19 @@ class nextvideo1(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -1884,12 +1849,6 @@ class video3(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -1906,10 +1865,11 @@ class video3(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -1955,8 +1915,8 @@ class video3(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -1982,23 +1942,19 @@ class video3(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -2122,12 +2078,6 @@ class video4(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2144,10 +2094,11 @@ class video4(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -2196,9 +2147,9 @@ class video4(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
             nextmodule = "Videos4"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -2220,23 +2171,19 @@ class video4(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -2354,12 +2301,6 @@ class nextvideo4(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.timer = eTimer()
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
-            self.timer.callback.append(self.left)
-        self.timer.start(200, 1)
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
@@ -2376,10 +2317,11 @@ class nextvideo4(Screen):
     def load_infos(self):
         try:
             i = len(self.names)
-            if i > -1:
-                idx = self['list'].getSelectionIndex()
-                info = self.infos[idx]
-                self['desc'].setText(info)
+            if i < 0:
+                return
+            idx = self['list'].getSelectionIndex()
+            info = self.infos[idx]
+            self['desc'].setText(info)
         except Exception as e:
             print(e)
 
@@ -2423,9 +2365,9 @@ class nextvideo4(Screen):
                 i += 1
             except Exception as e:
                 print('nextVideos4: ', e)
-                break
             nextmodule = "Videos4"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -2448,23 +2390,19 @@ class nextvideo4(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
@@ -2653,8 +2591,8 @@ class video5(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-                break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
@@ -2674,23 +2612,19 @@ class video5(Screen):
 
     def up(self):
         self[self.currentList].up()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def down(self):
         self[self.currentList].down()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def left(self):
         self[self.currentList].pageUp()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def right(self):
         self[self.currentList].pageDown()
-        self.load_infos()
-        self.load_poster()
+        self.__layoutFinished()
 
     def load_poster(self):
         try:
