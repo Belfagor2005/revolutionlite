@@ -140,12 +140,12 @@ res_plugin_path = os.path.join(THISPLUG, 'res/')
 pngori = os.path.join(THISPLUG, 'res/pics/fulltop.jpg')
 piccons = os.path.join(THISPLUG, 'res/img/')
 imgjpg = ("nasa.jpg", "nasa1.jpg", "nasa2.jpg")
-no_cover = piccons + 'backg.png'
-piconinter = piccons + 'inter.png'
-piconlive = piccons + 'tv.png'
-piconmovie = piccons + 'cinema.png'
-piconsearch = piccons + 'search.png'
-piconseries = piccons + 'series.png'
+no_cover = os.path.join(piccons, 'backg.png')
+piconinter = os.path.join(piccons, 'inter.png')
+piconlive = os.path.join(piccons, 'tv.png')
+piconmovie = os.path.join(piccons, 'cinema.png')
+piconsearch = os.path.join(piccons, 'search.png')
+piconseries = os.path.join(piccons, 'series.png')
 nextpng = 'next.png'
 prevpng = 'prev.png'
 
@@ -210,10 +210,13 @@ def piconlocal(name):
         ["drama", "dramma"],
         ["western", "western"],
         ["biografico", "biografico"],
+        ["storia", "biografico"],
+        ["documentario", "biografico"],
         ["romantico", "romantico"],
         ["romance", "romantico"],
         ["horror", "horror"],
         ["musica", "musical"],
+        ["show", "musical"],
         ["guerra", "guerra"],
         ["bambini", "bambini"],
         ["bianco", "bianconero"],
@@ -223,13 +226,20 @@ def piconlocal(name):
         ["documentary", "documentary"],
         ["crime", "crime"],
         ["mystery", "mistery"],
+        ["mistero", "mistery"],
+        ["giallo", "mistery"],
         ["fiction", "fiction"],
         ["adventure", "mistery"],
         ["action", "azione"],
         ["007", "007"],
         ["sport", "sport"],
         ["teatr", "teatro"],
+        ["variet", "teatro"],
+        ["giallo", "teatro"],
         ["extra", "extra"],
+        ["sexy", "fantasy"],
+        ["erotic", "fantasy"],
+        ["animazione", "bambini"],
         ["search", "search"],
 
         ["abruzzo", "regioni/abruzzo"],
@@ -260,6 +270,7 @@ def piconlocal(name):
         ["webcam", "relaxweb"],
         ["relax", "relaxweb"],
         ["vecchi", "vecchi"],
+        ["muto", "vecchi"],
         ["'italiani", "movie"],
         ["fantascienza", "fantascienza"],
         ["fantasy", "fantasy"],
@@ -493,7 +504,7 @@ class Revolmain(Screen):
 
     def keyNumberGlobalCB(self, idx):
         i = len(self.menu_list)
-        print('iiiiii= ', i)
+        # print('iiiiii= ', i)
         if i < 0:
             return
         global nextmodule
@@ -935,7 +946,7 @@ class live_stream(Screen):
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
-                
+
             except Exception as e:
                 print(e)
 
@@ -944,37 +955,34 @@ class live_stream(Screen):
 
     def okRun(self):
         global search
-        i = len(self.names)
-        if i < 0:
-            return
-        idx = self['list'].getSelectionIndex()
-
-        name = self.names[idx]
-        url = self.urls[idx]
-        pic = self.pics[idx]
-        desc = self.infos[idx]
-        if 'Search' in str(name):
-            search = True
-            self.search_text(name, url, pic)
-        # live
-        if nextmodule == 'Videos3':
-            # openCat
-            self.session.open(video3, name, url, pic, nextmodule)
-        # movie
-        if 'listMovie' in str(url):
-            self.session.open(nextvideo4, name, url, pic, nextmodule)
-        else:
-            if 'movieId' in str(url):
-                self.session.open(video5, name, url, pic, nextmodule)
-        # series
-        if '&page' in str(url) and nextmodule == 'Videos1':
-            self.session.open(nextvideo1, name, url, pic, nextmodule)
-
-        if '&page' not in str(url) and nextmodule == 'Videos1':
-            if 'tvseriesId' in str(url):
-                self.session.open(video6, name, url, pic, nextmodule)
+        idx = self['list'].getSelectedIndex()
+        if idx is not None or idx != -1:
+            name = self.names[idx]
+            url = self.urls[idx]
+            pic = self.pics[idx]
+            desc = self.infos[idx]
+            if 'Search' in str(name):
+                search = True
+                self.search_text(name, url, pic)
+            # live
+            if nextmodule == 'Videos3':
+                # openCat
+                self.session.open(video3, name, url, pic, nextmodule)
+            # movie
+            if 'listMovie' in str(url):
+                self.session.open(nextvideo4, name, url, pic, nextmodule)
             else:
-                self.session.open(Playstream1, name, url, desc, pic)
+                if 'movieId' in str(url):
+                    self.session.open(video5, name, url, pic, nextmodule)
+            # series
+            if '&page' in str(url) and nextmodule == 'Videos1':
+                self.session.open(nextvideo1, name, url, pic, nextmodule)
+
+            if '&page' not in str(url) and nextmodule == 'Videos1':
+                if 'tvseriesId' in str(url):
+                    self.session.open(video6, name, url, pic, nextmodule)
+                else:
+                    self.session.open(Playstream1, name, url, desc, pic)
 
     def search_text(self, name, url, pic):
         self.namex = name
@@ -1508,6 +1516,7 @@ class nextvideo3(Screen):
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
+
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1651,6 +1660,7 @@ class nextvideo1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -1681,11 +1691,13 @@ class nextvideo1(Screen):
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
+
             except Exception as e:
                 print(e)
             nextmodule = "Videos1"
@@ -3207,7 +3219,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a').replace(' ', '%20')
-        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url) + ':' + self.name
         if streaml is True:
             ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
         print('final reference 2:   ', ref)
