@@ -93,6 +93,16 @@ streamlink = False
 if Utils.isStreamlinkAvailable:
     streamlink = True
 
+try:
+    from Plugins.Extensions.SubsSupport import SubsSupport, SubsSupportStatus
+except ImportError:
+    class SubsSupport(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+
+class SubsSupportStatus(object):
+    def __init__(self, *args, **kwargs):
 
 def trace_error():
     import traceback
@@ -294,7 +304,19 @@ def piconlocal(name):
     path = os.path.join(piccons, piconlocal)
     return str(path)
 
-
+EXTDOWN = {
+        ".avi": "movie",
+        ".divx": "movie",
+        ".mpg": "movie",
+        ".mpeg": "movie",
+        ".mkv": "movie",
+        ".mov": "movie",
+        ".m4v": "movie",
+        ".flv": "movie",
+        ".m3u8": "movie",
+        ".relinker": "movie",
+        ".mp4": "movie",
+    }    
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
@@ -3113,7 +3135,7 @@ class Playstream1(Screen):
         return
 
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport, SubsSupportStatus, SubsSupport):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -3122,24 +3144,36 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     screen_timeout = 4000
 
     def __init__(self, session, name, url, desc):
-        global streaml
+        global streaml, _session
+        _session = session
+        streaml = False                            
         Screen.__init__(self, session)
         self.session = session
-        global _session
-        _session = session
         self.skinName = 'MoviePlayer'
-        streaml = False
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
         TvInfoBarShowHide.__init__(self)
-        InfoBarAudioSelection.__init__(self)
         InfoBarSubtitleSupport.__init__(self)
+        InfoBarAudioSelection.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
         except:
             self.init_aspect = 0
+        try:
+            SubsSupport.__init__(self, searchSupport=True, embeddedSupport=True)
+            SubsSupportStatus.__init__(self)
+        except:
+            pass
         self.new_aspect = self.init_aspect
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference() 
+        self.service = None 
+        self.allowPiP = False        
+        self.desc = desc
+        self.url = url
+        self.name = name
+        self.state = self.STATE_PLAYING
+       
         self['actions'] = ActionMap(['WizardActions', 'MoviePlayerActions', 'MovieSelectionActions', 'MediaPlayerActions', 'EPGSelectActions', 'MediaPlayerSeekActions', 'ColorActions',
                                      'ButtonSetupActions', 'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
             'leavePlayer': self.cancel,
@@ -3151,14 +3185,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             'cancel': self.cancel,
             'back': self.cancel
         }, -1)
-        self.allowPiP = False
-        self.service = None
+
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        self.desc = desc
-        self.url = url
-        self.name = name
-        self.state = self.STATE_PLAYING
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         if '8088' in str(self.url):
             self.onFirstExecBegin.append(self.slinkPlay)
         else:
@@ -3212,6 +3240,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         ref = str(self.url)
         ref = ref.replace(':', '%3a').replace(' ', '%20')
         print('final reference 1:   ', ref)
+        ref = "{0}:{1}".format(ref, self.name)
         sref = eServiceReference(ref)
         sref.setName(self.name)
         self.session.nav.stopService()
@@ -3234,7 +3263,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(cfg.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-        if str(splitext(url)[-1]) == ".m3u8":
+        if str(os.path.splitext(url)[-1]) == ".m3u8":
             if self.servicetype == "1":
                 self.servicetype = "4097"
         currentindex = 0
@@ -3262,6 +3291,17 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
+    def up(self):
+        pass
+
+    def down(self):
+        self.up()
+
+    def doEofInternal(self, playing):
+        self.close()
+
+    def __evEOF(self):
+        self.end = True
     def showVideoInfo(self):
         if self.shown:
             self.hideInfobar()
@@ -3278,7 +3318,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(SREF)
+        self.session.nav.playService(self.srefInit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
