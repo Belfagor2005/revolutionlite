@@ -4,7 +4,7 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*             20/03/2023               *
+*             29/04/2023               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
@@ -18,7 +18,7 @@ from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import ConfigDirectory, ConfigSubsection
 from Components.config import ConfigYesNo, ConfigSelection
-from Components.config import getConfigListEntry, ConfigText, configfile
+from Components.config import getConfigListEntry, configfile
 from Components.config import config, ConfigEnableDisable
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
@@ -33,8 +33,8 @@ from Components.Task import Task, Condition, Job, job_manager
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarNotifications
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
@@ -103,6 +103,8 @@ except ImportError:
 
 class SubsSupportStatus(object):
     def __init__(self, *args, **kwargs):
+        pass
+
 
 def trace_error():
     import traceback
@@ -215,6 +217,7 @@ def piconlocal(name):
         ["comedy", "commedia"],
         ["thriller", "thriller"],
         ["family", "family"],
+        ["famiglia", "family"],
         ["azione", "azione"],
         ["dramma", "dramma"],
         ["drama", "dramma"],
@@ -304,6 +307,7 @@ def piconlocal(name):
     path = os.path.join(piccons, piconlocal)
     return str(path)
 
+
 EXTDOWN = {
         ".avi": "movie",
         ".divx": "movie",
@@ -316,7 +320,9 @@ EXTDOWN = {
         ".m3u8": "movie",
         ".relinker": "movie",
         ".mp4": "movie",
-    }    
+    }
+
+
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
@@ -325,7 +331,7 @@ class rvList(MenuList):
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(30)
+            self.l.setItemHeight(35)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -392,15 +398,13 @@ except:
 global Path_Movies, Path_Cache
 Path_Movies = str(cfg.movie.value)
 Path_Cache = str(cfg.cachefold.value)
-print('Path Movies: ', Path_Movies)
-print('Path Cache: ', Path_Cache)
 
 
 if not os.path.exists(Path_Cache):
     try:
         os.makedirs(Path_Cache)
     except OSError as e:
-        print(('Error creating directory %s:\n%s') % (Path_Cache, str(e)))
+        print(('Error creating directory %s:\n%s') % (Path_Cache, e))
 logdata("path picons: ", str(Path_Cache))
 
 
@@ -413,7 +417,7 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as e:
-            print("[XCF] Tmdb: ", str(e))
+            print("[XCF] Tmdb: ", e)
         return True
     elif os.path.exists(IMDb):
         try:
@@ -421,7 +425,7 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as e:
-            print("[XCF] imdb: ", str(e))
+            print("[XCF] imdb: ", e)
         return True
     else:
         text_clear = html_conv.html_unescape(text_clear)
@@ -569,7 +573,7 @@ class Revolmain(Screen):
             try:
                 self.mbox = self.session.open(MessageBox, _('freearhey Plugin Not Installed!!\nUse my Plugin Freearhey'), MessageBox.TYPE_INFO, timeout=4)
             except Exception as e:
-                print('error infobox ', str(e))
+                print('error infobox ', e)
 
     def goConfig(self):
         self.session.open(myconfig)
@@ -736,14 +740,16 @@ class myconfig(ConfigListScreen, Screen):
         self.setInfo()
 
     def setInfo(self):
-        entry = str(self.getCurrentEntry())
-        if entry == _('Set the path to the Cache folder'):
-            self['description'].setText(_("Press Ok to select the folder containing the picons files"))
-        if entry == _('Set the path Movie folder'):
-            self['description'].setText(_("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required"))
-        if entry == _('Services Player Reference type'):
-            self['description'].setText(_("Configure Service Player Reference"))
-        return
+        try:
+            sel = self['config'].getCurrent()[2]
+            if sel:
+                # print('sel =: ', sel)
+                self['description'].setText(str(sel))
+            else:
+                self['description'].setText(_('SELECT YOUR CHOICE'))
+            return
+        except Exception as e:
+            print("Error ", e)
 
     def keyLeft(self):
         ConfigListScreen.keyLeft(self)
@@ -814,7 +820,7 @@ class myconfig(ConfigListScreen, Screen):
                 minFree=15
             )
         except Exception as e:
-            print(e)
+            print('openDirectoryBrowser get failed: ', e)
 
     def openDirectoryBrowserCB(self, path):
         if path is not None:
@@ -904,7 +910,7 @@ class live_stream(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -935,76 +941,69 @@ class live_stream(Screen):
                     self.pics.append(str(piconsearch))
                     self.infos.append(str('Search Movies'))
                     i += 1
-
                 if 'live' in nextmodule:
                     nextmodule = "Videos3"
-
                 if 'series' in nextmodule:
                     nextmodule = 'Videos1'
                 print('=====================')
                 print(nextmodule)
                 print('=====================')
-
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
-
                 if "thumbnail" in y["items"][i]:
                     pic = str(y["items"][i]["thumbnail"])
-
                 # if _('serie') not in self.name.lower():
                     # pic = piconlocal(name)
-
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
-
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
-
             except Exception as e:
                 print(e)
-
-            showlist(self.names, self['list'])
-            self.__layoutFinished()
+                break
+        showlist(self.names, self['list'])
 
     def okRun(self):
         global search
+        i = len(self.names)
+        if i < 0:
+            return
         idx = self['list'].getSelectedIndex()
-        if idx is not None or idx != -1:
-            name = self.names[idx]
-            url = self.urls[idx]
-            pic = self.pics[idx]
-            desc = self.infos[idx]
-            if 'Search' in str(name):
-                search = True
-                self.search_text(name, url, pic)
-            # live
-            if nextmodule == 'Videos3':
-                # openCat
-                self.session.open(video3, name, url, pic, nextmodule)
-            # movie
-            if 'listMovie' in str(url):
-                self.session.open(nextvideo4, name, url, pic, nextmodule)
-            else:
-                if 'movieId' in str(url):
-                    self.session.open(video5, name, url, pic, nextmodule)
-            # series
-            if '&page' in str(url) and nextmodule == 'Videos1':
-                self.session.open(nextvideo1, name, url, pic, nextmodule)
+        # if idx is not None or idx != -1:
+        name = self.names[idx]
+        url = self.urls[idx]
+        pic = self.pics[idx]
+        desc = self.infos[idx]
+        if 'Search' in str(name):
+            search = True
+            self.search_text(name, url, pic)
+        # live
+        if nextmodule == 'Videos3':
+            # openCat
+            self.session.open(video3, name, url, pic, nextmodule)
+        # movie
+        if 'listMovie' in str(url):
+            self.session.open(nextvideo4, name, url, pic, nextmodule)
+        else:
+            if 'movieId' in str(url):
+                self.session.open(video5, name, url, pic, nextmodule)
+        # series
+        if '&page' in str(url) and nextmodule == 'Videos1':
+            self.session.open(nextvideo1, name, url, pic, nextmodule)
 
-            if '&page' not in str(url) and nextmodule == 'Videos1':
-                if 'tvseriesId' in str(url):
-                    self.session.open(video6, name, url, pic, nextmodule)
-                else:
-                    self.session.open(Playstream1, name, url, desc, pic)
+        if '&page' not in str(url) and nextmodule == 'Videos1':
+            if 'tvseriesId' in str(url):
+                self.session.open(video6, name, url, pic, nextmodule)
+            else:
+                self.session.open(Playstream1, name, url, desc, pic)
 
     def search_text(self, name, url, pic):
         self.namex = name
@@ -1042,7 +1041,7 @@ class live_stream(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1062,7 +1061,7 @@ class live_stream(Screen):
         self.close()
 
     def up(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         if idx and (idx != '' or idx > -1):
             self[self.currentList].up()
             self.__layoutFinished()
@@ -1081,16 +1080,32 @@ class live_stream(Screen):
         self[self.currentList].pageDown()
         self.__layoutFinished()
 
+    def download(self, link, name):
+        if PY3:
+            link = link.encode()
+        callInThread(threadGetPage, url=link, file=None, success=name, fail=self.downloadError)
+
+    def getPoster1(self, output):
+        f = open(pictmp, 'wb')
+        f.write(output)
+        f.close()
+        self.showPoster1(pictmp)
+
+    def showPoster1(self, poster1):
+        if fileExists(poster1):
+            self["poster"].instance.setPixmapFromFile(poster1)
+            self['poster'].show()
+        return
+
     def load_poster(self):
         try:
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             url = self.urls[idx]
             pixmaps = self.pics[idx]
-
             if 'series' not in str(url):
                 pixmaps = piconlocal(name)
                 if os.path.exists(pixmaps):
@@ -1098,56 +1113,26 @@ class live_stream(Screen):
                     return
             if pixmaps != "" or pixmaps != "n/A" or pixmaps is not None or pixmaps != "null":
                 try:
-                    parsed = urlparse(pixmaps)
-                    domain = parsed.hostname
-                    scheme = parsed.scheme
-                    if scheme == "https" and sslverify:
-                        sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
-                    else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                    self.download(pixmaps, self.getPoster1)
                 except Exception as e:
                     print(e)
         except Exception as e:
             print(e)
 
-    def downloadPic(self, data, pictmp):
-        if os.path.exists(pictmp):
+    def downloadPic(self, data, pixmaps):
+        if os.path.exists(pixmaps):
             try:
-                self.poster_resize(pictmp)
+                self.showPoster1(pixmaps)
             except Exception as ex:
                 print("* error ** %s" % ex)
                 pass
 
     def downloadError(self, png):
         try:
-            if fileExists(png):
-                self.poster_resize(png)
+            if fileExists(no_cover):
+                self.showPoster1(no_cover)
         except Exception as e:
             print(e)
-            self.poster_resize(no_cover)
-
-    def poster_resize(self, png):
-        self["poster"].hide()
-        size = self['poster'].instance.size()
-        self.picload = ePicLoad()
-        self.scale = AVSwitch().getFramebufferScale()
-        self.picload.setPara((size.width(),
-                              size.height(),
-                              self.scale[0],
-                              self.scale[1],
-                              False,
-                              1,
-                              '#FF000000'))
-        if Utils.DreamOS():
-            self.picload.startDecode(png, False)
-        else:
-            self.picload.startDecode(png, 0, 0, False)
-        ptr = self.picload.getData()
-        if ptr is not None:
-            self['poster'].instance.setPixmap(ptr)
-            self['poster'].show()
-        return
 
 
 class video6(Screen):
@@ -1202,7 +1187,7 @@ class video6(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1217,7 +1202,7 @@ class video6(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1229,53 +1214,52 @@ class video6(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
-        referer = 'https://tivustream.website'
-        url = self.url
-        content = Utils.ReadUrl2(url, referer)
-        if PY3:
-            content = six.ensure_str(content)
-        y = json.loads(content)
-        i = 0
-        while i < 50:
-            name = ""
-            url = ""
-            pic = ""
-            info = ''
-            try:
-                if "title" in y["items"][i]:
+        try:
+            referer = 'https://tivustream.website'
+            url = self.url
+            content = Utils.ReadUrl2(url, referer)
+            if PY3:
+                content = six.ensure_str(content)
+            y = json.loads(content)
+            i = 0
+            while i < 50:
+                name = ""
+                url = ""
+                pic = ""
+                info = ''
+                try:
+                    # if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-
-                if "link" in y["items"][i]:
+                    # if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
-
-                if "thumbnail" in y["items"][i]:
+                    # elif "yatse" in y["items"][i]:
+                        # url = (y["items"][i]["yatse"])
+                    # if "thumbnail" in y["items"][i]:
                     pic = (y["items"][i]["thumbnail"])
-
-                if "info" in y["items"][i]:
+                    # if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
+                    self.names.append(name)
+                    self.urls.append(url)
+                    self.pics.append(pic)
+                    self.infos.append(html_conv.html_unescape(info))
+                    i += 1
+                except Exception as e:
+                    print(e)
+                    break
+        except Exception as e:
+            print(e)
 
-                self.names.append(name)
-                self.urls.append(url)
-                self.pics.append(pic)
-                self.infos.append(html_conv.html_unescape(info))
-                i += 1
-            except Exception as e:
-                print(e)
-            nextmodule = "Videos1"
+        nextmodule = "Videos1"
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         if idx and (idx != '' or idx > -1):
             name = self.names[idx]
             url = self.urls[idx]
@@ -1318,7 +1302,7 @@ class video6(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1428,7 +1412,7 @@ class nextvideo3(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1443,7 +1427,7 @@ class nextvideo3(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1467,23 +1451,19 @@ class nextvideo3(Screen):
             pic = ""
             info = ''
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1491,14 +1471,14 @@ class nextvideo3(Screen):
                 i += 1
             except Exception as e:
                 print(e)
+                break
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1534,7 +1514,7 @@ class nextvideo3(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1578,7 +1558,7 @@ class nextvideo3(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -1655,7 +1635,7 @@ class nextvideo1(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1670,7 +1650,7 @@ class nextvideo1(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1682,7 +1662,6 @@ class nextvideo1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -1696,33 +1675,28 @@ class nextvideo1(Screen):
             pic = ""
             info = ''
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
                 if _('serie') not in self.name.lower():
                     pic = piconlocal(name)
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
-
             except Exception as e:
                 print(e)
-            nextmodule = "Videos1"
+                break
+        nextmodule = "Videos1"
         showlist(self.names, self['list'])
         self.__layoutFinished()
 
@@ -1730,7 +1704,7 @@ class nextvideo1(Screen):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1772,7 +1746,7 @@ class nextvideo1(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1815,7 +1789,7 @@ class nextvideo1(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -1844,11 +1818,11 @@ class video3(Screen):
         with open(skin, 'r') as f:
             self.skin = f.read()
         self.setup_title = ('HOME REVOLUTION')
+        self.list = []
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
-        self.list = []
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
@@ -1886,7 +1860,7 @@ class video3(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1901,7 +1875,7 @@ class video3(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1924,24 +1898,19 @@ class video3(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-                    # i += 1
-
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1949,14 +1918,14 @@ class video3(Screen):
                 i += 1
             except Exception as e:
                 print(e)
+                break
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1995,7 +1964,7 @@ class video3(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2038,7 +2007,7 @@ class video3(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2115,7 +2084,7 @@ class video4(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2130,7 +2099,7 @@ class video4(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -2155,25 +2124,20 @@ class video4(Screen):
             pic = ""
             info = ''
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
                 # test on dream one
                 # if _('serie') not in self.name.lower():
                     # pic = piconlocal(name)
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2181,15 +2145,15 @@ class video4(Screen):
                 i += 1
             except Exception as e:
                 print(e)
-            nextmodule = "Videos4"
+                break
+        nextmodule = "Videos4"
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -2224,7 +2188,7 @@ class video4(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2267,7 +2231,7 @@ class video4(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2338,7 +2302,7 @@ class nextvideo4(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2353,7 +2317,7 @@ class nextvideo4(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -2376,38 +2340,38 @@ class nextvideo4(Screen):
             name = ""
             url = ""
             pic = ""
+            info = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
+                # test on dream one
+                # if _('serie') not in self.name.lower():
+                    # pic = piconlocal(name)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
             except Exception as e:
-                print('nextVideos4: ', e)
-            nextmodule = "Videos4"
+                print(e)
+                break
+        nextmodule = "Videos4"
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -2443,7 +2407,7 @@ class nextvideo4(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2486,7 +2450,7 @@ class nextvideo4(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2563,7 +2527,7 @@ class video5(Screen):
         self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2577,7 +2541,7 @@ class video5(Screen):
         try:
             i = len(self.names)
             if i > -1:
-                idx = self['list'].getSelectionIndex()
+                idx = self['list'].getSelectedIndex()
                 info = self.infos[idx]
                 self['desc'].setText(info)
         except Exception as e:
@@ -2601,23 +2565,19 @@ class video5(Screen):
             pic = self.pic
             info = ''
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
-
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
-
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
-
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2625,14 +2585,14 @@ class video5(Screen):
                 i += 1
             except Exception as e:
                 print(e)
+                break
         showlist(self.names, self['list'])
-        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         name = self.names[idx]
         url = self.urls[idx]
         desc = self.infos[idx]
@@ -2665,7 +2625,7 @@ class video5(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectionIndex()
+            idx = self['list'].getSelectedIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2708,7 +2668,7 @@ class video5(Screen):
                 self.poster_resize(no_cover)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -2893,6 +2853,7 @@ class Playstream1(Screen):
             if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:
                 self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=5, default=False)
             else:
+                self.downloading = False
                 self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
 
     def download_m3u(self, result):
@@ -2905,7 +2866,7 @@ class Playstream1(Screen):
             fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
             fileTitle = re.sub(r' ', '_', fileTitle)
             fileTitle = re.sub(r'_+', '_', fileTitle)
-            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
+            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
             fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
             fileTitle = fileTitle.lower() + ext
             self.in_tmp = os.path.join(Path_Movies, fileTitle)
@@ -3000,7 +2961,7 @@ class Playstream1(Screen):
         showlist(self.names, self['list'])
 
     def okClicked(self):
-        idx = self['list'].getSelectionIndex()
+        idx = self['list'].getSelectedIndex()
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
@@ -3110,7 +3071,7 @@ class Playstream1(Screen):
                 self.poster_resize(png)
         except Exception as ex:
             self.poster_resize(no_cover)
-            print(str(ex))
+            print(ex)
 
     def poster_resize(self, png):
         self["poster"].hide()
@@ -3146,7 +3107,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def __init__(self, session, name, url, desc):
         global streaml, _session
         _session = session
-        streaml = False                            
+        streaml = False
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
@@ -3166,14 +3127,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         except:
             pass
         self.new_aspect = self.init_aspect
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference() 
-        self.service = None 
-        self.allowPiP = False        
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.service = None
+        self.allowPiP = False
         self.desc = desc
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-       
         self['actions'] = ActionMap(['WizardActions', 'MoviePlayerActions', 'MovieSelectionActions', 'MediaPlayerActions', 'EPGSelectActions', 'MediaPlayerSeekActions', 'ColorActions',
                                      'ButtonSetupActions', 'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
             'leavePlayer': self.cancel,
@@ -3185,7 +3145,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             'cancel': self.cancel,
             'back': self.cancel
         }, -1)
-
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         if '8088' in str(self.url):
             self.onFirstExecBegin.append(self.slinkPlay)
@@ -3248,9 +3207,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a').replace(' ', '%20')
-        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url) + ':' + self.name
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)  # + ':' + self.name
         if streaml is True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url) + ':' + self.name
         print('final reference 2:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -3302,6 +3261,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def __evEOF(self):
         self.end = True
+
     def showVideoInfo(self):
         if self.shown:
             self.hideInfobar()
@@ -3314,7 +3274,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             self.doShow()
 
     def cancel(self):
-        SREF = self.srefInit
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
@@ -3384,7 +3343,7 @@ class plgnstrt(Screen):
             try:
                 self.poster_resize(pngori)
             except Exception as ex:
-                print(str(ex))
+                print(ex)
 
     def loadDefaultImage(self, failure=None):
         import random
@@ -3725,7 +3684,7 @@ class AutoStartTimertvsl:
             Update.upd_done()
             _firstStarttvsl = False
         except Exception as e:
-            print('error tivustream lite', str(e))
+            print('error tivustream lite', e)
 
 
 def autostart(reason, session=None, **kwargs):
