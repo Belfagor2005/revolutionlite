@@ -112,7 +112,7 @@ class SubsSupportStatus(object):
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
     print('[FILMXY][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
-        response = get(url)
+        response = get(url, verify=False)
         response.raise_for_status()
         if file is None:
             success(response.content)
@@ -746,8 +746,9 @@ class myconfig(ConfigListScreen, Screen):
 
     def cachedel(self):
         fold = os.path.join(str(cfg.cachefold.value), "revolution/pic")
-        cmd = "rm " + fold + "/*"
-        os.system(cmd)
+        # cmd = "rm " + fold + "/*"
+        # os.system(cmd)
+        Utils.cachedel(fold)
         self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
 
     def createSetup(self):
@@ -983,10 +984,10 @@ class live_stream(Screen):
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
                 info = info.replace('---', ' ')
-                print('live_stream load json name = ', name)
-                print('live_stream load json url = ', url)
-                print('live_stream load json pic = ', pic)
-                print('live_stream load json info = ', info)
+                # print('live_stream load json name = ', name)
+                # print('live_stream load json url = ', url)
+                # print('live_stream load json pic = ', pic)
+                # print('live_stream load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1726,10 +1727,10 @@ class nextvideo1(Screen):
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
 
-                print('nextvideo1 load json name = ', name)
-                print('nextvideo1 load json url = ', url)
-                print('nextvideo1 load json pic = ', pic)
-                print('nextvideo1 load json info = ', info)
+                # print('nextvideo1 load json name = ', name)
+                # print('nextvideo1 load json url = ', url)
+                # print('nextvideo1 load json pic = ', pic)
+                # print('nextvideo1 load json info = ', info)
 
                 self.names.append(name)
                 self.urls.append(url)
@@ -2729,9 +2730,9 @@ class video5(Screen):
         try:
             if fileExists(png):
                 self.poster_resize(no_cover)
-        except Exception as ex:
+        except Exception as e:
             self.poster_resize(no_cover)
-            print(ex)
+            print(e)
 
     def poster_resize(self, png):
         self["poster"].hide()
