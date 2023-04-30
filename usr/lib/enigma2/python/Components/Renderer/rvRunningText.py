@@ -83,7 +83,6 @@ class rvRunningText(Renderer):
         self.instance.resize(eSize(self.W, self.H))
         self.scroll_label = eLabel(instance)
         self.mTimer = eTimer()
-
         try:
             self.mTimer_conn = self.mTimer.timeout.connect(self.movingLoop)
         except:

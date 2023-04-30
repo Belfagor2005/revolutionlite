@@ -31,7 +31,7 @@ from Components.Sources.Progress import Progress
 from Components.Sources.StaticText import StaticText
 from Components.Task import Task, Condition, Job, job_manager
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBar import MoviePlayer
+# from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarNotifications
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
@@ -52,6 +52,9 @@ from enigma import eTimer
 from enigma import iPlayableService
 from os.path import splitext
 from twisted.web.client import downloadPage
+from requests import get, exceptions
+from requests.exceptions import HTTPError
+from twisted.internet.reactor import callInThread
 import json
 import os
 import re
@@ -106,6 +109,24 @@ class SubsSupportStatus(object):
         pass
 
 
+def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
+    print('[FILMXY][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+    try:
+        response = get(url)
+        response.raise_for_status()
+        if file is None:
+            success(response.content)
+        elif key is not None:
+            success(response.content, file, key)
+        else:
+            success(response.content, file)
+    except HTTPError as httperror:
+        print('[FILMXY][threadGetPage] Http error: ', httperror)
+        fail(error)  # E0602 undefined name 'error'
+    except exceptions.RequestException as error:
+        print(error)
+
+
 def trace_error():
     import traceback
     try:
@@ -127,7 +148,7 @@ def logdata(name='', data=None):
 
 
 def getversioninfo():
-    currversion = '1.7'
+    currversion = '1.8'
     version_file = os.path.join(THISPLUG, 'version')
     if os.path.exists(version_file):
         try:
@@ -526,7 +547,7 @@ class Revolmain(Screen):
         self.load_poster()
 
     def okRun(self):
-        self.keyNumberGlobalCB(self['list'].getSelectedIndex())
+        self.keyNumberGlobalCB(self['list'].getSelectionIndex())
 
     def keyNumberGlobalCB(self, idx):
         i = len(self.menu_list)
@@ -596,7 +617,7 @@ class Revolmain(Screen):
 
     def load_poster(self):
         try:
-            sel = self['list'].getSelectedIndex()
+            sel = self['list'].getSelectionIndex()
             if sel is not None or sel != -1:
                 if sel == 0:
                     pixmaps = piconsearch
@@ -907,10 +928,10 @@ class live_stream(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -948,19 +969,24 @@ class live_stream(Screen):
                 print('=====================')
                 print(nextmodule)
                 print('=====================')
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
-                # if _('serie') not in self.name.lower():
-                    # pic = piconlocal(name)
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
+                if _('serie') not in self.name.lower():
+                    pic = piconlocal(name)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
+                info = info.replace('---', ' ')
+                print('live_stream load json name = ', name)
+                print('live_stream load json url = ', url)
+                print('live_stream load json pic = ', pic)
+                print('live_stream load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -969,6 +995,7 @@ class live_stream(Screen):
             except Exception as e:
                 print(e)
                 break
+        self.__layoutFinished()
         showlist(self.names, self['list'])
 
     def okRun(self):
@@ -976,7 +1003,7 @@ class live_stream(Screen):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         # if idx is not None or idx != -1:
         name = self.names[idx]
         url = self.urls[idx]
@@ -1041,7 +1068,7 @@ class live_stream(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1061,7 +1088,7 @@ class live_stream(Screen):
         self.close()
 
     def up(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         if idx and (idx != '' or idx > -1):
             self[self.currentList].up()
             self.__layoutFinished()
@@ -1102,7 +1129,7 @@ class live_stream(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             url = self.urls[idx]
             pixmaps = self.pics[idx]
@@ -1184,10 +1211,10 @@ class video6(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1202,7 +1229,7 @@ class video6(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1241,6 +1268,10 @@ class video6(Screen):
                     # if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
+                    # print('video6 load json name = ', name)
+                    # print('video6 load json url = ', url)
+                    # print('video6 load json pic = ', pic)
+                    # print('video6 load json info = ', info)
                     self.names.append(name)
                     self.urls.append(url)
                     self.pics.append(pic)
@@ -1254,12 +1285,13 @@ class video6(Screen):
 
         nextmodule = "Videos1"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         if idx and (idx != '' or idx > -1):
             name = self.names[idx]
             url = self.urls[idx]
@@ -1302,7 +1334,7 @@ class video6(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1409,10 +1441,10 @@ class nextvideo3(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1427,7 +1459,7 @@ class nextvideo3(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1464,6 +1496,10 @@ class nextvideo3(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+                # print('nextvideo3 load json name = ', name)
+                # print('nextvideo3 load json url = ', url)
+                # print('nextvideo3 load json pic = ', pic)
+                # print('nextvideo3 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1473,12 +1509,13 @@ class nextvideo3(Screen):
                 print(e)
                 break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1514,7 +1551,7 @@ class nextvideo3(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1632,10 +1669,10 @@ class nextvideo1(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -1650,7 +1687,7 @@ class nextvideo1(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1688,6 +1725,12 @@ class nextvideo1(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
+                print('nextvideo1 load json name = ', name)
+                print('nextvideo1 load json url = ', url)
+                print('nextvideo1 load json pic = ', pic)
+                print('nextvideo1 load json info = ', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1704,7 +1747,7 @@ class nextvideo1(Screen):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1746,7 +1789,7 @@ class nextvideo1(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -1857,25 +1900,25 @@ class video3(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
-        self.load_infos()
         self.load_poster()
+        self.load_infos()
 
     def load_infos(self):
         try:
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -1911,6 +1954,10 @@ class video3(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+                # print('Videos3 load json name = ', name)
+                # print('Videos3 load json url = ', url)
+                # print('Videos3 load json pic = ', pic)
+                # print('Videos3 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1920,12 +1967,13 @@ class video3(Screen):
                 print(e)
                 break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1964,7 +2012,7 @@ class video3(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2081,10 +2129,10 @@ class video4(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2099,7 +2147,7 @@ class video4(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -2138,6 +2186,10 @@ class video4(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+                # print('video4 load json name = ', name)
+                # print('video4 load json url = ', url)
+                # print('video4 load json pic = ', pic)
+                # print('video4 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2148,12 +2200,13 @@ class video4(Screen):
                 break
         nextmodule = "Videos4"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -2188,7 +2241,7 @@ class video4(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2299,10 +2352,10 @@ class nextvideo4(Screen):
         except:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2317,7 +2370,7 @@ class nextvideo4(Screen):
             i = len(self.names)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             info = self.infos[idx]
             self['desc'].setText(info)
         except Exception as e:
@@ -2356,6 +2409,10 @@ class nextvideo4(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+                # print('nextvideo4 load json name = ', name)
+                # print('nextvideo4 load json url = ', url)
+                # print('nextvideo4 load json pic = ', pic)
+                # print('nextvideo4 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2366,12 +2423,13 @@ class nextvideo4(Screen):
                 break
         nextmodule = "Videos4"
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -2407,7 +2465,7 @@ class nextvideo4(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2524,10 +2582,10 @@ class video5(Screen):
         except:
             self.timer.callback.append(self.left)
         self.timer.start(200, 1)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        # self.onLayoutFinish.append(self.__layoutFinished)
 
     def showIMDB(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         text_clear = self.names[idx]
         if returnIMDB(text_clear):
             print('show imdb/tmdb')
@@ -2541,7 +2599,7 @@ class video5(Screen):
         try:
             i = len(self.names)
             if i > -1:
-                idx = self['list'].getSelectedIndex()
+                idx = self['list'].getSelectionIndex()
                 info = self.infos[idx]
                 self['desc'].setText(info)
         except Exception as e:
@@ -2578,6 +2636,10 @@ class video5(Screen):
                 # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+                # print('video5 load json name = ', name)
+                # print('video5 load json url = ', url)
+                # print('video5 load json pic = ', pic)
+                # print('video5 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2587,12 +2649,13 @@ class video5(Screen):
                 print(e)
                 break
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         i = len(self.names)
         if i < 0:
             return
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         name = self.names[idx]
         url = self.urls[idx]
         desc = self.infos[idx]
@@ -2625,7 +2688,7 @@ class video5(Screen):
             i = len(self.pics)
             if i < 0:
                 return
-            idx = self['list'].getSelectedIndex()
+            idx = self['list'].getSelectionIndex()
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
@@ -2961,7 +3024,7 @@ class Playstream1(Screen):
         showlist(self.names, self['list'])
 
     def okClicked(self):
-        idx = self['list'].getSelectedIndex()
+        idx = self['list'].getSelectionIndex()
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
