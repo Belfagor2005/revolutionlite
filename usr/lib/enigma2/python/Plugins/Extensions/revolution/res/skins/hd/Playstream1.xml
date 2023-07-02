@@ -7,7 +7,7 @@
 	<!-- <widget name="title" position="447,16" size="245,32" font="Regular;28" halign="right" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5" /> -->
 	<!-- Menu List -->
 	<widget name="info" position="140,86" size="561,40" font="Regular; 24" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
-	<widget name="list" position="147,138" size="545,411" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#ffffff" backgroundColor="#000000" backgroundColorSelected="barColor" />
+	<widget name="list" position="147,138" size="545,411" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#ffffff" backgroundColor="#000000" backgroundColorSelected="#001b3c85" />
 	<widget name="progress" position="405,661" size="300,50" foregroundColor="#2a70a4" backgroundColor="#10000000" transparent="1" zPosition="5" />
 	<widget source="progresstext" render="Label" font="Regular;20" position="407,658" size="300,50" backgroundColor="#202020" transparent="1" halign="center" zPosition="6" />
 	<ePixmap name="red" position="146,595" zPosition="2" size="210,60" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
