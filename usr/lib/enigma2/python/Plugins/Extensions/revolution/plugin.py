@@ -67,7 +67,8 @@ import time
 PY3 = False
 PY3 = sys.version_info.major >= 3
 print('Py3: ', PY3)
-
+if PY3:
+    print('six.PY3: True ')
 try:
     from urllib.parse import urlparse
     from urllib.request import urlopen, Request
@@ -78,8 +79,6 @@ except ImportError:
     from urllib2 import urlopen, Request
     from urllib2 import URLError
 
-if PY3:
-    print('six.PY3: True ')
 
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/revolution'
 global skin_path, Path_Cache, pngs, pngl, pngx, file_json, nextmodule, search, pngori, pictmp
@@ -300,7 +299,6 @@ def piconlocal(name):
         ["umbria", "regioni/umbria"],
         ["veneto", "regioni/veneto"],
         ["aosta", "regioni/valledaosta"],
-
         ["mediaset", "mediaset"],
         ["nazionali", "nazionali"],
         ["news", "news"],
@@ -328,8 +326,8 @@ def piconlocal(name):
         piconlocal = prevpng
     elif 'next' in name.lower():
         piconlocal = nextpng
-    print('>>>>>>>> ' + str(piccons) + str(piconlocal))
     path = os.path.join(piccons, piconlocal)
+    print('>>>>>>>> ' + path)    
     return str(path)
 
 
