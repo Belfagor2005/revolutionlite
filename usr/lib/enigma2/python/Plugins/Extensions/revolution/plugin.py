@@ -31,7 +31,6 @@ from Components.Sources.Progress import Progress
 from Components.Sources.StaticText import StaticText
 from Components.Task import Task, Condition, Job, job_manager
 from Plugins.Plugin import PluginDescriptor
-# from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarNotifications
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
@@ -461,6 +460,7 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
+    return False
 
 
 def paypal():
