@@ -4,12 +4,12 @@
     <widget name="info" position="302,127" size="1094,67" font="Regular;40" halign="left" foregroundColor="yellow" backgroundColor="#000000" transparent="1" zPosition="5" />
     <widget name="pth" position="623,1348" size="779,59" font="Regular;40" halign="right" foregroundColor="#808080" backgroundColor="#000000" transparent="1" zPosition="5" render="rvRunningText" />
     <widget name="poster" position="1840,200" size="560,784" alphatest="blend" scale="1" zPosition="3" />
-    <ePixmap position="1847,200" size="560,784" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/img/tvposter.png" zPosition="2" scale="1" />
+    <ePixmap position="1847,200" size="560,784" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/img/tvposter.png" zPosition="2" scale="stretch" />
     <widget source="desc" render="rvRunningText" position="304,1022" size="1102,294" font="Regular;40" foregroundColor="#ffb75b" backgroundColor="#101010" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1" />
     <eLabel position="302,1022" size="1102,294" backgroundColor="#30000000" zPosition="1" />
     <!-- Graph -->
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" size="2560,1440" zPosition="1" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="294,54" size="372,67" zPosition="5" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="294,54" scale="stretch" size="372,67" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/menu.png" scale="strech" position="1300,120" size="107,47" zPosition="3" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="294,187" size="1107,11" zPosition="5" />
     <!-- Menu List -->

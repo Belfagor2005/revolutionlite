@@ -1,10 +1,10 @@
 <!-- ***** PLAYLIST FOLDER 1920x1080 ***** 26/03/2022 /-->
 <screen name="StreamTasks" position="0,0" size="1280,720" title="Video Download List" backgroundColor="#FF000000" flags="wfNoBorder">
-	<ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main3.png" zPosition="1" />
+	<ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" scale="stretch" zPosition="1" />
 	<ePixmap position="153,10" size="123,114" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/icon.png" alphatest="blend" zPosition="3" />
 	<eLabel position="151,130" size="1046,3" backgroundColor="#202020" zPosition="5" />
 	<!-- Clock -->
-	<widget source="global.CurrentTime" render="Label" position="925,70" size="266,53" font="Regular;22" halign="right" valign="center" foregroundColor="#808080" backgroundColor="#101010" transparent="1" zPosition="2">
+	<widget source="global.CurrentTime" render="Label" position="928,45" size="266,53" font="Regular;22" halign="right" valign="center" foregroundColor="#808080" backgroundColor="#101010" transparent="1" zPosition="2">
 		<convert type="ClockToText">Format %A %d %B %H:%M:%S</convert>
 	</widget>
 	<eLabel text="MovieList" position="295,42" size="478,66" font="Regular;32" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="5" />
@@ -23,10 +23,8 @@
 		</convert>
 	</widget>
 	<!-- Buttons Colors -->
-	<eLabel position="146,603" size="1046,3" backgroundColor="#202020" zPosition="1" />
-	<ePixmap name="red" position="146,620" zPosition="2" size="210,60" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
-	<widget name="key_red" position="235,613" size="210,60" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	<ePixmap name="green" position="531,620" zPosition="2" size="210,60" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
-	<widget name="key_green" position="618,607" size="210,60" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;30" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	
+	<eLabel backgroundColor="#00ff0000" position="142,615" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#0000ff00" position="141,668" size="300,6" zPosition="12" />
+	<widget name="key_red" render="Label" position="141,622" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_green" render="Label" position="140,675" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
 </screen>
