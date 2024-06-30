@@ -244,7 +244,7 @@ class rvRunningText(Renderer):
                     self.moveLabel(self.X, self.Y)
 
     def moveLabel(self, X, Y):
-        self.scroll_label.move(ePoint(X-self.soffset[0], Y-self.soffset[1]))
+        self.scroll_label.move(ePoint(X - self.soffset[0], Y-self.soffset[1]))
 
     def calcMoving(self):
         self.X = self.Y = 0
@@ -299,8 +299,8 @@ class rvRunningText(Renderer):
                         self.mStop = self.P = max(self.A, min(self.B, self.mStartPoint - text_width + self.soffset[0]))
             elif self.type == SWIMMING:
                 if text_width < self.W:
-                    self.A = self.X + 1         # incomprehensible indent '+ 1' ???
-                    self.B = self.W - text_width - 1    # incomprehensible indent '- 1' ???
+                    self.A = self.X + 1  # incomprehensible indent '+ 1' ???
+                    self.B = self.W - text_width - 1  # incomprehensible indent '- 1' ???
                     if self.halign == LEFT:
                         self.P = self.A
                         self.mStep = abs(self.mStep)
@@ -359,7 +359,7 @@ class rvRunningText(Renderer):
 
                 else:
                     if text_height == self.H:
-                        text_height += max(2, text_height/40)
+                        text_height += max(2, text_height / 40)
                     self.A = self.H - text_height
                     self.B = self.Y
                     if self.direction == TOP:
@@ -399,7 +399,7 @@ class rvRunningText(Renderer):
             timeout = self.mStepTimeout
             if (self.mStop is not None) and (self.mStop + abs(self.mStep) > self.P >= self.mStop):
                 if (self.type == RUNNING) and (self.mOneShot > 0):
-                    if (self.mRepeat > 0) and (self.mCount-1 <= 0):
+                    if (self.mRepeat > 0) and (self.mCount - 1 <= 0):
                         return
                     timeout = self.mOneShot
                 elif (self.type == SWIMMING) and (self.mPageLength > 0) and (self.mPageDelay > 0):
