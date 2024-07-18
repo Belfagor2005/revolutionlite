@@ -1,0 +1,11 @@
+<!-- Skin plgstr 01/10/2022 -->
+<screen name="plgnstrt" flags="wfNoBorder" position="center,center" size="1280,720" title="..::TiVuStream Project::.." backgroundColor="#30000000">
+	<ePixmap position="524,36" size="166,78" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tivustream_xxx.png" scale="stretch" alphatest="blend" zPosition="5" />
+	<ePixmap position="64,40" size="214,75" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tivustream_or.png" scale="stretch" alphatest="blend" zPosition="5" />
+	<widget name="poster" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/fulltop.jpg" position="58,35" size="633,600" alphatest="blend" scale="stretch" zPosition="-1" />
+	<eLabel position="1222,30" size="5,610" zPosition="1" backgroundColor="#30403f3f" />
+	<eLabel position="55,30" size="1170,5" zPosition="1" backgroundColor="#30403f3f" />
+	<eLabel position="50,30" size="5,610" zPosition="1" backgroundColor="#30403f3f" />
+	<eLabel position="50,635" size="1175,5" zPosition="1" backgroundColor="#30403f3f" />
+	<widget source="list" render="rvRunningText" position="714,60" size="486,562" font="Regular;18" foregroundColor="#ffb75b" backgroundColor="#101010" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap" />
+</screen>
