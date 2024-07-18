@@ -20,7 +20,7 @@ from Components.Button import Button
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryPixmapAlphaTest, MultiContentEntryText
+from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
@@ -182,8 +182,8 @@ currversion = getversioninfo()
 Path_Tmp = "/tmp"
 pictmp = Path_Tmp + "/poster.jpg"
 UrlSvr = UrlSvr.replace('+', '')
-title_plug = 'Pro Lite V. %s' % currversion
-desc_plug = 'TivuStream Pro Revolution Lite'
+title_plug = 'TVS Lite V. %s' % currversion
+desc_plug = 'TVS Lite Revolution Lite'
 ico_path = os.path.join(THISPLUG, 'logo.png')
 res_plugin_path = os.path.join(THISPLUG, 'res/')
 pngori = os.path.join(THISPLUG, 'res/pics/fulltop.jpg')
