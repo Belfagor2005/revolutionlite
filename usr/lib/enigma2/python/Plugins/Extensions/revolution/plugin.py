@@ -233,12 +233,14 @@ def TvsApi():
         pass
 
 
+# https twisted client hack #
+sslverify = False
 try:
     from twisted.internet import ssl
     from twisted.internet._sslverify import ClientTLSOptions
     sslverify = True
-except:
-    sslverify = False
+except ImportError:
+    pass
 
 if sslverify:
     class SNIFactory(ssl.ClientContextFactory):
