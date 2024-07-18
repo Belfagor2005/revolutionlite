@@ -7,8 +7,8 @@
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="294,20" scale="stretch" size="371,80" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="287,160" size="1100,11" alphatest="blend" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="294,1227" size="1100,11" alphatest="blend" zPosition="5" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/PayPal.png" position="2018,227" size="208,100" scale="stretch" zPosition="5" alphatest="on" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/parsatv/res/pics/qr-code.png" position="1972,356" size="320,320" scale="stretch" zPosition="2" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/PayPal.png" position="2018,227" size="208,100" scale="stretch" zPosition="5" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/qr-code.png" position="1972,356" size="320,320" scale="stretch" zPosition="2" alphatest="on" />
 	<widget name="paypal" position="1784,766" size="702,263" font="Regular;32" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<eLabel position="1774,188" size="720,852" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
 	<!-- Menu List -->
