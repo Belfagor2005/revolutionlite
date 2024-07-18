@@ -209,7 +209,7 @@ elif screenwidth.width() == 1920:
 else:
     skin_path = res_plugin_path + 'skins/hd/'
 
-if Utils.DreamOS():
+if os.path.exists('/var/lib/dpkg/status'):
     skin_path = skin_path + 'dreamOs/'
 logdata("path picons: ", str(skin_path))
 
@@ -718,7 +718,7 @@ class Revolmain(Screen):
                 else:
                     pixmaps = piconinter
                 size = self['poster'].instance.size()
-                if Utils.DreamOS():
+                if os.path.exists('/var/lib/dpkg/status'):
                     self['poster'].instance.setPixmap(gPixmapPtr())
                 else:
                     self['poster'].instance.setPixmap(None)
@@ -732,7 +732,7 @@ class Revolmain(Screen):
                                       1,
                                       '#FF000000'))
                 ptr = self.picload.getData()
-                if Utils.DreamOS():
+                if os.path.exists('/var/lib/dpkg/status'):
                     if self.picload.startDecode(pixmaps, False) == 0:
                         ptr = self.picload.getData()
                 else:
@@ -1473,7 +1473,7 @@ class video6(Screen):
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -1697,7 +1697,7 @@ class nextvideo3(Screen):
                               False,
                               1,
                               '#FF000000'))
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -1928,7 +1928,7 @@ class nextvideo1(Screen):
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -2157,7 +2157,7 @@ class video3(Screen):
                               False,
                               1,
                               '#FF000000'))
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -2380,7 +2380,7 @@ class video4(Screen):
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -2604,7 +2604,7 @@ class nextvideo4(Screen):
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -2828,7 +2828,7 @@ class video5(Screen):
         self.scale = AVSwitch().getFramebufferScale()
         # if self.picload:
         self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -3031,7 +3031,7 @@ class Playstream1(Screen):
 
                 # useragent = "--header='User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'"
                 # WGET = '/usr/bin/wget'
-                # if Utils.DreamOS():
+                # if os.path.exists('/var/lib/dpkg/status'):
                     # WGET = '/usr/bin/wget --no-check-certificate'
                 # cmd = WGET + " %s -c '%s' -O '%s'" % (useragent, self.urlm3u, self.in_tmp)
                 # cmd2 = WGET + " -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
@@ -3236,7 +3236,7 @@ class Playstream1(Screen):
                               False,
                               1,
                               '#FF000000'))
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
             self.picload.startDecode(png, 0, 0, False)
@@ -3458,7 +3458,7 @@ class plgnstrt(Screen):
 
     def poster_resize(self, pngori):
         pixmaps = pngori
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self['poster'].instance.setPixmap(gPixmapPtr())
         else:
             self['poster'].instance.setPixmap(None)
@@ -3473,7 +3473,7 @@ class plgnstrt(Screen):
                              1,
                              '#FF000000'))
         ptr = self.picload.getData()
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             if self.picload.startDecode(pixmaps, False) == 0:
                 ptr = self.picload.getData()
         else:
@@ -3505,7 +3505,7 @@ class plgnstrt(Screen):
         self.icount = 0
         self['list'].setText(_('\n\n\nCheck Connection wait please...'))
         self.timer = eTimer()
-        if Utils.DreamOS():
+        if os.path.exists('/var/lib/dpkg/status'):
             self.timer_conn = self.timer.timeout.connect(self.OpenCheck)
         else:
             self.timer.callback.append(self.OpenCheck)
