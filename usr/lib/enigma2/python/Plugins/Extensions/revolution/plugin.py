@@ -10,35 +10,41 @@
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-from . import Utils
-from . import _
-from . import html_conv
-import codecs
+from . import _, paypal
+from .resolver import Utils
+from .resolver import html_conv
+from .resolver.Console import Console as xConsole
 from Components.AVSwitch import AVSwitch
-try:
-    from enigma import eAVSwitch
-except Exception as e:
-    print(e)
 from Components.ActionMap import ActionMap
 from Components.Button import Button
-from Components.config import ConfigDirectory, ConfigSubsection
-from Components.config import ConfigYesNo, ConfigSelection
-from Components.config import getConfigListEntry, configfile
-from Components.config import config, ConfigEnableDisable
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryPixmapAlphaTest, MultiContentEntryText
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Components.Sources.Progress import Progress
 from Components.Sources.StaticText import StaticText
-from Components.Task import Task, Condition, Job, job_manager
+from Components.Task import (Task, Condition, Job, job_manager)
+from Components.config import (
+    ConfigEnableDisable,
+    ConfigDirectory,
+    ConfigSelection,
+    getConfigListEntry,
+    configfile,
+    config,
+    ConfigYesNo,
+    ConfigSubsection,
+)
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBarGenerics import InfoBarNotifications
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
+from Screens.InfoBarGenerics import (
+    InfoBarSubtitleSupport,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarNotifications,
+)
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
@@ -47,19 +53,27 @@ from Screens.TaskView import JobView
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import fileExists, SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
-from enigma import RT_HALIGN_LEFT
-from enigma import RT_VALIGN_CENTER
-from enigma import eListboxPythonMultiContent
-from enigma import ePicLoad, loadPNG, gFont, gPixmapPtr
-from enigma import eServiceReference
-from enigma import eTimer
-from enigma import iPlayableService
-from enigma import getDesktop
+from enigma import (
+    RT_VALIGN_CENTER,
+    RT_HALIGN_LEFT,
+    eListboxPythonMultiContent,
+    eServiceReference,
+    eTimer,
+    iPlayableService,
+    iServiceInformation,
+    getDesktop,
+    ePicLoad,
+    gFont,
+    loadPNG,
+    gPixmapPtr,
+)
 from os.path import splitext
-from twisted.web.client import downloadPage
 from requests import get, exceptions
 from requests.exceptions import HTTPError
 from twisted.internet.reactor import callInThread
+from twisted.web.client import downloadPage
+from datetime import datetime
+import codecs
 import json
 import os
 import re
@@ -89,7 +103,6 @@ global pngs, nextmodule, search, pngori, pictmp
 
 search = False
 _session = None
-_firstStart = True
 UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
@@ -124,7 +137,7 @@ def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args,
             success(response.content, file)
     except HTTPError as httperror:
         print('[FILMXY][threadGetPage] Http error: ', httperror)
-        fail(error)  # E0602 undefined name 'error'
+        # fail(error)  # E0602 undefined name 'error'
     except exceptions.RequestException as error:
         print(error)
 
@@ -150,7 +163,7 @@ def logdata(name='', data=None):
 
 
 def getversioninfo():
-    currversion = '1.8'
+    currversion = '1.9'
     version_file = os.path.join(THISPLUG, 'version')
     if os.path.exists(version_file):
         try:
@@ -185,6 +198,9 @@ piconseries = os.path.join(piccons, 'series.png')
 nextpng = 'next.png'
 prevpng = 'prev.png'
 UrlLst = Utils.b64decoder(UrlSvr)
+installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ubGl0ZS9tYWluL2luc3RhbGxlci5zaA=='
+developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbmxpdGU='
+
 screenwidth = getDesktop(0).size()
 if screenwidth.width() == 2560:
     skin_path = res_plugin_path + 'skins/uhd/'
@@ -330,7 +346,7 @@ def piconlocal(name):
     elif 'next' in name.lower():
         piconlocal = nextpng
     path = os.path.join(piccons, piconlocal)
-    print('>>>>>>>> ' + path)    
+    print('>>>>>>>> ' + path)
     return str(path)
 
 
@@ -355,7 +371,7 @@ class rvList(MenuList):
         if screenwidth.width() == 2560:
             self.l.setItemHeight(60)
             textfont = int(42)
-            self.l.setFont(0, gFont('Regular', textfont))        
+            self.l.setFont(0, gFont('Regular', textfont))
         elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
             textfont = int(30)
@@ -467,13 +483,6 @@ def returnIMDB(text_clear):
     return False
 
 
-def paypal():
-    conthelp = "If you like what I do you\n"
-    conthelp += "can contribute with a coffee\n"
-    conthelp += "scan the qr code and donate € 1.00"
-    return conthelp
-
-
 EXTRAD = "radio", "radyo", "mix", "fm", "kbit", "rap", "metal", "alternative"
 EXTXXX = "adult", "xxx"
 EXTCAM = "webcam", "webcams"
@@ -483,12 +492,11 @@ EXTRLX = "relax", "nature", "escape"
 EXTMOV = "movie", "film"
 
 
-PanelMain = [
-             ('SEARCH'),
-             ('LIVE'),
-             ('MOVIE'),
-             ('SERIES'),
-             ('INTERNATIONAL')]
+PanelMain = [('SEARCH'),
+    ('LIVE'),
+    ('MOVIE'),
+    ('SERIES'),
+    ('INTERNATIONAL')]
 
 
 class Revolmain(Screen):
@@ -504,13 +512,15 @@ class Revolmain(Screen):
         nextmodule = 'revolmain'
         self['list'] = rvList([])
         self.setup_title = ('HOME REVOLUTION')
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['poster'] = Pixmap()
         self['desc'] = StaticText()
-        self['info'] = Label('')
+        self['info'] = Label()
         self['info'].setText('Select')
         self['key_red'] = Button(_('Exit'))
+        self['key_yellow'] = Button(_('Update'))
+        self['key_yellow'].hide()
         self.currentList = 'list'
         self.names = []
         self.urls = []
@@ -518,26 +528,92 @@ class Revolmain(Screen):
         self.infos = []
         self.menulist = []
         self['title'] = Label(title_plug)
+        self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'EPGSelectActions',
-                                     'ButtonSetupActions',
+                                     'HotkeyActions',
+                                     'InfobarEPGActions',
                                      'MenuActions',
-                                     'DirectionActions'], {'ok': self.okRun,
-                                                           'green': self.okRun,
-                                                           'back': self.closerm,
-                                                           'red': self.closerm,
-                                                           # 'yellow': self.remove,
-                                                           # 'blue': self.msgtqm,
-                                                           'up': self.up,
+                                     'ChannelSelectBaseActions',
+                                     'DirectionActions'], {'up': self.up,
                                                            'down': self.down,
                                                            'left': self.left,
                                                            'right': self.right,
+                                                           'yellow': self.update_me,  # update_me,
+                                                           'yellow_long': self.update_dev,
+                                                           'info_long': self.update_dev,
+                                                           'infolong': self.update_dev,
+                                                           'showEventInfoPlugin': self.update_dev,
                                                            'menu': self.goConfig,
-                                                           'cancel': self.closerm}, -1)
-
+                                                           'ok': self.okRun,
+                                                           'green': self.okRun,
+                                                           'cancel': self.closerm,
+                                                           'red': self.closerm}, -1)
+        self.timer = eTimer()
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self.check_vers)
+        else:
+            self.timer.callback.append(self.check_vers)
+        self.timer.start(500, 1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.__layoutFinished)
+
+    def check_vers(self):
+        remote_version = '0.0'
+        remote_changelog = ''
+        req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        page = Utils.urlopen(req).read()
+        if PY3:
+            data = page.decode("utf-8")
+        else:
+            data = page.encode("utf-8")
+        if data:
+            lines = data.split("\n")
+            for line in lines:
+                if line.startswith("version"):
+                    remote_version = line.split("=")
+                    remote_version = line.split("'")[1]
+                if line.startswith("changelog"):
+                    remote_changelog = line.split("=")
+                    remote_changelog = line.split("'")[1]
+                    break
+        self.new_version = remote_version
+        self.new_changelog = remote_changelog
+        if currversion < remote_version:
+            self.Update = True
+            self['key_yellow'].show()
+            # self['key_green'].show()
+            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+        # self.update_me()
+
+    def update_me(self):
+        if self.Update is True:
+            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+        else:
+            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+
+    def update_dev(self):
+        try:
+            req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            page = Utils.urlopen(req).read()
+            data = json.loads(page)
+            remote_date = data['pushed_at']
+            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            remote_date = strp_remote_date.strftime('%Y-%m-%d')
+            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+        except Exception as e:
+            print('error xcons:', e)
+
+    def install_update(self, answer=False):
+        if answer:
+            cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+        else:
+            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+
+    def myCallback(self, result=None):
+        print('result:', result)
+        return
 
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
@@ -702,7 +778,7 @@ class myconfig(ConfigListScreen, Screen):
         self.session = session
         skin = os.path.join(skin_path, 'myconfig.xml')
         with codecs.open(skin, "r", encoding="utf-8") as f:
-            self.skin = f.read())
+            self.skin = f.read()
         self.setup_title = title_plug
         self.setTitle(title_plug)
         self.onChangedEntry = []
@@ -713,9 +789,9 @@ class myconfig(ConfigListScreen, Screen):
         self['key_yellow'] = Button(_('Choice'))
         self["key_blue"] = Button(_('Empty Cache'))
         self["paypal"] = Label()
-        self['info'] = Label('')
+        self['info'] = Label()
         self['title'] = Label(title_plug)
-        self['description'] = Label('')
+        self['description'] = Label()
         self["setupActions"] = ActionMap(['OkCancelActions',
                                           'DirectionActions',
                                           'ColorActions',
@@ -903,7 +979,7 @@ class live_stream(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -1192,7 +1268,7 @@ class video6(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -1422,7 +1498,7 @@ class nextvideo3(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -1650,7 +1726,7 @@ class nextvideo1(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -1881,7 +1957,7 @@ class video3(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -2110,7 +2186,7 @@ class video4(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -2333,7 +2409,7 @@ class nextvideo4(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -2557,7 +2633,7 @@ class video5(Screen):
         self['list'] = self.list
         self['list'] = rvList([])
         self['info'] = Label(name)
-        self['pth'] = Label('')
+        self['pth'] = Label()
         self['pth'].setText(_('Cache folder ') + Path_Cache)
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
@@ -3226,11 +3302,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def getAspect(self):
-        try:
-            aspect = AVSwitch().getAspectRatioSetting()
-        except:
-            aspect = eAVSwitch().getAspectRatioSetting()
-        return aspect
+        return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
         return {
@@ -3253,9 +3325,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                6: '16_9_letterbox'}
         config.av.aspectratio.setValue(map[aspect])
         try:
-            AVSwitch.setAspectRatio(aspect)
+            AVSwitch().setAspectRatio(aspect)
         except:
-            eAVSwitch.setAspectRatio(aspect)
+            pass
 
     def av(self):
         temp = int(self.getAspect())
@@ -3526,20 +3598,7 @@ class StreamTasks(Screen):
             message = "The Movie path not configured or path not exist!!!"
             Utils.web_info(message)
             self.close()
-    '''
-    # def getprogress(self):
-        # jobs = job_manager.getPendingJobs()
-        # if len(jobs) >= 1:
-            # for jobentry in jobs:
-                # jobname = str(jobentry.name)
-                # for video in self.downloads_all:
-                    # title = str(video[1])
-                    # if title == jobname:
-                        # video[3] = jobentry.getStatustext()
-                        # video[4] = jobentry.progress
-                        # self.buildList()
-                        # break
-    '''
+
     def getTaskList(self):
         jobs = job_manager.getPendingJobs()
         if len(jobs) >= 1:
@@ -3743,36 +3802,6 @@ class downloadTask(Task):
                 pass
 
 
-class AutoStartTimertvsl:
-
-    def __init__(self, session):
-        self.session = session
-        print("*** running AutoStartTimertvsl ***")
-        if _firstStarttvsl:
-            self.runUpdate()
-
-    def runUpdate(self):
-        global _firstStart
-        print("*** running update ***")
-        try:
-            from . import Update
-            Update.upd_done()
-            _firstStarttvsl = False
-        except Exception as e:
-            print('error tivustream lite', e)
-
-
-def autostart(reason, session=None, **kwargs):
-    print("*** running autostart ***")
-    global autoStartTimertvsl
-    global _firstStarttvsl
-    if reason == 0:
-        if session is not None:
-            _firstStarttvsl = True
-            autoStartTimertvsl = AutoStartTimertvsl(session)
-    return
-
-
 def main(session, **kwargs):
     try:
         session.open(Revolmain)
@@ -3797,10 +3826,6 @@ def Plugins(**kwargs):
     if not os.path.exists('/var/lib/dpkg/status'):
         ico_path = res_plugin_path + 'pics/logo.png'
     result = [PluginDescriptor(name=desc_plug,
-                               description=title_plug,
-                               where=[PluginDescriptor.WHERE_SESSIONSTART],
-                               fnc=autostart),
-              PluginDescriptor(name=desc_plug,
                                description=title_plug,
                                where=PluginDescriptor.WHERE_PLUGINMENU,
                                icon=ico_path, fnc=main)]

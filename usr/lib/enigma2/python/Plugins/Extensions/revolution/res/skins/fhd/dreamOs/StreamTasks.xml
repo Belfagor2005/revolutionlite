@@ -1,8 +1,8 @@
 <!-- ***** PLAYLIST FOLDER 1920x1080 ***** 15-05-2018 /-->
 <screen name="StreamTasks" position="0,0" size="1920,1080" title="Video Download List" backgroundColor="#FF000000" flags="wfNoBorder">
-	<eLabel text="MovieList" position="364,15" size="500,100" font="Regular;48" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="3" />
-	<ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" zPosition="1" />
-	<ePixmap position="212,9" size="120,117" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/icon.png" alphatest="blend" zPosition="1" />
+	<eLabel text="MovieList" position="399,15" size="883,100" font="Regular;48" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="3" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" position="0,0" scale="stretch" size="1920,1080" zPosition="1" />
+	<ePixmap position="222,4" size="163,117" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/icon.png" scale="stretch" alphatest="blend" zPosition="4" />
 	<eLabel position="210,130" size="1520,5" backgroundColor="#202020" zPosition="2" />
 	<eLabel position="210,955" size="1520,5" backgroundColor="#202020" zPosition="1" />	
 	<!-- Clock -->
@@ -24,8 +24,8 @@
 		</convert>
 	</widget>
 	<!-- Buttons Colors -->
-	<eLabel backgroundColor="#00ff0000" position="219,969" size="300,6" zPosition="12" />
-	<eLabel backgroundColor="#0000ff00" position="217,1024" size="300,6" zPosition="12" />
-	<widget name="key_red" render="Label" position="219,976" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
-	<widget name="key_green" render="Label" position="217,1031" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+    <eLabel position="230,980" size="210,60" backgroundColor="#ff0033" zPosition="4" />       
+    <eLabel position="470,980" size="210,60" backgroundColor="#009900" zPosition="4" />
+	<widget name="key_red" position="228,980" size="213,63" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_green" position="470,978" size="210,64" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 </screen>
