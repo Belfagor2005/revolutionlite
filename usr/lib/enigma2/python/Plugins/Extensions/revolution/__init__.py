@@ -21,6 +21,43 @@ def paypal():
     return conthelp
 
 
+def trace_error():
+    import traceback
+    import sys
+    try:
+        traceback.print_exc(file=sys.stdout)
+        traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
+    except:
+        pass
+
+
+def logdata(name='', data=None):
+    try:
+        data = str(data)
+        fp = open('/tmp/revolution.log', 'a')
+        fp.write(str(name) + ': ' + data + "\n")
+        fp.close()
+    except:
+        trace_error()
+        pass
+
+
+def getversioninfo():
+    currversion = '1.0'
+    version_file = os.path.join(THISPLUG, 'version')
+    if os.path.exists(version_file):
+        try:
+            fp = open(version_file, 'r').readlines()
+            for line in fp:
+                if 'version' in line:
+                    currversion = line.split('=')[1].strip()
+        except:
+            pass
+    logdata("Plugin ", THISPLUG)
+    logdata("Version ", currversion)
+    return (currversion)
+
+
 def localeInit():
     if isDreamOS:  # check if opendreambox image
         lang = language.getLanguage()[:2]  # getLanguage returns e.g. "fi_FI" for "language_country"

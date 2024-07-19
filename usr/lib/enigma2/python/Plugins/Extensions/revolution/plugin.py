@@ -4,13 +4,13 @@
 '''
 ****************************************
 *        coded by Lululla              *
-*             29/04/2023               *
+*             04/07/2023               *
 *       skin by MMark                  *
 ****************************************
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-from . import _, paypal
+from . import _, logdata, getversioninfo, paypal
 from .resolver import Utils
 from .resolver import html_conv
 from .resolver.Console import Console as xConsole
@@ -36,6 +36,7 @@ from Components.config import (
     config,
     ConfigYesNo,
     ConfigSubsection,
+    ConfigText,
 )
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBarGenerics import (
@@ -54,18 +55,18 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import fileExists, SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
 from enigma import (
-    RT_VALIGN_CENTER,
     RT_HALIGN_LEFT,
+    RT_VALIGN_CENTER,
     eListboxPythonMultiContent,
+    ePicLoad,
     eServiceReference,
     eTimer,
+    gFont,
+    gPixmapPtr,
+    getDesktop,
     iPlayableService,
     iServiceInformation,
-    getDesktop,
-    ePicLoad,
-    gFont,
     loadPNG,
-    gPixmapPtr,
 )
 from os.path import splitext
 from requests import get, exceptions
@@ -82,9 +83,11 @@ import ssl
 import sys
 import time
 
+global pngs, nextmodule, search, pngori, pictmp, Path_Movies, Path_Cache
+
 PY3 = False
 PY3 = sys.version_info.major >= 3
-print('Py3: ', PY3)
+
 if PY3:
     print('six.PY3: True ')
 try:
@@ -99,15 +102,15 @@ except ImportError:
 
 
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/revolution'
-global pngs, nextmodule, search, pngori, pictmp
+
 
 search = False
 _session = None
+streamlink = False
 UrlSvr = 'aHR0cDov+L3BhdGJ+1d2ViLmN+vbS9pcH+R2Lw=='
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 
-streamlink = False
 if Utils.isStreamlinkAvailable:
     streamlink = True
 
@@ -125,8 +128,9 @@ class SubsSupportStatus(object):
 
 
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
-    print('[FILMXY][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+    print('[threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
+        url = url.replace('https', 'http')
         response = get(url, verify=False)
         response.raise_for_status()
         if file is None:
@@ -136,51 +140,15 @@ def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args,
         else:
             success(response.content, file)
     except HTTPError as httperror:
-        print('[FILMXY][threadGetPage] Http error: ', httperror)
+        print('[threadGetPage] Http error: ', httperror)
         # fail(error)  # E0602 undefined name 'error'
     except exceptions.RequestException as error:
         print(error)
 
 
-def trace_error():
-    import traceback
-    try:
-        traceback.print_exc(file=sys.stdout)
-        traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
-    except:
-        pass
-
-
-def logdata(name='', data=None):
-    try:
-        data = str(data)
-        fp = open('/tmp/revolution.log', 'a')
-        fp.write(str(name) + ': ' + data + "\n")
-        fp.close()
-    except:
-        trace_error()
-        pass
-
-
-def getversioninfo():
-    currversion = '1.9'
-    version_file = os.path.join(THISPLUG, 'version')
-    if os.path.exists(version_file):
-        try:
-            fp = open(version_file, 'r').readlines()
-            for line in fp:
-                if 'version' in line:
-                    currversion = line.split('=')[1].strip()
-        except:
-            pass
-    logdata("Plugin ", THISPLUG)
-    logdata("Version ", currversion)
-    return (currversion)
-
-
-currversion = getversioninfo()
+currversion = '1.9'  # getversioninfo()
 Path_Tmp = "/tmp"
-pictmp = Path_Tmp + "/poster.jpg"
+pictmp = os.path.join(Path_Tmp, "poster.jpg")
 UrlSvr = UrlSvr.replace('+', '')
 title_plug = 'TVS Lite V. %s' % currversion
 desc_plug = 'TVS Lite Revolution Lite'
@@ -200,7 +168,7 @@ prevpng = 'prev.png'
 UrlLst = Utils.b64decoder(UrlSvr)
 installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ubGl0ZS9tYWluL2luc3RhbGxlci5zaA=='
 developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbmxpdGU='
-
+PanelMain = [('SEARCH'), ('LIVE'), ('MOVIE'), ('SERIES'), ('INTERNATIONAL')]
 screenwidth = getDesktop(0).size()
 if screenwidth.width() == 2560:
     skin_path = res_plugin_path + 'skins/uhd/'
@@ -353,18 +321,18 @@ def piconlocal(name):
 
 
 EXTDOWN = {
-        ".avi": "movie",
-        ".divx": "movie",
-        ".mpg": "movie",
-        ".mpeg": "movie",
-        ".mkv": "movie",
-        ".mov": "movie",
-        ".m4v": "movie",
-        ".flv": "movie",
-        ".m3u8": "movie",
-        ".relinker": "movie",
-        ".mp4": "movie",
-    }
+    ".avi": "movie",
+    ".divx": "movie",
+    ".mpg": "movie",
+    ".mpeg": "movie",
+    ".mkv": "movie",
+    ".mov": "movie",
+    ".m4v": "movie",
+    ".flv": "movie",
+    ".m3u8": "movie",
+    ".relinker": "movie",
+    ".mp4": "movie",
+}
 
 
 class rvList(MenuList):
@@ -417,10 +385,8 @@ def showlist(data, list):
         list.setList(plist)
 
 
-modechoices = [
-        ("4097", _("IPTV(4097)")),
-        ("1", _("Dvb(1)")),
-    ]
+modechoices = [("4097", _("IPTV(4097)")),
+               ("1", _("Dvb(1)"))]
 
 if os.path.exists("/usr/bin/gstplayer"):
     modechoices.append(("5001", _("Gstreamer(5001)")))
@@ -435,8 +401,8 @@ config.plugins.revolution = ConfigSubsection()
 cfg = config.plugins.revolution
 cfg.services = ConfigSelection(default='4097', choices=modechoices)
 cfg.cachefold = ConfigDirectory(default='/media/hdd')
-
 cfg.movie = ConfigDirectory("/media/hdd/movie")
+
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadpath = defaultMoviePath()
@@ -446,7 +412,6 @@ except:
         cfg.movie = ConfigDirectory(default='/media/hdd/movie')
 
 
-global Path_Movies, Path_Cache
 Path_Movies = str(cfg.movie.value)
 Path_Cache = str(cfg.cachefold.value)
 
@@ -494,11 +459,193 @@ EXTRLX = "relax", "nature", "escape"
 EXTMOV = "movie", "film"
 
 
-PanelMain = [('SEARCH'),
-    ('LIVE'),
-    ('MOVIE'),
-    ('SERIES'),
-    ('INTERNATIONAL')]
+class myconfig(ConfigListScreen, Screen):
+    def __init__(self, session):
+        Screen.__init__(self, session)
+        self.session = session
+        skin = os.path.join(skin_path, 'myconfig.xml')
+        with codecs.open(skin, "r", encoding="utf-8") as f:
+            self.skin = f.read()
+        self.setup_title = title_plug
+        self.setTitle(title_plug)
+        self.onChangedEntry = []
+        self.list = []
+        ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
+        self['key_red'] = Button(_('Back'))
+        self['key_green'] = Button(_('Save'))
+        self['key_yellow'] = Button(_('Choice'))
+        self["key_blue"] = Button(_('Empty Cache'))
+        self["paypal"] = Label()
+        self['info'] = Label()
+        self['title'] = Label(title_plug)
+        self['description'] = Label()
+        self["setupActions"] = ActionMap(['OkCancelActions',
+                                          'DirectionActions',
+                                          'ColorActions',
+                                          'VirtualKeyboardActions'], {'cancel': self.extnok,
+                                                                      'red': self.extnok,
+                                                                      'back': self.close,
+                                                                      'left': self.keyLeft,
+                                                                      'right': self.keyRight,
+                                                                      'showVirtualKeyboard': self.KeyText,
+                                                                      'yellow': self.Ok_edit,
+                                                                      'ok': self.Ok_edit,
+                                                                      'blue': self.cachedel,
+                                                                      'green': self.msgok}, -1)
+        self.createSetup()
+        self.onLayoutFinish.append(self.layoutFinished)
+        if self.setInfo not in self['config'].onSelectionChanged:
+            self['config'].onSelectionChanged.append(self.setInfo)
+
+    def layoutFinished(self):
+        payp = paypal()
+        self["paypal"].setText(payp)
+        self.setTitle(self.setup_title)
+        if not os.path.exists('/tmp/currentip'):
+            os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
+        currentip1 = open('/tmp/currentip', 'r')
+        currentip = currentip1.read()
+        self['info'].setText(_('Settings Revolution\nYour current IP is %s') % currentip)
+
+    def VirtualKeyBoardCallback(self, callback=None):
+        if callback is not None and len(callback):
+            self['config'].getCurrent()[1].value = callback
+            self['config'].invalidate(self['config'].getCurrent())
+
+    def KeyText(self):
+        sel = self['config'].getCurrent()
+        if sel:
+            self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
+
+    def cachedel(self):
+        fold = os.path.join(str(cfg.cachefold.value), "revolution/pic")
+        # cmd = "rm " + fold + "/*"
+        # os.system(cmd)
+        Utils.cachedel(fold)
+        self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
+
+    def createSetup(self):
+        self.editListEntry = None
+        self.list = []
+        self.list.append(getConfigListEntry(_("Set the path Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Set the path to the Cache folder"), cfg.cachefold, _("Press Ok to select the folder containing the picons files")))
+        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services, _("Configure Service Player Reference")))
+        self['config'].list = self.list
+        self["config"].l.setList(self.list)
+        self.setInfo()
+
+    def setInfo(self):
+        try:
+            sel = self['config'].getCurrent()[2]
+            if sel:
+                # print('sel =: ', sel)
+                self['description'].setText(str(sel))
+            else:
+                self['description'].setText(_('SELECT YOUR CHOICE'))
+            return
+        except Exception as e:
+            print("Error ", e)
+
+    def keyLeft(self):
+        ConfigListScreen.keyLeft(self)
+        self.createSetup()
+
+    def keyRight(self):
+        ConfigListScreen.keyRight(self)
+        self.createSetup()
+
+    def msgok(self):
+        if self['config'].isChanged():
+            for x in self['config'].list:
+                x[1].save()
+            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
+            self.close()
+        else:
+            self.close()
+
+    def restartenigma(self, result):
+        if result:
+            self.session.open(TryQuitMainloop, 3)
+        else:
+            self.close(True)
+
+    def changedEntry(self):
+        for x in self.onChangedEntry:
+            x()
+        try:
+            if isinstance(self['config'].getCurrent()[1], ConfigEnableDisable) or isinstance(self['config'].getCurrent()[1], ConfigYesNo) or isinstance(self['config'].getCurrent()[1], ConfigSelection):
+                self.createSetup()
+        except:
+            pass
+
+    def getCurrentEntry(self):
+        return self['config'].getCurrent() and self['config'].getCurrent()[0] or ''
+
+    def getCurrentValue(self):
+        return self['config'].getCurrent() and str(self['config'].getCurrent()[1].getText()) or ''
+
+    def createSummary(self):
+        from Screens.Setup import SetupSummary
+        return SetupSummary
+
+    def Ok_edit(self):
+        # ConfigListScreen.keyOK(self)
+        sel = self['config'].getCurrent()[1]
+        if sel and sel == cfg.cachefold:
+            self.setting = 'cachefold'
+            self.openDirectoryBrowser(cfg.cachefold.value)
+        if sel and sel == cfg.movie:
+            self.setting = 'moviefold'
+            self.openDirectoryBrowser(cfg.movie.value)
+        else:
+            pass
+
+    def openDirectoryBrowser(self, path):
+        try:
+            self.session.openWithCallback(
+                self.openDirectoryBrowserCB,
+                LocationBox,
+                windowTitle=_('Choose Directory:'),
+                text=_('Choose Directory'),
+                currDir=str(path),
+                bookmarks=config.movielist.videodirs,
+                autoAdd=False,
+                editDir=True,
+                inhibitDirs=['/bin', '/boot', '/dev', '/home', '/lib', '/proc', '/run', '/sbin', '/sys', '/var'],
+                minFree=15
+            )
+        except Exception as e:
+            print('openDirectoryBrowser get failed: ', e)
+
+    def openDirectoryBrowserCB(self, path):
+        if path is not None:
+            if self.setting == 'cachefold':
+                cfg.cachefold.setValue(path)
+            if self.setting == 'moviefold':
+                cfg.movie.setValue(path)
+        return
+
+    def save(self):
+        if self['config'].isChanged():
+            for x in self['config'].list:
+                x[1].save()
+            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
+            cfg.save()
+            configfile.save()
+        self.close()
+
+    def extnok(self, answer=None):
+        from Screens.MessageBox import MessageBox
+        if answer is None:
+            if self["config"].isChanged():
+                self.session.openWithCallback(self.extnok, MessageBox, _("Really close without saving settings?"))
+            else:
+                self.close()
+        elif answer:
+            for x in self["config"].list:
+                x[1].cancel()
+            self.close()
+        return
 
 
 class Revolmain(Screen):
@@ -511,7 +658,7 @@ class Revolmain(Screen):
         with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         global nextmodule
-        nextmodule = 'revolmain'
+        nextmodule = 'Revolmain'
         self['list'] = rvList([])
         self.setup_title = ('HOME REVOLUTION')
         self['pth'] = Label()
@@ -537,7 +684,8 @@ class Revolmain(Screen):
                                      'InfobarEPGActions',
                                      'MenuActions',
                                      'ChannelSelectBaseActions',
-                                     'DirectionActions'], {'up': self.up,
+                                     'DirectionActions'], {'ok': self.okRun,
+                                                           'up': self.up,
                                                            'down': self.down,
                                                            'left': self.left,
                                                            'right': self.right,
@@ -547,7 +695,6 @@ class Revolmain(Screen):
                                                            'infolong': self.update_dev,
                                                            'showEventInfoPlugin': self.update_dev,
                                                            'menu': self.goConfig,
-                                                           'ok': self.okRun,
                                                            'green': self.okRun,
                                                            'cancel': self.closerm,
                                                            'red': self.closerm}, -1)
@@ -774,198 +921,6 @@ class Revolmain(Screen):
         return
 
 
-class myconfig(ConfigListScreen, Screen):
-    def __init__(self, session):
-        Screen.__init__(self, session)
-        self.session = session
-        skin = os.path.join(skin_path, 'myconfig.xml')
-        with codecs.open(skin, "r", encoding="utf-8") as f:
-            self.skin = f.read()
-        self.setup_title = title_plug
-        self.setTitle(title_plug)
-        self.onChangedEntry = []
-        self.list = []
-        ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
-        self['key_red'] = Button(_('Back'))
-        self['key_green'] = Button(_('Save'))
-        self['key_yellow'] = Button(_('Choice'))
-        self["key_blue"] = Button(_('Empty Cache'))
-        self["paypal"] = Label()
-        self['info'] = Label()
-        self['title'] = Label(title_plug)
-        self['description'] = Label()
-        self["setupActions"] = ActionMap(['OkCancelActions',
-                                          'DirectionActions',
-                                          'ColorActions',
-                                          'ButtonSetupActions',
-                                          'VirtualKeyboardActions'], {'cancel': self.extnok,
-                                                                      'red': self.extnok,
-                                                                      'back': self.close,
-                                                                      'left': self.keyLeft,
-                                                                      'right': self.keyRight,
-                                                                      'showVirtualKeyboard': self.KeyText,
-                                                                      'yellow': self.Ok_edit,
-                                                                      'ok': self.Ok_edit,
-                                                                      'blue': self.cachedel,
-                                                                      'green': self.msgok}, -1)
-
-        self.createSetup()
-        self.onLayoutFinish.append(self.layoutFinished)
-        if self.setInfo not in self['config'].onSelectionChanged:
-            self['config'].onSelectionChanged.append(self.setInfo)
-
-    def layoutFinished(self):
-        payp = paypal()
-        self["paypal"].setText(payp)
-        self.setTitle(self.setup_title)
-        if not os.path.exists('/tmp/currentip'):
-            os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
-        currentip1 = open('/tmp/currentip', 'r')
-        currentip = currentip1.read()
-        self['info'].setText(_('Settings Revolution\nYour current IP is %s') % currentip)
-
-    def VirtualKeyBoardCallback(self, callback=None):
-        if callback is not None and len(callback):
-            self['config'].getCurrent()[1].value = callback
-            self['config'].invalidate(self['config'].getCurrent())
-
-    def KeyText(self):
-        sel = self['config'].getCurrent()
-        if sel:
-            self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
-
-    def cachedel(self):
-        fold = os.path.join(str(cfg.cachefold.value), "revolution/pic")
-        # cmd = "rm " + fold + "/*"
-        # os.system(cmd)
-        Utils.cachedel(fold)
-        self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
-
-    def createSetup(self):
-        self.editListEntry = None
-        self.list = []
-        self.list.append(getConfigListEntry(_("Set the path Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required")))
-        self.list.append(getConfigListEntry(_("Set the path to the Cache folder"), cfg.cachefold, _("Press Ok to select the folder containing the picons files")))
-        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services, _("Configure Service Player Reference")))
-        self['config'].list = self.list
-        self["config"].l.setList(self.list)
-        self.setInfo()
-
-    def setInfo(self):
-        try:
-            sel = self['config'].getCurrent()[2]
-            if sel:
-                # print('sel =: ', sel)
-                self['description'].setText(str(sel))
-            else:
-                self['description'].setText(_('SELECT YOUR CHOICE'))
-            return
-        except Exception as e:
-            print("Error ", e)
-
-    def keyLeft(self):
-        ConfigListScreen.keyLeft(self)
-        self.createSetup()
-
-    def keyRight(self):
-        ConfigListScreen.keyRight(self)
-        self.createSetup()
-
-    def msgok(self):
-        if self['config'].isChanged():
-            for x in self['config'].list:
-                x[1].save()
-            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
-            self.close()
-        else:
-            self.close()
-
-    def restartenigma(self, result):
-        if result:
-            self.session.open(TryQuitMainloop, 3)
-        else:
-            self.close(True)
-
-    def changedEntry(self):
-        for x in self.onChangedEntry:
-            x()
-        try:
-            if isinstance(self['config'].getCurrent()[1], ConfigEnableDisable) or isinstance(self['config'].getCurrent()[1], ConfigYesNo) or isinstance(self['config'].getCurrent()[1], ConfigSelection):
-                self.createSetup()
-        except:
-            pass
-
-    def getCurrentEntry(self):
-        return self['config'].getCurrent() and self['config'].getCurrent()[0] or ''
-
-    def getCurrentValue(self):
-        return self['config'].getCurrent() and str(self['config'].getCurrent()[1].getText()) or ''
-
-    def createSummary(self):
-        from Screens.Setup import SetupSummary
-        return SetupSummary
-
-    def Ok_edit(self):
-        ConfigListScreen.keyOK(self)
-        sel = self['config'].getCurrent()[1]
-        if sel and sel == cfg.cachefold:
-            self.setting = 'cachefold'
-            self.openDirectoryBrowser(cfg.cachefold.value)
-        if sel and sel == cfg.movie:
-            self.setting = 'moviefold'
-            self.openDirectoryBrowser(cfg.movie.value)
-        else:
-            pass
-
-    def openDirectoryBrowser(self, path):
-        try:
-            self.session.openWithCallback(
-                self.openDirectoryBrowserCB,
-                LocationBox,
-                windowTitle=_('Choose Directory:'),
-                text=_('Choose Directory'),
-                currDir=str(path),
-                bookmarks=config.movielist.videodirs,
-                autoAdd=False,
-                editDir=True,
-                inhibitDirs=['/bin', '/boot', '/dev', '/home', '/lib', '/proc', '/run', '/sbin', '/sys', '/var'],
-                minFree=15
-            )
-        except Exception as e:
-            print('openDirectoryBrowser get failed: ', e)
-
-    def openDirectoryBrowserCB(self, path):
-        if path is not None:
-            if self.setting == 'cachefold':
-                cfg.cachefold.setValue(path)
-            if self.setting == 'moviefold':
-                cfg.movie.setValue(path)
-        return
-
-    def save(self):
-        if self['config'].isChanged():
-            for x in self['config'].list:
-                x[1].save()
-            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
-            cfg.save()
-            configfile.save()
-        self.close()
-
-    def extnok(self, answer=None):
-        from Screens.MessageBox import MessageBox
-        if answer is None:
-            if self["config"].isChanged():
-                self.session.openWithCallback(self.extnok, MessageBox, _("Really close without saving settings?"))
-            else:
-                self.close()
-        elif answer:
-            for x in self["config"].list:
-                x[1].cancel()
-
-            self.close()
-        return
-
-
 class live_stream(Screen):
     def __init__(self, session, name, url, pic, nextmodule):
         Screen.__init__(self, session)
@@ -1002,7 +957,6 @@ class live_stream(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1033,17 +987,17 @@ class live_stream(Screen):
         self.pics = []
         self.infos = []
         referer = 'https://tivustream.website'
+        name = self.name
         url = self.url
+        pic = self.pic
+        info = ""
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i < 50:
-            name = ""
-            url = ""
-            pic = ""
-            info = ''
+
             try:
                 if 'movie' in nextmodule:
                     nextmodule = "Videos4"
@@ -1073,20 +1027,19 @@ class live_stream(Screen):
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
                 info = info.replace('---', ' ')
-                # print('live_stream load json name = ', name)
-                # print('live_stream load json url = ', url)
-                # print('live_stream load json pic = ', pic)
-                # print('live_stream load json info = ', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
+
             except Exception as e:
                 print(e)
                 break
-        self.__layoutFinished()
+
         showlist(self.names, self['list'])
+        self.__layoutFinished()
 
     def okRun(self):
         global search
@@ -1166,6 +1119,7 @@ class live_stream(Screen):
 
     def cancel(self):
         global nextmodule
+
         if nextmodule == 'Videos3':
             nextmodule = 'live'
         if nextmodule == 'Videos4':
@@ -1285,7 +1239,7 @@ class video6(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1345,23 +1299,13 @@ class video6(Screen):
                 pic = ""
                 info = ''
                 try:
-                    # if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
                     name = Utils.cleanName(name)
-                    # if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
-                    # elif "yatse" in y["items"][i]:
-                        # url = (y["items"][i]["yatse"])
-                    # if "thumbnail" in y["items"][i]:
                     pic = (y["items"][i]["thumbnail"])
-                    # if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
-                    # print('video6 load json name = ', name)
-                    # print('video6 load json url = ', url)
-                    # print('video6 load json pic = ', pic)
-                    # print('video6 load json info = ', info)
                     self.names.append(name)
                     self.urls.append(url)
                     self.pics.append(pic)
@@ -1508,6 +1452,7 @@ class nextvideo3(Screen):
         self.name = name
         self.url = url
         self.pic = pic
+
         self.downloading = False
         self.currentList = 'list'
         self['title'] = Label(title_plug)
@@ -1515,7 +1460,7 @@ class nextvideo3(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1556,15 +1501,16 @@ class nextvideo3(Screen):
             print(e)
 
     def readJsonFile(self):
+
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
         referer = 'https://tivustream.website'
-        url = self.url
-        content = Utils.ReadUrl2(url, referer)
+        content = Utils.ReadUrl2(self.url, referer)
         if PY3:
             content = six.ensure_str(content)
+
         y = json.loads(content)
         i = 0
         while i < 50:
@@ -1573,23 +1519,14 @@ class nextvideo3(Screen):
             pic = ""
             info = ''
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
-                # print('nextvideo3 load json name = ', name)
-                # print('nextvideo3 load json url = ', url)
-                # print('nextvideo3 load json pic = ', pic)
-                # print('nextvideo3 load json info = ', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1606,6 +1543,7 @@ class nextvideo3(Screen):
         if i < 0:
             return
         idx = self['list'].getSelectionIndex()
+
         name = self.names[idx]
         url = self.urls[idx]
         pic = self.pics[idx]
@@ -1618,6 +1556,7 @@ class nextvideo3(Screen):
     def cancel(self):
         global nextmodule
         nextmodule = 'Videos3'
+
         self.close(None)
 
     def up(self):
@@ -1645,7 +1584,6 @@ class nextvideo3(Screen):
             name = self.names[idx]
             pixmaps = self.pics[idx]
             pixmaps = six.ensure_binary(self.pics[idx])
-
             if 'next' in name.lower():
                 pixmaps = str(piccons) + nextpng
                 if os.path.exists(pixmaps):
@@ -1743,7 +1681,7 @@ class nextvideo1(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -1974,7 +1912,7 @@ class video3(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2031,23 +1969,13 @@ class video3(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
-                # print('Videos3 load json name = ', name)
-                # print('Videos3 load json url = ', url)
-                # print('Videos3 load json pic = ', pic)
-                # print('Videos3 load json info = ', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2203,7 +2131,7 @@ class video4(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2426,7 +2354,7 @@ class nextvideo4(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2650,7 +2578,7 @@ class video5(Screen):
                                      'ColorActions',
                                      'EPGSelectActions',
                                      'MenuActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'DirectionActions'], {'ok': self.okRun,
                                                            'red': self.cancel,
                                                            'up': self.up,
@@ -2965,7 +2893,7 @@ class Playstream1(Screen):
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
                                      'DirectionActions',
-                                     'ButtonSetupActions',
+                                     # 'ButtonSetupActions',
                                      'OkCancelActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
@@ -3011,7 +2939,6 @@ class Playstream1(Screen):
 
     def download_m3u(self, result):
         if result:
-            # if 'm3u8' not in self.urlm3u:
             path = urlparse(self.urlm3u).path
             ext = splitext(path)[1]
             if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
@@ -3024,27 +2951,12 @@ class Playstream1(Screen):
             fileTitle = fileTitle.lower() + ext
             self.in_tmp = os.path.join(Path_Movies, fileTitle)
             self.downloading = True
-
             try:
-                '''
-                # self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
-                # self.download.addProgress(self.downloadProgress)
-                # self.download.start().addCallback(self.finish).addErrback(self.showError)
-
-                # useragent = "--header='User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'"
-                # WGET = '/usr/bin/wget'
-                # if os.path.exists('/var/lib/dpkg/status'):
-                    # WGET = '/usr/bin/wget --no-check-certificate'
-                # cmd = WGET + " %s -c '%s' -O '%s'" % (useragent, self.urlm3u, self.in_tmp)
-                # cmd2 = WGET + " -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
-                '''
                 f = open(self.in_tmp, 'wb')
                 f.close()
-
                 cmd = "wget -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
                 if "https" in str(self.urlm3u):
                     cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
-
                 job_manager.AddJob(downloadJob(self, cmd, self.in_tmp, fileTitle))
 
             except URLError as e:
@@ -3286,7 +3198,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.name = name
         self.state = self.STATE_PLAYING
         self['actions'] = ActionMap(['WizardActions', 'MoviePlayerActions', 'MovieSelectionActions', 'MediaPlayerActions', 'EPGSelectActions', 'MediaPlayerSeekActions', 'ColorActions',
-                                     'ButtonSetupActions', 'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
+                                     'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
             'leavePlayer': self.cancel,
             'epg': self.showIMDB,
             'info': self.showIMDB,
