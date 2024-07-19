@@ -3,7 +3,7 @@
 	<widget name="title" position="308,100" size="1075,58" font="Regular;38" halign="center" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="6" />
 	<widget name="info" position="287,180" size="1100,120" font="Regular;40" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
 	<widget name="description" position="298,1056" zPosition="4" size="1100,155" font="Regular; 46" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="left" valign="center" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" scale="stretch" size="2560,1440" zPosition="1" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" size="2560,1440" scale="stretch" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/tvs.png" alphatest="blend" position="294,20" scale="stretch" size="371,80" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="287,160" size="1100,11" alphatest="blend" zPosition="5" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sep.png" position="294,1227" size="1100,11" alphatest="blend" zPosition="5" />
@@ -12,7 +12,7 @@
 	<widget name="paypal" position="1784,766" size="702,263" font="Regular;32" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<eLabel position="1774,188" size="720,852" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
 	<!-- Menu List -->
-	<widget name="config" position="294,307" size="1102,734" font="Regular;40" itemHeight="67" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sliderb.png" />
+	<widget name="config" position="294,307" size="1102,734" font="Regular;40" itemHeight="67" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" />
 	<!-- Colors 1220 -->
 	<eLabel backgroundColor="#00ff0000" position="292,1259" size="400,8" zPosition="10" />
 	<eLabel backgroundColor="#0000ff00" position="292,1339" size="400,8" zPosition="10" />

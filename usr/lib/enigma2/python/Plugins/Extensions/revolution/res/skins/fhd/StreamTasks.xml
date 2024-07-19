@@ -1,7 +1,7 @@
 <!-- ***** PLAYLIST FOLDER 1920x1080 ***** 15-05-2018 /-->
 <screen name="StreamTasks" position="0,0" size="1920,1080" title="Video Download List" backgroundColor="#FF000000" flags="wfNoBorder">
 	<eLabel text="MovieList" position="399,15" size="883,100" font="Regular;48" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="3" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" position="0,0" scale="stretch" size="1920,1080" zPosition="1" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main2.png" position="0,0" scale="stretch" size="1920,1080" />
 	<ePixmap position="222,4" size="163,117" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/icon.png" scale="stretch" alphatest="blend" zPosition="4" />
 	<eLabel position="210,130" size="1520,5" backgroundColor="#202020" zPosition="2" />
 	<eLabel position="210,955" size="1520,5" backgroundColor="#202020" zPosition="1" />	

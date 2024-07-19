@@ -2,7 +2,7 @@
 <screen name="Playstream1" position="0,0" size="1280,720" title=".::REVOLUTION::.." backgroundColor="#FF000000" flags="wfNoBorder">
 	<widget source="Title" render="Label" position="152,4" size="537,66" font="Regular;33" foregroundColor="#007fcfff" backgroundColor="#000000" transparent="1" zPosition="5" halign="center" />
 	<eLabel position="153,80" size="540,2" backgroundColor="#303030" zPosition="4" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" scale="stretch" size="1280,720" zPosition="1" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" size="1280,720" scale="stretch" />
 	<eLabel position="153,640" size="540,2" backgroundColor="#303030" zPosition="4" />
 	<widget name="title" position="154,55" size="537,23" font="Regular;18" halign="center" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="6" />
 	<widget name="poster" position="833,100" size="280,392" alphatest="blend" scale="1" zPosition="3" />
