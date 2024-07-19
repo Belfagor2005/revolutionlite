@@ -2,8 +2,7 @@
 <screen name="revall" position="0,0" size="1920,1080" title="..::Revolution::.." backgroundColor="#ff000000" flags="wfNoBorder">
 	<widget name="title" position="531,43" size="511,48" font="Regular; 32" halign="right" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="5" />
     <widget name="info" position="226,95" size="820,50" font="Regular;30" halign="left" foregroundColor="yellow" backgroundColor="#000000" transparent="1" zPosition="5" />
-    <widget name="pth" position="219,1024" size="829,44" font="Regular;30" halign="right" foregroundColor="#808080" backgroundColor="#000000" transparent="1" zPosition="5" render="rvRunningText" />
-    <widget source="desc" render="rvRunningText" position="217,741" size="826,220" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="transparent" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1" />
+    <widget name="pth" position="219,1024" size="829,44" font="Regular;30" halign="right" foregroundColor="#808080" backgroundColor="#000000" transparent="1" zPosition="5" />
     <eLabel position="216,751" size="828,220" backgroundColor="#30000000" zPosition="1" />
     <!-- Graph -->
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/main1.png" position="0,0" size="1920,1080" scale="stretch" />
@@ -16,6 +15,7 @@
     <eLabel name="" position="990,970" size="55,52" backgroundColor="#003e4b53" halign="center" valign="center" transparent="0" cornerRadius="26" font="Regular; 17" zPosition="3" text="INFO" />
     <!-- Menu List -->
     <widget name="list" position="219,153" size="830,580" scrollbarMode="showOnDemand" enableWrapAround="1" transparent="1" zPosition="10" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#000b2049" backgroundColorSelected="#0b2049" />
+    <widget source="desc" render="rvRunningText" position="217,741" size="826,220" font="Regular;30" foregroundColor="#ffb75b" backgroundColor="transparent" halign="center" transparent="1" zPosition="2" options="movetype=running,startpoint=0,direction=top,steptime=80,repeat=0,always=0,oneshot=0,startdelay=6000,wrap=1" />
     <!-- Colors -->
     <eLabel position="230,960" size="210,60" backgroundColor="#ff0033" zPosition="4" />       
     <eLabel position="656,960" size="210,60" backgroundColor="#ffff00" zPosition="4" />
