@@ -12,7 +12,7 @@
 	<widget name="paypal" position="1338,574" size="526,197" font="Regular;24" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<eLabel position="1330,141" size="540,639" backgroundColor="#80000000" cornerRadius="20" zPosition="1" />
 	<!-- Menu List -->
-	<widget name="config" position="220,230" size="826,550" font="Regular;30" itemHeight="50" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/revolution/res/pics/sliderb.png" />
+	<widget name="config" position="220,230" size="826,550" font="Regular;30" itemHeight="50" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" />
 	<!-- Colors 1220 -->
 	<eLabel backgroundColor="#00ff0000" position="219,944" size="300,6" zPosition="10" />
 	<eLabel backgroundColor="#0000ff00" position="219,1004" size="300,6" zPosition="10" />

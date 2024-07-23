@@ -10,10 +10,11 @@
 Info http://t.me/tivustream
 '''
 from __future__ import print_function
-from . import _, logdata, getversioninfo, paypal
+from . import _, logdata, paypal  # getversioninfo
 from .resolver import Utils
 from .resolver import html_conv
 from .resolver.Console import Console as xConsole
+
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
@@ -36,7 +37,7 @@ from Components.config import (
     config,
     ConfigYesNo,
     ConfigSubsection,
-    ConfigText,
+    # ConfigText,
 )
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBarGenerics import (
@@ -65,7 +66,7 @@ from enigma import (
     gPixmapPtr,
     getDesktop,
     iPlayableService,
-    iServiceInformation,
+    # iServiceInformation,
     loadPNG,
 )
 from os.path import splitext
@@ -146,7 +147,7 @@ def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args,
         print(error)
 
 
-currversion = '1.9'  # getversioninfo()
+currversion = '2.0'  # getversioninfo()
 Path_Tmp = "/tmp"
 pictmp = os.path.join(Path_Tmp, "poster.jpg")
 UrlSvr = UrlSvr.replace('+', '')
@@ -943,6 +944,8 @@ class live_stream(Screen):
         self["poster"] = Pixmap()
         self["poster"].hide()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.names = []
         self.urls = []
         self.pics = []
@@ -1230,6 +1233,8 @@ class video6(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -1450,6 +1455,8 @@ class nextvideo3(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -1672,6 +1679,8 @@ class nextvideo1(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -1903,6 +1912,8 @@ class video3(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -2122,6 +2133,8 @@ class video4(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -2345,6 +2358,8 @@ class nextvideo4(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
@@ -2569,6 +2584,8 @@ class video5(Screen):
         self['desc'] = StaticText()
         self["poster"] = Pixmap()
         self['key_red'] = Button(_('Back'))
+        self['key_yellow'] = Button()
+        self['key_yellow'].hide()
         self.name = name
         self.url = url
         self.pic = pic
