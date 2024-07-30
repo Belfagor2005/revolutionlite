@@ -618,7 +618,8 @@ class myconfig(ConfigListScreen, Screen):
         except Exception as e:
             print('openDirectoryBrowser get failed: ', e)
 
-    def openDirectoryBrowserCB(self, path):
+    def openDirectoryBrowserCB(self, path=None)        
+        # if callback is not None and len(callback):
         if path is not None:
             if self.setting == 'cachefold':
                 cfg.cachefold.setValue(path)
@@ -905,7 +906,7 @@ class Revolmain(Screen):
         self.picx = pic
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
 
-    def filterChannels(self, result):
+    def filterChannels(self, result=None):
         if result:
             global search
             pic = self.picx
@@ -1088,7 +1089,7 @@ class live_stream(Screen):
         self.picx = pic
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
 
-    def filterChannels(self, result):
+    def filterChannels(self, result=None):
         if result:
             global search
             pic = self.picx
@@ -2958,7 +2959,7 @@ class Playstream1(Screen):
                 self.downloading = False
                 self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
 
-    def download_m3u(self, result):
+    def download_m3u(self, result=None):
         if result:
             path = urlparse(self.urlm3u).path
             ext = splitext(path)[1]
@@ -2986,7 +2987,7 @@ class Playstream1(Screen):
         else:
             self.downloading = False
 
-    def ImageDownloadCB(self, ret):
+    def ImageDownloadCB(self, ret=None):
         if ret:
             return
         if job_manager.active_job:
@@ -3607,7 +3608,7 @@ class StreamTasks(Screen):
         dom = sel
         self.session.openWithCallback(self.callMyMsg1, MessageBox, _("Do you want to remove %s ?") % dom, MessageBox.TYPE_YESNO, timeout=15, default=False)
 
-    def callMyMsg1(self, result):
+    def callMyMsg1(self, result=None):
         if result:
             current = self["movielist"].getCurrent()
             sel = Path_Movies + current[1]
