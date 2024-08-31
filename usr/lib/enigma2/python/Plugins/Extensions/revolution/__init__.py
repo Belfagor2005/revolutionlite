@@ -5,7 +5,7 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 import gettext
 import os
-
+import sys
 PluginLanguageDomain = 'revolution'
 PluginLanguagePath = 'Extensions/revolution/res/locale'
 
