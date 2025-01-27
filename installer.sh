@@ -2,8 +2,8 @@
 ## setup command=wget -q --no-check-certificate https://raw.githubusercontent.com/Belfagor2005/revolutionlite/main/installer.sh -O - | /bin/sh
 
 ## Only This 2 lines to edit with new version ######
-version='2.0'
-changelog='\nAdd Locale Language\nFix conponent stream'
+version='2.1'
+changelog='\nAdd next/rew on Player'
 ##############################################################
 
 TMPPATH=/tmp/revolutionlite-main
