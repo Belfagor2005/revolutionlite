@@ -30,7 +30,9 @@ from Components.Button import Button
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
+from Components.MultiContent import (
+    MultiContentEntryPixmapAlphaTest,
+    MultiContentEntryText)
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
@@ -117,8 +119,16 @@ if Utils.isStreamlinkAvailable:
     streamlink = True
 
 
-def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
-    print('[threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+def threadGetPage(
+        url=None,
+        file=None,
+        key=None,
+        success=None,
+        fail=None,
+        *args,
+        **kwargs):
+    print('[threadGetPage] url, file, key, args, kwargs', url,
+          "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
         url = url.replace('https', 'http')
         response = get(url, verify=False)
@@ -140,8 +150,10 @@ currversion = '2.1'  # getversioninfo()
 Path_Tmp = "/tmp"
 plugin_path = '/usr/lib/enigma2/python/Plugins/Extensions/revolution'
 
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
-           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Encoding': 'deflate'}
 
 title_plug = 'TVS Pro Lite V. %s' % currversion
 desc_plug = 'TVS Pro Lite Revolution'
@@ -177,7 +189,7 @@ def TvsApi():
         series = tvs.readline().strip()
         other = tvs.readline().strip()
         return live, movie, series, other
-    except:
+    except BaseException:
         return live, movie, series, other
         pass
 
@@ -213,7 +225,14 @@ if isDreamOS:
     path_skin = os.path.join(path_skin, 'dreamOs')
 
 logdata("path picons: ", str(path_skin))
-VIDEO_ASPECT_RATIO_MAP = {0: "4:3 Letterbox", 1: "4:3 PanScan", 2: "16:9", 3: "16:9 Always", 4: "16:10 Letterbox", 5: "16:10 PanScan", 6: "16:9 Letterbox"}
+VIDEO_ASPECT_RATIO_MAP = {
+    0: "4:3 Letterbox",
+    1: "4:3 PanScan",
+    2: "16:9",
+    3: "16:9 Always",
+    4: "16:10 Letterbox",
+    5: "16:10 PanScan",
+    6: "16:9 Letterbox"}
 VIDEO_FMT_PRIORITY_MAP = {"38": 1, "37": 2, "22": 3, "18": 4, "35": 5, "34": 6}
 
 
@@ -368,14 +387,59 @@ def rvListEntry(name, url, idx='None'):
         pngs = os.path.join(plugin_path, 'res/pics/sport.png')
 
     if screenwidth.width() == 2560:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    5, 5), size=(
+                    50, 50), png=loadPNG(pngs)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    90,
+                    0),
+                size=(
+                    1200,
+                    60),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     elif screenwidth.width() == 1920:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    5, 5), size=(
+                    40, 40), png=loadPNG(pngs)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    70,
+                    0),
+                size=(
+                    1000,
+                    50),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 8), size=(40, 40), png=loadPNG(pngs)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    3, 8), size=(
+                    40, 40), png=loadPNG(pngs)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    50,
+                    0),
+                size=(
+                    500,
+                    50),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
 
     return res
 
@@ -414,7 +478,7 @@ try:
     from Components.UsageConfig import defaultMoviePath
     downloadpath = defaultMoviePath()
     cfg.movie = ConfigDirectory(default=downloadpath)
-except:
+except BaseException:
     if os.path.exists("/usr/bin/apt-get"):
         cfg.movie = ConfigDirectory(default='/media/hdd/movie')
 
@@ -485,7 +549,11 @@ class myconfig(ConfigListScreen, Screen):
         self.setTitle(title_plug)
         self.onChangedEntry = []
         self.list = []
-        ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
+        ConfigListScreen.__init__(
+            self,
+            self.list,
+            session=self.session,
+            on_change=self.changedEntry)
         self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('- - - -'))
         self['key_yellow'] = Button(_('Choice'))
@@ -520,7 +588,9 @@ class myconfig(ConfigListScreen, Screen):
             os.system('wget -qO- http://ipecho.net/plain > /tmp/currentip')
         currentip1 = open('/tmp/currentip', 'r')
         currentip = currentip1.read()
-        self['info'].setText(_('Settings Revolution\nYour current IP is %s') % currentip)
+        self['info'].setText(
+            _('Settings Revolution\nYour current IP is %s') %
+            currentip)
 
     def VirtualKeyBoardCallback(self, callback=None):
         if callback is not None and len(callback):
@@ -530,19 +600,36 @@ class myconfig(ConfigListScreen, Screen):
     def KeyText(self):
         sel = self['config'].getCurrent()
         if sel:
-            self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
+            self.session.openWithCallback(
+                self.VirtualKeyBoardCallback,
+                VirtualKeyBoard,
+                title=self['config'].getCurrent()[0],
+                text=self['config'].getCurrent()[1].value)
 
     def cachedel(self):
         fold = os.path.join(str(cfg.cachefold.value), "revolution/pic")
         Utils.cachedel(fold)
-        self.mbox = self.session.open(MessageBox, _('All cache fold are empty!'), MessageBox.TYPE_INFO, timeout=5)
+        self.mbox = self.session.open(
+            MessageBox,
+            _('All cache fold are empty!'),
+            MessageBox.TYPE_INFO,
+            timeout=5)
 
     def createSetup(self):
         self.editListEntry = None
         self.list = []
-        self.list.append(getConfigListEntry(_("Set the path Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required")))
-        self.list.append(getConfigListEntry(_("Set the path to the Cache folder"), cfg.cachefold, _("Press Ok to select the folder containing the picons files")))
-        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services, _("Configure Service Player Reference")))
+        self.list.append(getConfigListEntry(_("Set the path Movie folder"), cfg.movie, _(
+            "Folder Movie Path (eg.: /media/hdd/movie), Press OK - Enigma restart required")))
+        self.list.append(
+            getConfigListEntry(
+                _("Set the path to the Cache folder"),
+                cfg.cachefold,
+                _("Press Ok to select the folder containing the picons files")))
+        self.list.append(
+            getConfigListEntry(
+                _('Services Player Reference type'),
+                cfg.services,
+                _("Configure Service Player Reference")))
         self['config'].list = self.list
         self["config"].l.setList(self.list)
         self.setInfo()
@@ -570,7 +657,11 @@ class myconfig(ConfigListScreen, Screen):
         if self['config'].isChanged():
             for x in self['config'].list:
                 x[1].save()
-            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
+            self.mbox = self.session.open(
+                MessageBox,
+                _('Settings saved correctly!'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
             self.close()
         else:
             self.close()
@@ -582,20 +673,29 @@ class myconfig(ConfigListScreen, Screen):
             self.close(True)
 
     def changedEntry(self):
-        self['key_green'].instance.setText(_('Save') if self['config'].isChanged() else '- - - -')
+        self['key_green'].instance.setText(
+            _('Save') if self['config'].isChanged() else '- - - -')
         for x in self.onChangedEntry:
             x()
         try:
-            if isinstance(self['config'].getCurrent()[1], ConfigEnableDisable) or isinstance(self['config'].getCurrent()[1], ConfigYesNo) or isinstance(self['config'].getCurrent()[1], ConfigSelection):
+            if isinstance(
+                self['config'].getCurrent()[1],
+                ConfigEnableDisable) or isinstance(
+                self['config'].getCurrent()[1],
+                ConfigYesNo) or isinstance(
+                self['config'].getCurrent()[1],
+                    ConfigSelection):
                 self.createSetup()
-        except:
+        except BaseException:
             pass
 
     def getCurrentEntry(self):
-        return self['config'].getCurrent() and self['config'].getCurrent()[0] or ''
+        return self['config'].getCurrent() and self['config'].getCurrent()[
+            0] or ''
 
     def getCurrentValue(self):
-        return self['config'].getCurrent() and str(self['config'].getCurrent()[1].getText()) or ''
+        return self['config'].getCurrent() and str(
+            self['config'].getCurrent()[1].getText()) or ''
 
     def createSummary(self):
         from Screens.Setup import SetupSummary
@@ -623,9 +723,18 @@ class myconfig(ConfigListScreen, Screen):
                 bookmarks=config.movielist.videodirs,
                 autoAdd=False,
                 editDir=True,
-                inhibitDirs=['/bin', '/boot', '/dev', '/home', '/lib', '/proc', '/run', '/sbin', '/sys', '/var'],
-                minFree=15
-            )
+                inhibitDirs=[
+                    '/bin',
+                    '/boot',
+                    '/dev',
+                    '/home',
+                    '/lib',
+                    '/proc',
+                    '/run',
+                    '/sbin',
+                    '/sys',
+                    '/var'],
+                minFree=15)
         except Exception as e:
             print('openDirectoryBrowser get failed: ', e)
 
@@ -641,7 +750,11 @@ class myconfig(ConfigListScreen, Screen):
         if self['config'].isChanged():
             for x in self['config'].list:
                 x[1].save()
-            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
+            self.mbox = self.session.open(
+                MessageBox,
+                _('Settings saved correctly!'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
             cfg.save()
             configfile.save()
         self.close()
@@ -650,7 +763,8 @@ class myconfig(ConfigListScreen, Screen):
         from Screens.MessageBox import MessageBox
         if answer is None:
             if self["config"].isChanged():
-                self.session.openWithCallback(self.extnok, MessageBox, _("Really close without saving settings?"))
+                self.session.openWithCallback(
+                    self.extnok, MessageBox, _("Really close without saving settings?"))
             else:
                 self.close()
         elif answer:
@@ -730,7 +844,9 @@ class Revolmain(Screen):
     def check_vers(self):
         remote_version = '0.0'
         remote_changelog = ''
-        req = Request(b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        req = Request(
+            b64decoder(installer_url), headers={
+                'User-Agent': 'Mozilla/5.0'})
         page = urlopen(req).read()
         if PY3:
             data = page.decode("utf-8")
@@ -751,32 +867,66 @@ class Revolmain(Screen):
         if currversion < remote_version:
             self.Update = True
             self['key_yellow'].show()
-            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') %
+                (self.new_version,
+                 self.new_changelog),
+                MessageBox.TYPE_INFO,
+                timeout=5)
 
     def update_me(self):
         if self.Update is True:
-            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+            self.session.openWithCallback(
+                self.install_update,
+                MessageBox,
+                _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") %
+                (self.new_version,
+                 self.new_changelog),
+                MessageBox.TYPE_YESNO)
         else:
-            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+            self.session.open(
+                MessageBox,
+                _("Congrats! You already have the latest version..."),
+                MessageBox.TYPE_INFO,
+                timeout=4)
 
     def update_dev(self):
         try:
-            req = Request(b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            req = Request(
+                b64decoder(developer_url), headers={
+                    'User-Agent': 'Mozilla/5.0'})
             page = urlopen(req).read()
             data = json.loads(page)
             remote_date = data['pushed_at']
-            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            strp_remote_date = datetime.strptime(
+                remote_date, '%Y-%m-%dT%H:%M:%SZ')
             remote_date = strp_remote_date.strftime('%Y-%m-%d')
-            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+            self.session.openWithCallback(
+                self.install_update,
+                MessageBox,
+                _("Do you want to install update ( %s ) now?") %
+                (remote_date),
+                MessageBox.TYPE_YESNO)
         except Exception as e:
             print('error xcons:', e)
 
     def install_update(self, answer=False):
         if answer:
-            cmd1 = 'wget -q "--no-check-certificate" ' + b64decoder(installer_url) + ' -O - | /bin/sh'
-            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+            cmd1 = 'wget -q "--no-check-certificate" ' + \
+                b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(
+                xConsole,
+                'Upgrading...',
+                cmdlist=[cmd1],
+                finishedCallback=self.myCallback,
+                closeOnSuccess=False)
         else:
-            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+            self.session.open(
+                MessageBox,
+                _("Update Aborted!"),
+                MessageBox.TYPE_INFO,
+                timeout=3)
 
     def myCallback(self, result=None):
         print('result:', result)
@@ -814,25 +964,29 @@ class Revolmain(Screen):
         live, movie, series, other = TvsApi()
         if sel == ('SEARCH'):
             name = 'Search'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query='  # live #all_channel_live
+            # live #all_channel_live
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query='
             pic = piconsearch
             nextmodule = "Videos4"
             self.search_text(name, url, pic)
         elif sel == ('LIVE'):
             name = 'LIVE'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1'  # live #all_channel_live
+            # live #all_channel_live
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=live&page=1'
             pic = piconlive
             nextmodule = 'live'
             self.session.open(live_stream, name, url, pic, nextmodule)
         elif sel == 'MOVIE':
             name = 'MOVIE'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listGenMovie&page=1'  # movie #all_channel_movie
+            # movie #all_channel_movie
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listGenMovie&page=1'
             pic = piconmovie
             nextmodule = 'movie'
             self.session.open(live_stream, name, url, pic, nextmodule)
         elif sel == ('SERIES'):
             name = 'SERIES'
-            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listSerie&page=1'  # series #all_channel_series
+            # series #all_channel_series
+            url = 'https://tivustream.website/php_filter/kodi19/kodi19.php?mode=listSerie&page=1'
             pic = piconseries
             nextmodule = 'series'
             self.session.open(live_stream, name, url, pic, nextmodule)
@@ -841,13 +995,18 @@ class Revolmain(Screen):
                 self.zfreearhey()
 
     def zfreearhey(self):
-        freearhey = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+        freearhey = resolveFilename(
+            SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
         if os.path.isdir(freearhey):
             from Plugins.Extensions.freearhey.plugin import freearhey
             self.session.open(freearhey)
         else:
             try:
-                self.mbox = self.session.open(MessageBox, _('freearhey Plugin Not Installed!!\nUse my Plugin Freearhey'), MessageBox.TYPE_INFO, timeout=4)
+                self.mbox = self.session.open(
+                    MessageBox,
+                    _('freearhey Plugin Not Installed!!\nUse my Plugin Freearhey'),
+                    MessageBox.TYPE_INFO,
+                    timeout=4)
             except Exception as e:
                 print('error infobox ', e)
 
@@ -916,7 +1075,11 @@ class Revolmain(Screen):
         self.namex = name
         self.urlx = url
         self.picx = pic
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
+        self.session.openWithCallback(
+            self.filterChannels,
+            VirtualKeyBoard,
+            title=_("Filter this category..."),
+            text='')
 
     def filterChannels(self, result=None):
         if result:
@@ -928,7 +1091,7 @@ class Revolmain(Screen):
                 search = True
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
 
-            except:
+            except BaseException:
                 return
         else:
             self.resetSearch()
@@ -997,8 +1160,9 @@ class live_stream(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -1032,7 +1196,8 @@ class live_stream(Screen):
                 if 'movie' in nextmodule:
                     nextmodule = "Videos4"
                     self.names.append('Search')
-                    self.urls.append("https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=")
+                    self.urls.append(
+                        "https://tivustream.website/php_filter/kodi19/kodi19.php?mode=movie&query=")
                     self.pics.append(str(piconsearch))
                     self.infos.append(str('Search Movies'))
                     i += 1
@@ -1102,13 +1267,24 @@ class live_stream(Screen):
                 self.session.open(video6, name, url, pic, nextmodule)
             else:
                 print('self.list=', self.menu_list)
-                self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+                self.session.open(
+                    Playstream1,
+                    name,
+                    url,
+                    desc,
+                    pic,
+                    idx,
+                    self.menu_list)
 
     def search_text(self, name, url, pic):
         self.namex = name
         self.urlx = url
         self.picx = pic
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
+        self.session.openWithCallback(
+            self.filterChannels,
+            VirtualKeyBoard,
+            title=_("Filter this category..."),
+            text='')
 
     def filterChannels(self, result=None):
         if result:
@@ -1120,7 +1296,7 @@ class live_stream(Screen):
                 search = True
                 self.session.open(nextvideo4, name, url, pic, nextmodule)
 
-            except:
+            except BaseException:
                 return
         else:
             self.resetSearch()
@@ -1183,7 +1359,12 @@ class live_stream(Screen):
     def download(self, link, name):
         if PY3:
             link = link.encode()
-        callInThread(threadGetPage, url=link, file=None, success=name, fail=self.downloadError)
+        callInThread(
+            threadGetPage,
+            url=link,
+            file=None,
+            success=name,
+            fail=self.downloadError)
 
     def getPoster1(self, output):
         with open(pictmp, 'wb') as f:
@@ -1289,8 +1470,9 @@ class video6(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -1375,12 +1557,14 @@ class video6(Screen):
             desc = self.infos[idx]
             if '&page' in str(url) and nextmodule == 'Videos1':  # wooork
                 self.session.open(nextvideo1, name, url, pic, nextmodule)
-            if '&page' not in str(url) and nextmodule == 'Videos1':  # in series not appears
+            if '&page' not in str(
+                    url) and nextmodule == 'Videos1':  # in series not appears
                 if 'tvseriesId' in str(url):
                     self.session.open(nextvideo1, name, url, pic, nextmodule)
                 else:
                     print('self.list=', self.menu_list)
-                    self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+                    self.session.open(
+                        Playstream1, name, url, desc, pic, idx, self.menu_list)
             else:
                 print('bhoo .mp4???')
                 return
@@ -1432,9 +1616,21 @@ class video6(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -1461,7 +1657,8 @@ class video6(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
+        self.picload.setPara(
+            [size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
@@ -1528,8 +1725,9 @@ class nextvideo3(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -1610,7 +1808,14 @@ class nextvideo3(Screen):
             self.session.open(video3, name, url, pic, nextmodule)
         else:
             print('self.list=', self.list)
-            self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+            self.session.open(
+                Playstream1,
+                name,
+                url,
+                desc,
+                pic,
+                idx,
+                self.menu_list)
 
     def cancel(self):
         global nextmodule
@@ -1660,9 +1865,21 @@ class nextvideo3(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -1762,8 +1979,9 @@ class nextvideo1(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -1844,12 +2062,20 @@ class nextvideo1(Screen):
         desc = self.infos[idx]
         if '&page' in str(url) and nextmodule == 'Videos1':  # wooork
             self.session.open(video6, name, url, pic, nextmodule)
-        if '&page' not in str(url) and nextmodule == 'Videos1':  # in series not appears
+        if '&page' not in str(
+                url) and nextmodule == 'Videos1':  # in series not appears
             if 'tvseriesId' in str(url):
                 self.session.open(video6, name, url, pic, nextmodule)
             else:
                 print('self.list=', self.menu_list)
-                self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+                self.session.open(
+                    Playstream1,
+                    name,
+                    url,
+                    desc,
+                    pic,
+                    idx,
+                    self.menu_list)
         else:
             print('bhoo .mp4???')
             return
@@ -1901,9 +2127,21 @@ class nextvideo1(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -1930,7 +2168,8 @@ class nextvideo1(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
+        self.picload.setPara(
+            [size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
@@ -1995,8 +2234,9 @@ class video3(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -2077,7 +2317,14 @@ class video3(Screen):
             self.session.open(nextvideo3, name, url, pic, nextmodule)
         else:
             print('self.list=', self.list)
-            self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+            self.session.open(
+                Playstream1,
+                name,
+                url,
+                desc,
+                pic,
+                idx,
+                self.menu_list)
 
     def cancel(self):
         global nextmodule
@@ -2129,9 +2376,21 @@ class video3(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -2229,8 +2488,9 @@ class video4(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -2358,9 +2618,21 @@ class video4(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -2387,7 +2659,8 @@ class video4(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
+        self.picload.setPara(
+            [size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
@@ -2452,8 +2725,9 @@ class nextvideo4(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -2582,9 +2856,21 @@ class nextvideo4(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -2611,7 +2897,8 @@ class nextvideo4(Screen):
         size = self['poster'].instance.size()
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
-        self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
+        self.picload.setPara(
+            [size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
@@ -2676,14 +2963,15 @@ class video5(Screen):
                                                            'cancel': self.cancel}, -2)
         self.readJsonTimer = eTimer()
         try:
-            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(self.readJsonFile)
-        except:
+            self.readJsonTimer_conn = self.readJsonTimer.timeout.connect(
+                self.readJsonFile)
+        except BaseException:
             self.readJsonTimer.callback.append(self.readJsonFile)
         self.readJsonTimer.start(200, True)
         self.timer = eTimer()
         try:
             self.timer_conn = self.timer.timeout.connect(self.left)
-        except:
+        except BaseException:
             self.timer.callback.append(self.left)
         self.timer.start(200, 1)
         # self.onLayoutFinish.append(self.__layoutFinished)
@@ -2759,7 +3047,14 @@ class video5(Screen):
         desc = self.infos[idx]
         pic = self.pics[idx]
         print('self.list=', self.menu_list)
-        self.session.open(Playstream1, name, url, desc, pic, idx, self.menu_list)
+        self.session.open(
+            Playstream1,
+            name,
+            url,
+            desc,
+            pic,
+            idx,
+            self.menu_list)
 
     def cancel(self):
         global nextmodule
@@ -2808,9 +3103,21 @@ class video5(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -2838,7 +3145,8 @@ class video5(Screen):
         self.picload = ePicLoad()
         self.scale = AVSwitch().getFramebufferScale()
         # if self.picload:
-        self.picload.setPara([size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
+        self.picload.setPara(
+            [size.width(), size.height(), self.scale[0], self.scale[1], 0, 1, '#00000000'])
         if os.path.exists('/var/lib/dpkg/status'):
             self.picload.startDecode(png, False)
         else:
@@ -2872,8 +3180,9 @@ class TvInfoBarShowHide():
         self.__locked = 0
         self.hideTimer = eTimer()
         try:
-            self.hideTimer_conn = self.hideTimer.timeout.connect(self.doTimerHide)
-        except:
+            self.hideTimer_conn = self.hideTimer.timeout.connect(
+                self.doTimerHide)
+        except BaseException:
             self.hideTimer.callback.append(self.doTimerHide)
         self.hideTimer.start(5000, True)
         self.onShow.append(self.__onShow)
@@ -2925,7 +3234,7 @@ class TvInfoBarShowHide():
     def lockShow(self):
         try:
             self.__locked += 1
-        except:
+        except BaseException:
             self.__locked = 0
         if self.execing:
             self.show()
@@ -2935,7 +3244,7 @@ class TvInfoBarShowHide():
     def unlockShow(self):
         try:
             self.__locked -= 1
-        except:
+        except BaseException:
             self.__locked = 0
         if self.__locked < 0:
             self.__locked = 0
@@ -2998,7 +3307,7 @@ class Playstream1(Screen):
         self.leftt = eTimer()
         try:
             self.leftt_conn = self.leftt.timeout.connect(self.load_poster)
-        except:
+        except BaseException:
             self.leftt.callback.append(self.load_poster)
         self.leftt.start(200, True)
         self.onLayoutFinish.append(self.openTest)
@@ -3011,14 +3320,25 @@ class Playstream1(Screen):
         self.namem3u = self.name1
         self.urlm3u = self.url
         if self.downloading is True:
-            self.session.open(MessageBox, _('You are already downloading!!!'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('You are already downloading!!!'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
             return
         else:
             if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:
-                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=5, default=False)
+                self.session.openWithCallback(
+                    self.download_m3u, MessageBox, _(
+                        "DOWNLOAD VIDEO?\n%s" %
+                        self.namem3u), type=MessageBox.TYPE_YESNO, timeout=5, default=False)
             else:
                 self.downloading = False
-                self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
+                self.session.open(
+                    MessageBox,
+                    _('Only VOD Movie allowed or not .ext Filtered!!!'),
+                    MessageBox.TYPE_INFO,
+                    timeout=5)
 
     def download_m3u(self, result=None):
         if result:
@@ -3029,21 +3349,62 @@ class Playstream1(Screen):
             fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
             fileTitle = re.sub(r' ', '_', fileTitle)
             fileTitle = re.sub(r'_+', '_', fileTitle)
-            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
-            fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
+            fileTitle = fileTitle.replace(
+                "(",
+                "_").replace(
+                ")",
+                "_").replace(
+                "#",
+                "").replace(
+                "+",
+                "_").replace(
+                    "\'",
+                    "_").replace(
+                        "'",
+                        "_").replace(
+                            "!",
+                            "_").replace(
+                                "&",
+                "_")
+            fileTitle = fileTitle.replace(
+                " ",
+                "_").replace(
+                ":",
+                "").replace(
+                "[",
+                "").replace(
+                "]",
+                "").replace(
+                    "!",
+                    "_").replace(
+                        "&",
+                "_")
             fileTitle = fileTitle.lower() + ext
             self.in_tmp = os.path.join(Path_Movies, fileTitle)
             self.downloading = True
             try:
                 f = open(self.in_tmp, 'wb')
                 f.close()
-                cmd = "wget -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
+                cmd = "wget -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (
+                    self.urlm3u, self.in_tmp)
                 if "https" in str(self.urlm3u):
-                    cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (self.urlm3u, self.in_tmp)
-                job_manager.AddJob(downloadJob(self, cmd, self.in_tmp, fileTitle))
+                    cmd = "wget --no-check-certificate -U 'Enigma2 - Revolution Plugin' -c '%s' -O '%s'" % (
+                        self.urlm3u, self.in_tmp)
+                job_manager.AddJob(
+                    downloadJob(
+                        self,
+                        cmd,
+                        self.in_tmp,
+                        fileTitle))
 
             except URLError as e:
-                self.session.openWithCallback(self.ImageDownloadCB, MessageBox, _("Download Failed !!") + "\n%s" % e, type=MessageBox.TYPE_ERROR)
+                self.session.openWithCallback(
+                    self.ImageDownloadCB,
+                    MessageBox,
+                    _("Download Failed !!") +
+                    "\n%s" %
+                    e,
+                    type=MessageBox.TYPE_ERROR)
                 self.downloading = False
         else:
             self.downloading = False
@@ -3059,13 +3420,18 @@ class Playstream1(Screen):
             self.LastJobView()
         else:
             self.downloading = False
-            self.session.open(MessageBox, _("Download Failed !!"), type=MessageBox.TYPE_ERROR)
+            self.session.open(
+                MessageBox,
+                _("Download Failed !!"),
+                type=MessageBox.TYPE_ERROR)
 
     def downloadProgress(self, recvbytes, totalbytes):
         self['info'].setText(_('Download...'))
         self["progress"].show()
-        self['progress'].value = int(100 * float(recvbytes) / float(totalbytes))
-        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (float(recvbytes) / 1024, float(totalbytes) / 1024, 100 * float(recvbytes) / float(totalbytes))
+        self['progress'].value = int(
+            100 * float(recvbytes) / float(totalbytes))
+        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (float(
+            recvbytes) / 1024, float(totalbytes) / 1024, 100 * float(recvbytes) / float(totalbytes))
         if recvbytes == totalbytes:
             self.downloading = False
 
@@ -3081,7 +3447,11 @@ class Playstream1(Screen):
 
     def showError(self, error):
         self.downloading = False
-        self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+        self.session.open(
+            MessageBox,
+            _('Download Failed!!!'),
+            MessageBox.TYPE_INFO,
+            timeout=5)
 
     def LastJobView(self):
         currentjob = None
@@ -3122,10 +3492,11 @@ class Playstream1(Screen):
             elif idx == 2:
                 try:
                     os.remove('/tmp/hls.avi')
-                except:
+                except BaseException:
                     pass
                 header = ''
-                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/hlsclient.py" "' + \
+                    self.url + '" "1" "' + header + '" + &'
                 print('In playVideo cmd =', cmd)
                 os.system(cmd)
                 os.system('sleep 3')
@@ -3135,7 +3506,7 @@ class Playstream1(Screen):
                 url = self.url
                 try:
                     os.remove('/tmp/hls.avi')
-                except:
+                except BaseException:
                     pass
                 cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/revolution/resolver/tsclient.py" "' + url + '" "1" + &'
                 print('hls cmd = ', cmd)
@@ -3164,7 +3535,14 @@ class Playstream1(Screen):
         else:
             print("Error: No item selected.")
             return
-        self.session.open(Playstream2, name, url, desc, self.index, item, self.menu_list)
+        self.session.open(
+            Playstream2,
+            name,
+            url,
+            desc,
+            self.index,
+            item,
+            self.menu_list)
         self.close()
 
     def play2(self):
@@ -3185,7 +3563,8 @@ class Playstream1(Screen):
                 if isinstance(url, bytes):
                     url = url.decode("utf-8")
                 url = url.replace(':', '%3a')
-                ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
+                ref = '5002:0:1:0:0:0:0:0:0:0:' + \
+                    'http%3a//127.0.0.1%3a8088/' + str(url)
                 sref = eServiceReference(ref)
                 sref.setName(name)
 
@@ -3193,17 +3572,28 @@ class Playstream1(Screen):
                 print("Error: No item selected.")
                 return
 
-            self.session.open(Playstream2, name, url, desc, self.index, item, self.menu_list)
+            self.session.open(
+                Playstream2,
+                name,
+                url,
+                desc,
+                self.index,
+                item,
+                self.menu_list)
             self.close()
         else:
-            self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('Install Streamlink first'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
 
     def cancel(self):
         try:
             self.session.nav.stopService()
             self.session.nav.playService(self.srefInit)
             self.close()
-        except:
+        except BaseException:
             pass
 
     def load_poster(self):
@@ -3222,9 +3612,21 @@ class Playstream1(Screen):
                     scheme = parsed.scheme
                     if scheme == "https" and sslverify:
                         sniFactory = SNIFactory(domain)
-                        downloadPage(pixmaps, pictmp, sniFactory, timeout=5).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp,
+                            sniFactory,
+                            timeout=5).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                     else:
-                        downloadPage(pixmaps, pictmp).addCallback(self.downloadPic, pictmp).addErrback(self.downloadError)
+                        downloadPage(
+                            pixmaps,
+                            pictmp).addCallback(
+                            self.downloadPic,
+                            pictmp).addErrback(
+                            self.downloadError)
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -3269,7 +3671,15 @@ class Playstream1(Screen):
         return
 
 
-class Playstream2(InfoBarBase, TvInfoBarShowHide, InfoBarSeek,  InfoBarNotifications, InfoBarAudioSelection, InfoBarSubtitleSupport, InfoBarMenu, Screen):
+class Playstream2(
+        InfoBarBase,
+        TvInfoBarShowHide,
+        InfoBarSeek,
+        InfoBarNotifications,
+        InfoBarAudioSelection,
+        InfoBarSubtitleSupport,
+        InfoBarMenu,
+        Screen):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -3302,7 +3712,7 @@ class Playstream2(InfoBarBase, TvInfoBarShowHide, InfoBarSeek,  InfoBarNotificat
         InfoBarNotifications.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
-        except:
+        except BaseException:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
         self.state = self.STATE_PLAYING
@@ -3397,7 +3807,7 @@ class Playstream2(InfoBarBase, TvInfoBarShowHide, InfoBarSeek,  InfoBarNotificat
         config.av.aspectratio.setValue(map[aspect])
         try:
             AVSwitch().setAspectRatio(aspect)
-        except:
+        except BaseException:
             pass
 
     def av(self):
@@ -3419,7 +3829,10 @@ class Playstream2(InfoBarBase, TvInfoBarShowHide, InfoBarSeek,  InfoBarNotificat
     def slinkPlay(self):
         name = self.name
         url = self.url
-        ref = "{0}:{1}".format(url.replace(":", "%3a"), name.replace(":", "%3a"))
+        ref = "{0}:{1}".format(
+            url.replace(
+                ":", "%3a"), name.replace(
+                ":", "%3a"))
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(str(name))
@@ -3487,7 +3900,7 @@ class Playstream2(InfoBarBase, TvInfoBarShowHide, InfoBarSeek,  InfoBarNotificat
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
-            except:
+            except BaseException:
                 pass
         self.close()
 
@@ -3595,11 +4008,12 @@ class plgnstrt(Screen):
     def OpenCheck(self):
         try:
             self['list'].setText(self.getinfo())
-        except:
+        except BaseException:
             self['list'].setText(_('\n\n' + 'Error downloading News!'))
 
     def error(self, error):
-        self['list'].setText(_('\n\n' + 'Server Off !') + '\n' + _('check SERVER in config'))
+        self['list'].setText(_('\n\n' + 'Server Off !') +
+                             '\n' + _('check SERVER in config'))
 
     def clsgo(self):
         self.session.openWithCallback(self.close, Revolmain)
@@ -3631,7 +4045,7 @@ class StreamTasks(Screen):
         self.Timer = eTimer()
         try:
             self.Timer_conn = self.Timer.timeout.connect(self.TimerFire)
-        except:
+        except BaseException:
             self.Timer.callback.append(self.TimerFire)
         self.onLayoutFinish.append(self.layoutFinished)
         self.onClose.append(self.__onClose)
@@ -3693,7 +4107,8 @@ class StreamTasks(Screen):
                         continue
                     if "autotimer" in filename:
                         continue
-                self.movielist.append(("movie", filename, _("Finished"), 100, "100%"))
+                self.movielist.append(
+                    ("movie", filename, _("Finished"), 100, "100%"))
 
     def keyOK(self):
         global file1
@@ -3709,9 +4124,14 @@ class StreamTasks(Screen):
                 file1 = False
                 isFile = os.path.isfile(url)
                 if isFile:
-                    self.session.open(Playstream2, name, url, desc, self.movielist)
+                    self.session.open(
+                        Playstream2, name, url, desc, self.movielist)
                 else:
-                    self.session.open(MessageBox, _("Is Directory or file not exist"), MessageBox.TYPE_INFO, timeout=5)
+                    self.session.open(
+                        MessageBox,
+                        _("Is Directory or file not exist"),
+                        MessageBox.TYPE_INFO,
+                        timeout=5)
             else:
                 job = current[0]
                 self.session.openWithCallback(self.JobViewCB, JobView, job)
@@ -3729,7 +4149,9 @@ class StreamTasks(Screen):
         current = self["movielist"].getCurrent()
         sel = Path_Movies + current[1]
         dom = sel
-        self.session.openWithCallback(self.callMyMsg1, MessageBox, _("Do you want to remove %s ?") % dom, MessageBox.TYPE_YESNO, timeout=15, default=False)
+        self.session.openWithCallback(
+            self.callMyMsg1, MessageBox, _("Do you want to remove %s ?") %
+            dom, MessageBox.TYPE_YESNO, timeout=15, default=False)
 
     def callMyMsg1(self, result=None):
         if result:
@@ -3741,9 +4163,18 @@ class StreamTasks(Screen):
                     self.Timer.stop()
                 cmd = 'rm -f ' + sel
                 os.system(cmd)
-                self.session.open(MessageBox, sel + _(" Movie has been successfully deleted\nwait time to refresh the list..."), MessageBox.TYPE_INFO, timeout=5)
+                self.session.open(
+                    MessageBox,
+                    sel +
+                    _(" Movie has been successfully deleted\nwait time to refresh the list..."),
+                    MessageBox.TYPE_INFO,
+                    timeout=5)
             else:
-                self.session.open(MessageBox, _("The movie not exist!\nwait time to refresh the list..."), MessageBox.TYPE_INFO, timeout=5)
+                self.session.open(
+                    MessageBox,
+                    _("The movie not exist!\nwait time to refresh the list..."),
+                    MessageBox.TYPE_INFO,
+                    timeout=5)
             self.onShown.append(self.rebuildMovieList)
 
 
@@ -3768,7 +4199,9 @@ class downloadJob(Job):
         try:
             serviceref = eServiceReference(4097, 0, filename)
             with open("%s.meta" % (filename), "w") as f:
-                f.write("%s\n%s\n%s\n%i\n" % (serviceref.toString(), filmtitle, "", time.time()))
+                f.write(
+                    "%s\n%s\n%s\n%i\n" %
+                    (serviceref.toString(), filmtitle, "", time.time()))
         except Exception as e:
             print(e)
         return
@@ -3788,12 +4221,32 @@ class DownloaderPostcondition(Condition):
 
     def getErrorMessage(self, task):
         return {
-            task.ERROR_CORRUPT_FILE: _("MOVIE DOWNLOAD FAILED!") + '\n\n' + _("DOWNLOADED FILE CORRUPTED:") + '\n%s' % task.error_message,
-            task.ERROR_RTMP_ReadPacket: _("MOVIE DOWNLOAD FAILED!") + '\n\n' + _("COULD NOT READ RTMP PACKET:") + '\n%s' % task.error_message,
-            task.ERROR_SEGFAULT: _("MOVIE DOWNLOAD FAILED!") + '\n\n' + _("SEGMENTATION FAULT:") + '\n%s' % task.error_message,
-            task.ERROR_SERVER: _("MOVIE DOWNLOAD FAILED!") + '\n\n' + _("SERVER RETURNED ERROR:") + '\n%s' % task.error_message,
-            task.ERROR_UNKNOWN: _("MOVIE DOWNLOAD FAILED!") + '\n\n' + _("UNKNOWN ERROR:") + '\n%s' % task.error_message
-        }[task.error]
+            task.ERROR_CORRUPT_FILE: _("MOVIE DOWNLOAD FAILED!") +
+            '\n\n' +
+            _("DOWNLOADED FILE CORRUPTED:") +
+            '\n%s' %
+            task.error_message,
+            task.ERROR_RTMP_ReadPacket: _("MOVIE DOWNLOAD FAILED!") +
+            '\n\n' +
+            _("COULD NOT READ RTMP PACKET:") +
+            '\n%s' %
+            task.error_message,
+            task.ERROR_SEGFAULT: _("MOVIE DOWNLOAD FAILED!") +
+            '\n\n' +
+            _("SEGMENTATION FAULT:") +
+            '\n%s' %
+            task.error_message,
+            task.ERROR_SERVER: _("MOVIE DOWNLOAD FAILED!") +
+            '\n\n' +
+            _("SERVER RETURNED ERROR:") +
+            '\n%s' %
+            task.error_message,
+            task.ERROR_UNKNOWN: _("MOVIE DOWNLOAD FAILED!") +
+            '\n\n' +
+            _("UNKNOWN ERROR:") +
+            '\n%s' %
+            task.error_message}[
+            task.error]
 
 
 class downloadTask(Task):
@@ -3815,7 +4268,9 @@ class downloadTask(Task):
         self.callback = callback
         self.download = downloadWithProgress(self.url, self.filename)
         self.download.addProgress(self.download_progress)
-        self.download.start().addCallback(self.download_finished).addErrback(self.download_failed)
+        self.download.start().addCallback(
+            self.download_finished).addErrback(
+            self.download_failed)
         print("[downloadTask] downloading", self.url, "to", self.filename)
 
     def abort(self):
@@ -3828,7 +4283,8 @@ class downloadTask(Task):
     def download_progress(self, recvbytes, totalbytes):
         if (recvbytes - self.last_recvbytes) > 10000:  # anti-flicker
             self.progress = int(100 * (float(recvbytes) / float(totalbytes)))
-            self.name = _("Downloading") + ' ' + _("%d of %d kBytes") % (recvbytes / 1024, totalbytes / 1024)
+            self.name = _("Downloading") + ' ' + \
+                _("%d of %d kBytes") % (recvbytes / 1024, totalbytes / 1024)
             self.last_recvbytes = recvbytes
 
     def download_failed(self, failure_instance=None, error_message=""):
@@ -3849,7 +4305,7 @@ class downloadTask(Task):
         if self.getProgress() == 0:
             try:
                 self.toolbox.download_failed()
-            except:
+            except BaseException:
                 pass
         elif self.getProgress() == 100:
             try:
@@ -3857,20 +4313,21 @@ class downloadTask(Task):
                 self.downloading = False
                 message = "Movie successfully transfered to your HDD!" + "\n" + self.filename
                 Utils.web_info(message)
-            except:
+            except BaseException:
                 pass
 
 
 def main(session, **kwargs):
     try:
         session.open(Revolmain)
-    except:
+    except BaseException:
         import traceback
         traceback.print_exc()
 
 
 def menu(menuid, **kwargs):
-    return [(desc_plug, main(), title_plug, 44)] if menuid == "mainmenu" else []
+    return [(desc_plug, main(), title_plug, 44)
+            ] if menuid == "mainmenu" else []
 
 
 def mainmenu(session, **kwargs):

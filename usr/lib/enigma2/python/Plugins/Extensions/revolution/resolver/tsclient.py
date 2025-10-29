@@ -19,6 +19,7 @@ Depends on python-crypto (for secure stream)
 Modified for OpenPli enigma2 usage by athoik
 Modified for KodiDirect, KodiLite and IPTVworld by pcd
 """
+import bitstring
 import sys
 import threading
 import time
@@ -52,7 +53,6 @@ def log(msg):
 SUPPORTED_VERSION = 3
 STREAM_PFILE = '/tmp/hls.avi'
 
-import bitstring
 
 defualtype = ""
 
@@ -79,7 +79,7 @@ def getLastPTS(data, rpid, type="video"):
     found = False
     while not found:
         if len(data) - currentpost >= 188:
-            bytes = data[currentpost:currentpost+188]
+            bytes = data[currentpost:currentpost + 188]
 
             bits = bitstring.ConstBitStream(bytes=bytes)
             sign = bits.read(8).uint
@@ -89,11 +89,11 @@ def getLastPTS(data, rpid, type="video"):
             pid = bits.read(13).uint
             if pid == rpid or rpid == 0:
                 try:
-                    packet = bits.read((packsize-3)*8)
+                    packet = bits.read((packsize - 3) * 8)
                     scramblecontrol = packet.read(2).uint
                     adapt = packet.read(2).uint
                     concounter = packet.read(4).uint
-                except:
+                except BaseException:
                     return None
                 decodedpts = None
                 av = ""
@@ -107,15 +107,15 @@ def getLastPTS(data, rpid, type="video"):
                     splicingpoint = packet.read(1).uint
                     transportprivate = packet.read(1).uint
                     adaptation_ext = packet.read(1).uint
-                    restofadapt = (adaptation_size+3) - 1
+                    restofadapt = (adaptation_size + 3) - 1
                     if pcrpresent == 1:
                         pcr = packet.read(48)
                         restofadapt -= 6
                     if opcrpresent == 1:
                         opcr = packet.read(48)
                         restofadapt -= 6
-                    packet.pos += (restofadapt-3) * 8
-                    if ((packet.len - packet.pos)/8) > 5:
+                    packet.pos += (restofadapt - 3) * 8
+                    if ((packet.len - packet.pos) / 8) > 5:
                         pesync = packet.read(24)  # .hex
                         if pesync == ('0x000001'):
                             pestype = packet.read(8).uint
@@ -123,7 +123,7 @@ def getLastPTS(data, rpid, type="video"):
                                 av = 'video'
                             if pestype < 223 and pestype > 191:
                                 av = 'audio'
-                            packet.pos += (3*8)
+                            packet.pos += (3 * 8)
                             ptspresent = packet.read(1).uint
                             dtspresent = packet.read(1).uint
                             if ptspresent:
@@ -136,7 +136,8 @@ def getLastPTS(data, rpid, type="video"):
                                 pts.pos += 1
                                 thirdpartpts = pts.read(15)
                                 # decodedpts = bitstring.ConstBitArray().join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]).uint
-                                decodedpts = int(''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
+                                decodedpts = int(
+                                    ''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
                             if dtspresent:
                                 dts = packet.read(40)
                                 dts.pos = 4
@@ -146,7 +147,8 @@ def getLastPTS(data, rpid, type="video"):
                                 dts.pos += 1
                                 thirdpartdts = dts.read(15)
                                 # decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
-                                decodeddts = int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
+                                decodeddts = int(
+                                    ''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
                 elif adapt == 2:
                     # if adapt is 2 the packet is only an adaptation field
                     adaptation_size = packet.read(8).uint
@@ -158,7 +160,7 @@ def getLastPTS(data, rpid, type="video"):
                     splicingpoint = packet.read(1).uint
                     transportprivate = packet.read(1).uint
                     adaptation_ext = packet.read(1).uint
-                    restofadapt = (adaptation_size+3) - 1
+                    restofadapt = (adaptation_size + 3) - 1
                     if pcrpresent == 1:
                         pcr = packet.read(48)
                         restofadapt -= 6
@@ -186,7 +188,8 @@ def getLastPTS(data, rpid, type="video"):
                             pts.pos += 1
                             thirdpartpts = pts.read(15)
                             # decodedpts = bitstring.ConstBitArray().join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]).uint
-                            decodedpts = int(''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
+                            decodedpts = int(
+                                ''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
                         if dtspresent:
                             dts = packet.read(40)
                             dts.pos = 4
@@ -196,11 +199,12 @@ def getLastPTS(data, rpid, type="video"):
                             dts.pos += 1
                             thirdpartdts = dts.read(15)
                             # decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
-                            decodeddts = int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
+                            decodeddts = int(
+                                ''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
                 if decodedpts and (type == "" or av == type) and len(av) > 0:
                     return decodedpts
 
-        currentpost = currentpost-packsize
+        currentpost = currentpost - packsize
         if currentpost < 10:
             found = True
     return ret
@@ -216,7 +220,7 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
         ff = data.find('\x47', currentpost)
         if ff == - 1:
             found = True
-        elif data[ff + packsize] == '\x47' and data[ff + packsize+packsize] == '\x47':
+        elif data[ff + packsize] == '\x47' and data[ff + packsize + packsize] == '\x47':
             spoint = ff
             found = True
         else:
@@ -228,7 +232,7 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
 
     while not found:
         if len(data) - currentpost >= 188:
-            bytes = data[currentpost:currentpost+188]
+            bytes = data[currentpost:currentpost + 188]
             bits = bitstring.ConstBitStream(bytes=bytes)
             sign = bits.read(8).uint
             tei = bits.read(1).uint
@@ -237,11 +241,11 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
             pid = bits.read(13).uint
             if rpid == pid or rpid == 0:
                 try:
-                    packet = bits.read((packsize-3)*8)
+                    packet = bits.read((packsize - 3) * 8)
                     scramblecontrol = packet.read(2).uint
                     adapt = packet.read(2).uint
                     concounter = packet.read(4).uint
-                except:
+                except BaseException:
                     return None
                 decodedpts = None
                 av = ""
@@ -255,15 +259,15 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                     splicingpoint = packet.read(1).uint
                     transportprivate = packet.read(1).uint
                     adaptation_ext = packet.read(1).uint
-                    restofadapt = (adaptation_size+3) - 1
+                    restofadapt = (adaptation_size + 3) - 1
                     if pcrpresent == 1:
                         pcr = packet.read(48)
                         restofadapt -= 6
                     if opcrpresent == 1:
                         opcr = packet.read(48)
                         restofadapt -= 6
-                    packet.pos += (restofadapt-3) * 8
-                    if ((packet.len - packet.pos)/8) > 5:
+                    packet.pos += (restofadapt - 3) * 8
+                    if ((packet.len - packet.pos) / 8) > 5:
                         pesync = packet.read(24)  # .hex
                         if pesync == ('0x000001'):
                             pestype = packet.read(8).uint
@@ -271,7 +275,7 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                                 av = 'video'
                             if pestype < 223 and pestype > 191:
                                 av = 'audio'
-                            packet.pos += (3*8)
+                            packet.pos += (3 * 8)
                             ptspresent = packet.read(1).uint
                             dtspresent = packet.read(1).uint
                             if ptspresent:
@@ -284,7 +288,8 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                                 pts.pos += 1
                                 thirdpartpts = pts.read(15)
                                 # decodedpts = bitstring.ConstBitArray().join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]).uint
-                                decodedpts = int(''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
+                                decodedpts = int(
+                                    ''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
                             if dtspresent:
                                 dts = packet.read(40)
                                 dts.pos = 4
@@ -294,7 +299,8 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                                 dts.pos += 1
                                 thirdpartdts = dts.read(15)
                                 # decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
-                                decodeddts = int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
+                                decodeddts = int(
+                                    ''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
                 elif adapt == 2:
                     # if adapt is 2 the packet is only an adaptation field
                     adaptation_size = packet.read(8).uint
@@ -306,7 +312,7 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                     splicingpoint = packet.read(1).uint
                     transportprivate = packet.read(1).uint
                     adaptation_ext = packet.read(1).uint
-                    restofadapt = (adaptation_size+3) - 1
+                    restofadapt = (adaptation_size + 3) - 1
                     if pcrpresent == 1:
                         pcr = packet.read(48)
                         restofadapt -= 6
@@ -334,7 +340,8 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                             pts.pos += 1
                             thirdpartpts = pts.read(15)
                             # decodedpts = bitstring.ConstBitArray().join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]).uint
-                            decodedpts = int(''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
+                            decodedpts = int(
+                                ''.join([firstpartpts.bin, secondpartpts.bin, thirdpartpts.bin]), 2)
                         if dtspresent:
                             dts = packet.read(40)
                             dts.pos = 4
@@ -344,13 +351,14 @@ def getFirstPTSFrom(data, rpid, initpts, type="video"):
                             dts.pos += 1
                             thirdpartdts = dts.read(15)
                             # decodeddts = bitstring.ConstBitArray().join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]).uint
-                            decodeddts = int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
+                            decodeddts = int(
+                                ''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]), 2)
                 if decodedpts and (type == "" or av == type) and len(av) > 0:
                     if decodedpts > initpts:
                         return decodedpts, currentpost
         else:
             found = True
-        currentpost = currentpost+188
+        currentpost = currentpost + 188
         if currentpost >= len(data):
             found = True
     return ret
@@ -457,7 +465,9 @@ class hlsclient(threading.Thread):
             self.url = urlparse.urljoin(self.url, variants[choice][0])
         """
         queue = queue.Queue(1024)  # 1024 blocks of 4K each ~ 4MB buffer
-        self.thread = threading.Thread(target=self.player_pipe, args=(queue, videopipe))
+        self.thread = threading.Thread(
+            target=self.player_pipe, args=(
+                queue, videopipe))
         self.thread.start()
 #        try:
         fpts = 0
@@ -494,20 +504,21 @@ class hlsclient(threading.Thread):
                 if len(chunk) > 1:
                     if i == 0:
                         try:
-                            firstpts, pos = getFirstPTSFrom(chunk, fixpid, lastpts)
-                        except:
+                            firstpts, pos = getFirstPTSFrom(
+                                chunk, fixpid, lastpts)
+                        except BaseException:
                             continue
-                    i = i+1
+                    i = i + 1
                     queue.put(chunk, block=True)
                 else:
                     continue
             lc = len(lastchunk)
             fpts = firstpts
-            lastpts=getLastPTS(lastchunk, fixpid, defualtype)
+            lastpts = getLastPTS(lastchunk, fixpid, defualtype)
             if (lastpts is None) or (lastpts == "None"):
                 lastpts = 0
             videotime = lastpts - firstpts
-            videotime = videotime/90000
+            videotime = videotime / 90000
             starttime = int(float(starttime))
             endtime = time.time()
             endtime = int(float(endtime))
@@ -556,12 +567,13 @@ class hlsclient(threading.Thread):
             self.thread._Thread__stop()
         self._Thread__stop()
 
+
 if __name__ == '__main__':
     try:
         h = hlsclient()
         h.setUrl(sys.argv[1])
         if (sys.argv[2]) == '1':
             h.play()
-    except:
+    except BaseException:
         os.remove(STREAM_PFILE)
         h.stop()

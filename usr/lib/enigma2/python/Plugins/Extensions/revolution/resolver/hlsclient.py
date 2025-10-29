@@ -41,58 +41,57 @@ STREAM_PFILE = '/tmp/hls.avi'
 
 
 ListAgent = [
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
-          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
-          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
-          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
-          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
-          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
-          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
-          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
-          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
-          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
-          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
-          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
-          ]
+    'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+    'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+    'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+    'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+    'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+    'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+    'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+    'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+    'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+    'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+    'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+    'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+    'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+    'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+    'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+    'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+    'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+    'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+    'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+    'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+    'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+    'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+    'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+    'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+    'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+    'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+    'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+    'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+    'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+    'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3']
 
 
 def RequestAgent():
@@ -109,7 +108,7 @@ if PY3:
             link = response.read().decode(errors='ignore')
             response.close()
             return link
-        except:
+        except BaseException:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
@@ -126,7 +125,7 @@ if PY3:
             link = response.read().decode()
             response.close()
             return link
-        except:
+        except BaseException:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
@@ -144,7 +143,7 @@ else:
             link = response.read()
             response.close()
             return link
-        except:
+        except BaseException:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
@@ -161,7 +160,7 @@ else:
             link = response.read()
             response.close()
             return link
-        except:
+        except BaseException:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
@@ -204,7 +203,7 @@ class hlsclient(threading.Thread):
             n1 = self.header.find("Referer", 0)
             n2 = self.header.find("=", n1)
             n3 = self.header.find("&", n2)
-            refr = self.header[(n2+1):n3]
+            refr = self.header[(n2 + 1):n3]
         else:
             refr = ""
         conn = getUrl2(downloadUrl, refr)
@@ -248,7 +247,7 @@ class hlsclient(threading.Thread):
             n1 = self.header.find("Referer", 0)
             n2 = self.header.find("=", n1)
             n3 = self.header.find("&", n2)
-            refr = self.header[(n2+1):n3]
+            refr = self.header[(n2 + 1):n3]
         else:
             refr = ""
         conn = getUrl2(url, refr)
@@ -277,14 +276,14 @@ class hlsclient(threading.Thread):
         attribs = []
         last = 0
         quote = False
-        for i, c in enumerate(attribstr+','):
+        for i, c in enumerate(attribstr + ','):
             if c == '"':
                 quote = not quote
             if quote:
                 continue
             if c == ',':
                 attribs.append(attribstr[last:i])
-                last = i+1
+                last = i + 1
         return tag, attribs
 
     def parse_kv(self, attribs, known_keys=None):
@@ -311,11 +310,13 @@ class hlsclient(threading.Thread):
                 if tag == '#EXTINF':
                     duration = float(attribs[0])
                 elif tag == '#EXT-X-TARGETDURATION':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-TARGETDURATION'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-TARGETDURATION'
                     targetduration = int(attribs[0])
                     pass
                 elif tag == '#EXT-X-MEDIA-SEQUENCE':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-MEDIA-SEQUENCE'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-MEDIA-SEQUENCE'
                     seq = int(attribs[0])
                 elif tag == '#EXT-X-KEY':
                     attribs = self.parse_kv(attribs, ('METHOD', 'URI', 'IV'))
@@ -328,24 +329,30 @@ class hlsclient(threading.Thread):
                         from Crypto.Cipher import AES
                         assert 'URI' in attribs, '[hlsclient::handle_basic_m3u] EXT-X-KEY: METHOD=AES-128, but no URI found'
                         if 'https://' in attribs['URI']:
-                            key = self.download_file(attribs['URI'].strip('"'))  # key = self.download_file(base_key_url+attribs['URI'].strip('"'))
+                            # key = self.download_file(base_key_url+attribs['URI'].strip('"'))
+                            key = self.download_file(attribs['URI'].strip('"'))
                             print(attribs['URI'].strip('"'))
                         else:
                             # key = self.download_file(base_key_url+attribs['URI'].strip('"'))
-                            key = self.download_file('m3u8http://hls.fra.rtlnow.de/hls-vod-enc-key/vodkey.bin')
+                            key = self.download_file(
+                                'm3u8http://hls.fra.rtlnow.de/hls-vod-enc-key/vodkey.bin')
 
-                        assert len(key) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: downloaded key file has bad length'
+                        assert len(
+                            key) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: downloaded key file has bad length'
                         if 'IV' in attribs:
-                            assert attribs['IV'].lower().startswith('0x'), '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad format'
+                            assert attribs['IV'].lower().startswith(
+                                '0x'), '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad format'
                             iv = attribs['IV'][2:].zfill(32).decode('hex')
-                            assert len(iv) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad length'
+                            assert len(
+                                iv) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad length'
                         else:
-                            iv = '\0'*8 + struct.pack('>Q', seq)
+                            iv = '\0' * 8 + struct.pack('>Q', seq)
                         enc = AES.new(key, AES.MODE_CBC, iv)
                     else:
                         assert False, '[hlsclient::handle_basic_m3u] EXT-X-KEY: METHOD=%s unknown' % attribs['METHOD']
                 elif tag == '#EXT-X-PROGRAM-DATE-TIME':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-PROGRAM-DATE-TIME'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-PROGRAM-DATE-TIME'
                     # TODO parse attribs[0] as ISO8601 date/time
                     pass
                 elif tag == '#EXT-X-ALLOW-CACHE':
@@ -361,11 +368,16 @@ class hlsclient(threading.Thread):
                     self.stop()
                 elif tag == '#EXT-X-DISCONTINUITY':
                     assert not attribs
-                    pass  # print '[hlsclient::handle_basic_m3u] discontinuity in stream'
+                    # print '[hlsclient::handle_basic_m3u] discontinuity in
+                    # stream'
+                    pass
                 elif tag == '#EXT-X-VERSION':
                     assert len(attribs) == 1
                     if int(attribs[0]) > SUPPORTED_VERSION:
-                        pass  # print '[hlsclient::handle_basic_m3u] file version %s exceeds supported version %d; some things might be broken' % (attribs[0], SUPPORTED_VERSION)
+                        # print '[hlsclient::handle_basic_m3u] file version %s
+                        # exceeds supported version %d; some things might be
+                        # broken' % (attribs[0], SUPPORTED_VERSION)
+                        pass
                 else:
                     os.remove(STREAM_PFILE)
                     self.stop()
@@ -387,11 +399,13 @@ class hlsclient(threading.Thread):
                 if tag == '#EXTINF':
                     duration = float(attribs[0])
                 elif tag == '#EXT-X-TARGETDURATION':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-TARGETDURATION'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-TARGETDURATION'
                     targetduration = int(attribs[0])
                     pass
                 elif tag == '#EXT-X-MEDIA-SEQUENCE':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-MEDIA-SEQUENCE'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-MEDIA-SEQUENCE'
                     seq = int(attribs[0])
                 elif tag == '#EXT-X-KEY':
                     attribs = self.parse_kv(attribs, ('METHOD', 'URI', 'IV'))
@@ -404,18 +418,22 @@ class hlsclient(threading.Thread):
                         from Crypto.Cipher import AES
                         assert 'URI' in attribs, '[hlsclient::handle_basic_m3u] EXT-X-KEY: METHOD=AES-128, but no URI found'
                         key = self.download_file(attribs['URI'].strip('"'))
-                        assert len(key) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: downloaded key file has bad length'
+                        assert len(
+                            key) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: downloaded key file has bad length'
                         if 'IV' in attribs:
-                            assert attribs['IV'].lower().startswith('0x'), '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad format'
+                            assert attribs['IV'].lower().startswith(
+                                '0x'), '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad format'
                             iv = attribs['IV'][2:].zfill(32).decode('hex')
-                            assert len(iv) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad length'
+                            assert len(
+                                iv) == 16, '[hlsclient::handle_basic_m3u] EXT-X-KEY: IV attribute has bad length'
                         else:
-                            iv = '\0'*8 + struct.pack('>Q', seq)
+                            iv = '\0' * 8 + struct.pack('>Q', seq)
                         enc = AES.new(key, AES.MODE_CBC, iv)
                     else:
                         assert False, '[hlsclient::handle_basic_m3u] EXT-X-KEY: METHOD=%s unknown' % attribs['METHOD']
                 elif tag == '#EXT-X-PROGRAM-DATE-TIME':
-                    assert len(attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-PROGRAM-DATE-TIME'
+                    assert len(
+                        attribs) == 1, '[hlsclient::handle_basic_m3u] too many attribs in EXT-X-PROGRAM-DATE-TIME'
                     pass
                 elif tag == '#EXT-X-ALLOW-CACHE':
                     # XXX deliberately ignore
@@ -433,7 +451,10 @@ class hlsclient(threading.Thread):
                 elif tag == '#EXT-X-VERSION':
                     assert len(attribs) == 1
                     if int(attribs[0]) > SUPPORTED_VERSION:
-                        pass  # print '[hlsclient::handle_basic_m3u] file version %s exceeds supported version %d; some things might be broken' % (attribs[0], SUPPORTED_VERSION)
+                        # print '[hlsclient::handle_basic_m3u] file version %s
+                        # exceeds supported version %d; some things might be
+                        # broken' % (attribs[0], SUPPORTED_VERSION)
+                        pass
                 else:
                     # raise ValueError('[hlsclient::handle_basic_m3u] tag %s not known' % tag)
                     pass
@@ -477,7 +498,9 @@ class hlsclient(threading.Thread):
         if len(variants) == 1:
             self.url = urlparse.urljoin(self.url, variants[0][0])
         elif len(variants) >= 2:
-            pass  # print '[hlsclient::play] More than one variant of the stream was provided.'
+            # print '[hlsclient::play] More than one variant of the stream was
+            # provided.'
+            pass
             autoChoice = {}
             for i, (vurl, vattrs) in enumerate(variants):
                 for attr in vattrs:
@@ -501,7 +524,9 @@ class hlsclient(threading.Thread):
             self.url = urlparse.urljoin(self.url, variants[choice][0])
 
         queue = queue.Queue(1024)  # 1024 blocks of 4K each ~ 4MB buffer
-        self.thread = threading.Thread(target=self.player_pipe, args=(queue, videopipe))
+        self.thread = threading.Thread(
+            target=self.player_pipe, args=(
+                queue, videopipe))
         self.thread.start()
         last_seq = -1
         targetduration = 5
@@ -512,12 +537,15 @@ class hlsclient(threading.Thread):
                 self.hread._Thread__stop()
             medialist = list(self.handle_basic_m3u(self.url))
             if None in medialist:
-                # choose to start playback at the start, since this is a VOD stream
+                # choose to start playback at the start, since this is a VOD
+                # stream
                 pass
             else:
-                # choose to start playback three files from the end, since this is a live stream
+                # choose to start playback three files from the end, since this
+                # is a live stream
                 medialist = medialist[-3:]
-                pass  # print 'Here in [hlsclient::play] medialist =', medialist
+                # print 'Here in [hlsclient::play] medialist =', medialist
+                pass
             for media in medialist:
                 try:
                     if media is None:
@@ -525,13 +553,14 @@ class hlsclient(threading.Thread):
                         return
                     seq, enc, duration, targetduration, media_url = media
                     if seq > last_seq:
-                        for chunk in self.download_chunks(urlparse.urljoin(self.url, media_url)):
+                        for chunk in self.download_chunks(
+                                urlparse.urljoin(self.url, media_url)):
                             if enc:
                                 chunk = enc.decrypt(chunk)
                             queue.put(chunk, block=True)
                         last_seq = seq
                         changed = 1
-                except:
+                except BaseException:
                     pass
             self._sleeping = True
             if changed == 1:
@@ -539,13 +568,13 @@ class hlsclient(threading.Thread):
                 time.sleep(duration)
             elif changed == 0:
                 # first attempt
-                time.sleep(targetduration*0.5)
+                time.sleep(targetduration * 0.5)
             elif changed == -1:
                 # second attempt
-                time.sleep(targetduration*1.5)
+                time.sleep(targetduration * 1.5)
             else:
                 # third attempt and beyond
-                time.sleep(targetduration*3.0)
+                time.sleep(targetduration * 3.0)
             self._sleeping = False
             changed -= 1
 
@@ -566,6 +595,6 @@ if __name__ == '__main__':
         if (sys.argv[2]) == '1':
             # h.start()
             h.play(header)
-    except:
+    except BaseException:
         os.remove(STREAM_PFILE)
         h.stop()

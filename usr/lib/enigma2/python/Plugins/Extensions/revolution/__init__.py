@@ -36,7 +36,7 @@ def trace_error():
     try:
         traceback.print_exc(file=sys.stdout)
         traceback.print_exc(file=open('/tmp/traceback.log', 'a'))
-    except:
+    except BaseException:
         pass
 
 
@@ -46,7 +46,7 @@ def logdata(name='', data=None):
         fp = open('/tmp/revolution.log', 'a')
         fp.write(str(name) + ': ' + data + "\n")
         fp.close()
-    except:
+    except BaseException:
         trace_error()
         pass
 
@@ -60,7 +60,7 @@ def getversioninfo():
             for line in fp:
                 if 'version' in line:
                     currversion = line.split('=')[1].strip()
-        except:
+        except BaseException:
             pass
     logdata("Plugin ", plugin_path)
     logdata("Version ", currversion)
@@ -71,7 +71,11 @@ def localeInit():
     if isDreamOS:
         lang = language.getLanguage()[:2]
         os.environ["LANGUAGE"] = lang
-    gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
+    gettext.bindtextdomain(
+        PluginLanguageDomain,
+        resolveFilename(
+            SCOPE_PLUGINS,
+            PluginLanguagePath))
 
 
 if isDreamOS:
@@ -83,7 +87,8 @@ else:
         if translated:
             return translated
         else:
-            print(("[%s] fallback to default translation for %s" % (PluginLanguageDomain, txt)))
+            print(("[%s] fallback to default translation for %s" %
+                  (PluginLanguageDomain, txt)))
             return gettext.gettext(txt)
 
 localeInit()
