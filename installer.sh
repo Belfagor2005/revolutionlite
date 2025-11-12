@@ -1,14 +1,13 @@
 #!/bin/bash
-
 ## setup command=wget -q --no-check-certificate https://raw.githubusercontent.com/Belfagor2005/revolutionlite/main/installer.sh -O - | /bin/sh
 
-## Only These 2 lines to edit with new version ######
 version='2.1'
 changelog='\nAdd next/rew on Player'
-##############################################################
 
-TMPPATH=/tmp/revolutionlite-main
-FILEPATH=/tmp/main.tar.gz
+TMPPATH=/tmp/revolutionlite-install
+FILEPATH=/tmp/revolutionlite-main.tar.gz
+
+echo "Starting revolutionlite installation..."
 
 # Determine plugin path based on architecture
 if [ ! -d /usr/lib64 ]; then
@@ -17,96 +16,156 @@ else
     PLUGINPATH=/usr/lib64/enigma2/python/Plugins/Extensions/revolution
 fi
 
-# Check package manager type
-if [ -f /var/lib/dpkg/status ]; then
-    STATUS=/var/lib/dpkg/status
-    OSTYPE=DreamOs
-    PKG_MANAGER="apt-get"
-    INSTALL_CMD="install -y"
-else
-    STATUS=/var/lib/opkg/status
-    OSTYPE=Dream
-    PKG_MANAGER="opkg"
-    INSTALL_CMD="install"
-fi
+# Cleanup function
+cleanup() {
+    echo "🧹 Cleaning up temporary files..."
+    [ -d "$TMPPATH" ] && rm -rf "$TMPPATH"
+    [ -f "$FILEPATH" ] && rm -f "$FILEPATH"
+    [ -d "/tmp/revolutionlite-main" ] && rm -rf "/tmp/revolutionlite-main"
+}
 
-echo ""
+# Detect OS type
+detect_os() {
+    if [ -f /var/lib/dpkg/status ]; then
+        OSTYPE="DreamOs"
+        STATUS="/var/lib/dpkg/status"
+    elif [ -f /etc/opkg/opkg.conf ] || [ -f /var/lib/opkg/status ]; then
+        OSTYPE="OE"
+        STATUS="/var/lib/opkg/status"
+    else
+        OSTYPE="Unknown"
+        STATUS=""
+    fi
+    echo "🔍 Detected OS type: $OSTYPE"
+}
+
+detect_os
+
+# Cleanup before starting
+cleanup
+mkdir -p "$TMPPATH"
 
 # Install wget if missing
 if ! command -v wget >/dev/null 2>&1; then
-    echo "Installing wget..."
-    if [ "$OSTYPE" = "DreamOs" ]; then
-        apt-get update && apt-get install wget -y || { echo "Failed to install wget"; exit 1; }
-    else
-        opkg update && opkg install wget || { echo "Failed to install wget"; exit 1; }
-    fi
+    echo "📥 Installing wget..."
+    case "$OSTYPE" in
+        "DreamOs")
+            apt-get update && apt-get install -y wget || { echo "❌ Failed to install wget"; exit 1; }
+            ;;
+        "OE")
+            opkg update && opkg install wget || { echo "❌ Failed to install wget"; exit 1; }
+            ;;
+        *)
+            echo "❌ Unsupported OS type. Cannot install wget."
+            exit 1
+            ;;
+    esac
 fi
 
 # Detect Python version
 if python --version 2>&1 | grep -q '^Python 3\.'; then
-    echo "Python3 image detected"
-    PYTHON=PY3
-    Packagesix=python3-six
-    Packagerequests=python3-requests
+    echo "🐍 Python3 image detected"
+    PYTHON="PY3"
+    Packagesix="python3-six"
+    Packagerequests="python3-requests"
 else
-    echo "Python2 image detected"
-    PYTHON=PY2
-    Packagerequests=python-requests
+    echo "🐍 Python2 image detected"
+    PYTHON="PY2"
+    Packagerequests="python-requests"
+    Packagesix="python-six"
 fi
 
 # Install required packages
-install_dependencies() {
+install_pkg() {
     local pkg=$1
-    if ! grep -qs "Package: $pkg" "$STATUS"; then
-        echo "Installing $pkg..."
-        if [ "$OSTYPE" = "DreamOs" ]; then
-            apt-get update && apt-get install $pkg -y || { echo "Failed to install $pkg"; exit 1; }
-        else
-            opkg update && opkg install $pkg || { echo "Failed to install $pkg"; exit 1; }
-        fi
+    if [ -z "$STATUS" ] || ! grep -qs "Package: $pkg" "$STATUS" 2>/dev/null; then
+        echo "📦 Installing $pkg..."
+        case "$OSTYPE" in
+            "DreamOs")
+                apt-get update && apt-get install -y "$pkg" || { echo "⚠️ Could not install $pkg, continuing anyway..."; }
+                ;;
+            "OE")
+                opkg update && opkg install "$pkg" || { echo "⚠️ Could not install $pkg, continuing anyway..."; }
+                ;;
+            *)
+                echo "⚠️ Cannot install $pkg on unknown OS type, continuing..."
+                ;;
+        esac
     else
-        echo "$pkg already installed"
+        echo "✅ $pkg already installed"
     fi
 }
 
-[ "$PYTHON" = "PY3" ] && install_dependencies "$Packagesix"
-install_dependencies "$Packagerequests"
+# Install Python dependencies
+if [ "$PYTHON" = "PY3" ]; then
+    install_pkg "$Packagesix"
+fi
+install_pkg "$Packagerequests"
 
-# Cleanup previous installations
-[ -d "$TMPPATH" ] && rm -rf "$TMPPATH"
-[ -f "$FILEPATH" ] && rm -f "$FILEPATH"
-[ -d "$PLUGINPATH" ] && rm -rf "$PLUGINPATH"
-
-# Download and install plugin
-mkdir -p "$TMPPATH"
-cd "$TMPPATH"
-set -e
-
-echo -e "\n# Your image is ${OSTYPE}\n"
-
-# Install additional dependencies for non-DreamOs systems
-if [ "$OSTYPE" != "DreamOs" ]; then
+# Install additional multimedia packages for OE systems
+if [ "$OSTYPE" = "OE" ]; then
+    echo "📥 Installing additional multimedia packages..."
     for pkg in ffmpeg gstplayer exteplayer3 enigma2-plugin-systemplugins-serviceapp; do
-        install_dependencies "$pkg"
+        install_pkg "$pkg"
     done
 fi
 
-echo "Downloading revolutionlite..."
+# Download and extract
+echo "⬇️ Downloading revolutionlite..."
 wget --no-check-certificate 'https://github.com/Belfagor2005/revolutionlite/archive/refs/heads/main.tar.gz' -O "$FILEPATH"
-tar -xzf "$FILEPATH"
-cp -r revolutionlite-main/usr/ /
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to download revolutionlite package!"
+    cleanup
+    exit 1
+fi
 
-set +e
+echo "📦 Extracting package..."
+tar -xzf "$FILEPATH" -C "$TMPPATH"
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to extract revolutionlite package!"
+    cleanup
+    exit 1
+fi
+
+# Install plugin files
+echo "🔧 Installing plugin files..."
+mkdir -p "$PLUGINPATH"
+
+# Find the correct directory in the extracted structure
+if [ -d "$TMPPATH/revolutionlite-main/usr/lib/enigma2/python/Plugins/Extensions/revolution" ]; then
+    cp -r "$TMPPATH/revolutionlite-main/usr/lib/enigma2/python/Plugins/Extensions/revolution"/* "$PLUGINPATH/" 2>/dev/null
+    echo "✅ Copied from standard plugin directory"
+elif [ -d "$TMPPATH/revolutionlite-main/usr/lib64/enigma2/python/Plugins/Extensions/revolution" ]; then
+    cp -r "$TMPPATH/revolutionlite-main/usr/lib64/enigma2/python/Plugins/Extensions/revolution"/* "$PLUGINPATH/" 2>/dev/null
+    echo "✅ Copied from lib64 plugin directory"
+elif [ -d "$TMPPATH/revolutionlite-main/usr" ]; then
+    # Copy entire usr tree
+    cp -r "$TMPPATH/revolutionlite-main/usr"/* /usr/ 2>/dev/null
+    echo "✅ Copied entire usr structure"
+else
+    echo "❌ Could not find plugin files in extracted archive"
+    echo "📋 Available directories in tmp:"
+    find "$TMPPATH" -type d | head -10
+    cleanup
+    exit 1
+fi
+
+sync
 
 # Verify installation
-if [ ! -d "$PLUGINPATH" ]; then
-    echo "Error: Plugin installation failed!"
-    rm -rf "$TMPPATH" "$FILEPATH"
+echo "🔍 Verifying installation..."
+if [ -d "$PLUGINPATH" ] && [ -n "$(ls -A "$PLUGINPATH" 2>/dev/null)" ]; then
+    echo "✅ Plugin directory found and not empty: $PLUGINPATH"
+    echo "📁 Contents:"
+    ls -la "$PLUGINPATH/" | head -10
+else
+    echo "❌ Plugin installation failed or directory is empty!"
+    cleanup
     exit 1
 fi
 
 # Cleanup
-rm -rf "$TMPPATH" "$FILEPATH"
+cleanup
 sync
 
 # System info
@@ -117,6 +176,7 @@ distro_version=$(grep '^version=' "$FILE" 2>/dev/null | awk -F '=' '{print $2}')
 python_vers=$(python --version 2>&1)
 
 cat <<EOF
+
 #########################################################
 #               INSTALLED SUCCESSFULLY                  #
 #                developed by LULULLA                   #
@@ -126,12 +186,23 @@ cat <<EOF
 #########################################################
 ^^^^^^^^^^Debug information:
 BOX MODEL: $box_type
-OO SYSTEM: $OSTYPE
+OS SYSTEM: $OSTYPE
 PYTHON: $python_vers
 IMAGE NAME: ${distro_value:-Unknown}
 IMAGE VERSION: ${distro_version:-Unknown}
+PLUGIN VERSION: $version
 EOF
 
+echo "🔄 Restarting enigma2 in 5 seconds..."
 sleep 5
-killall -9 enigma2
+
+# Restart Enigma2
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl restart enigma2
+elif command -v init >/dev/null 2>&1; then
+    init 4 && sleep 2 && init 3
+else
+    killall -9 enigma2
+fi
+
 exit 0
