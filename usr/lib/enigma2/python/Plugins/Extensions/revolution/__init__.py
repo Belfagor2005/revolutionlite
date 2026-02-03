@@ -14,8 +14,8 @@ import os
 from .resolver.Utils import b64decoder
 # from Utils import b64decoder
 plugin_path = '/usr/lib/enigma2/python/Plugins/Extensions/revolution'
-PluginLanguageDomain = 'moviebrowser'
-PluginLanguagePath = 'Extensions/MovieBrowser/locale'
+PluginLanguageDomain = 'revolution'
+PluginLanguagePath = 'Extensions/revolution/locale'
 
 
 isDreamOS = False
